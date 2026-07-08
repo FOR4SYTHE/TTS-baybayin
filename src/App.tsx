@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Settings2, Download } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 
 // Character Components
