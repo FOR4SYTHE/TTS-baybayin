@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Download, Lightbulb } from 'lucide-react';
+import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Download, Lightbulb, Camera } from 'lucide-react'; // Added Camera
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
+import SupremeLens from './SupremeLens'; // Added SupremeLens component
 
 // Character Components
 const Daisy = () => (
@@ -32,6 +33,33 @@ const Butterfly = () => (
     <circle cx="60" cy="70" r="3" fill="#1A1A1A" />
     <rect x="47" y="35" width="6" height="40" rx="3" fill="#1A1A1A" />
     <path d="M 48 35 Q 40 20 35 25 M 52 35 Q 60 20 65 25" fill="none" stroke="#1A1A1A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+  </motion.svg>
+);
+
+const CartoonCamera = () => (
+  <motion.svg width="90" height="90" viewBox="0 0 100 100"
+    whileHover={{ scale: 1.05, rotate: 3 }}
+    whileTap={{ scale: 0.95, rotate: -5 }}
+    className="overflow-visible"
+  >
+    {/* Red Shutter Button */}
+    <path d="M 22 42 L 34 38 L 32 33 L 20 37 Z" fill="#EF4444" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
+    
+    {/* Camera Body */}
+    <path d="M 16 46 C 16 42, 28 38, 38 34 C 44 28, 52 28, 58 34 C 68 38, 84 42, 84 46 C 88 60, 86 74, 80 78 C 70 84, 30 84, 20 78 C 12 74, 12 60, 16 46 Z" fill="#2C2825" stroke="#1A1A1A" strokeWidth="5" strokeLinejoin="round" />
+    
+    {/* Yellow Flash */}
+    <rect x="68" y="48" width="6" height="4" rx="2" fill="#EAB308" />
+    
+    {/* Lens Outer Grey Ring */}
+    <circle cx="48" cy="58" r="20" fill="#6B7280" stroke="#1A1A1A" strokeWidth="4" />
+    
+    {/* Lens Inner Blue Glass */}
+    <circle cx="48" cy="58" r="14" fill="#38BDF8" stroke="#1A1A1A" strokeWidth="3" />
+    
+    {/* Glass Glare / Scribbles */}
+    <path d="M 40 52 C 45 49, 52 52, 54 54" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+    <path d="M 38 58 C 42 56, 48 59, 48 59" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
   </motion.svg>
 );
 
@@ -128,6 +156,9 @@ export default function App() {
   const [appMode, setAppMode] = useState<'translator' | 'baybayin'>('translator');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextMode, setNextMode] = useState<'translator' | 'baybayin'>('translator');
+
+  // Lens State (Added for Supreme Lens)
+  const [isLensOpen, setIsLensOpen] = useState(false);
 
   // Translator States
   const [englishWord, setEnglishWord] = useState('');
@@ -472,7 +503,7 @@ export default function App() {
 
       {/* Main App Container */}
       <div
-        className={`min-h-[100dvh] font-sans p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#a5d6a7]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
+        className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#a5d6a7]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
         style={appMode === 'translator'
           ? { backgroundColor: '#f1f8e9', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23dcedc8\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
           : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%232C2825\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M 30,20 Q 50,-10 70,20 T 110,10 T 140,30 Q 120,50 100,30 T 60,40 Q 40,20 30,20 Z\' /%3E%3Cpath d=\'M 160,20 L 190,20 L 190,80 L 140,80 L 140,50 L 160,50 Z M 160,65 L 175,65 L 175,35 L 160,35 Z\' fill-rule=\'evenodd\'/%3E%3Cpath d=\'M 20,70 Q 40,70 40,90 Q 40,110 20,110 Q 0,110 0,90 Q 0,70 20,70 Z M 20,82 Q 28,82 28,90 Q 28,98 20,98 Q 12,98 12,90 Q 12,82 20,82 Z\' fill-rule=\'evenodd\' /%3E%3Cpath d=\'M 60,80 L 110,80 L 110,130 L 60,130 Z M 75,95 L 95,95 L 95,115 L 75,115 Z\' fill-rule=\'evenodd\' /%3E%3Ccircle cx=\'85\' cy=\'105\' r=\'4\' /%3E%3Cpath d=\'M 130,100 Q 150,100 160,120 T 190,130 Q 180,150 160,140 T 140,120 Q 120,110 130,100 Z\' /%3E%3Cpath d=\'M 30,140 L 50,130 L 70,150 L 50,170 Q 30,190 20,160 Z\' /%3E%3Cpath d=\'M 120,160 Q 140,150 150,170 T 180,180 Q 160,200 140,190 T 110,170 Z\' /%3E%3Ccircle cx=\'170\' cy=\'90\' r=\'8\' /%3E%3Ccircle cx=\'50\' cy=\'60\' r=\'6\' /%3E%3Cpath d=\'M 10,130 Q 20,140 10,150 Q 0,140 10,130 Z\' /%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
@@ -679,7 +710,7 @@ export default function App() {
 
               <motion.div className="absolute -bottom-16 -right-4 z-20 pointer-events-none" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
                 <Sparkle />
-              </motion.div>
+                  </motion.div>
             </div>
 
             {/* Translate Button */}
@@ -954,6 +985,23 @@ export default function App() {
             )}
           </div>
         )}
+
+        {/* Floating Action Button - Fixed bottom center (Standalone Cartoon Lens) */}
+        <div className="absolute bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none">
+          <button 
+            onClick={() => setIsLensOpen(true)}
+            className="pointer-events-auto cursor-pointer drop-shadow-[4px_4px_0px_#1A1A1A] hover:drop-shadow-[6px_6px_0px_#1A1A1A] active:drop-shadow-[0px_0px_0px_#1A1A1A] transition-all duration-150 outline-none bg-transparent border-none p-0"
+            title="Supreme Lens"
+          >
+            <CartoonCamera />
+          </button>
+        </div>
+
+        {/* Mount Supreme Lens Overlay */}
+        <AnimatePresence>
+          {isLensOpen && <SupremeLens onClose={() => setIsLensOpen(false)} />}
+        </AnimatePresence>
+
       </div>
     </>
   );
