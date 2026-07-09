@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Settings2, Download } from 'lucide-react';
+import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 
@@ -12,19 +12,17 @@ const Daisy = () => (
     <path d="M 50 85 C 65 85, 65 60, 50 50 C 35 60, 35 85, 50 85 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
     <path d="M 15 50 C 15 35, 40 35, 50 50 C 40 65, 15 65, 15 50 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
     <path d="M 85 50 C 85 35, 60 35, 50 50 C 60 65, 85 65, 85 50 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    
     <path d="M 25 25 C 40 15, 50 40, 50 50 C 40 60, 15 40, 25 25 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
     <path d="M 75 75 C 60 85, 50 60, 50 50 C 60 40, 85 60, 75 75 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
     <path d="M 75 25 C 85 40, 60 50, 50 50 C 40 50, 60 15, 75 25 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
     <path d="M 25 75 C 15 60, 40 50, 50 50 C 60 50, 40 85, 25 75 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    
     <circle cx="50" cy="50" r="12" fill="#1A1A1A" />
     <circle cx="46" cy="46" r="3" fill="#FFF" />
   </motion.svg>
 );
 
 const Butterfly = () => (
-  <motion.svg width="90" height="90" viewBox="0 0 100 100" 
+  <motion.svg width="90" height="90" viewBox="0 0 100 100"
     animate={{ y: [0, -8, 0], rotate: [-2, 4, -2] }}
     transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}>
     <path d="M 50 50 C 20 20, 10 50, 45 55 C 10 70, 30 90, 50 60 C 70 90, 90 70, 55 55 C 90 50, 80 20, 50 50 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="5" strokeLinejoin="round" />
@@ -90,32 +88,32 @@ const TribalPetroglyph2 = () => (
 
 // --- Baybayin Converter Logic ---
 const toBaybayin = (text: string) => {
-  if(!text) return "";
+  if (!text) return "";
   let str = text.toLowerCase();
   str = str.replace(/f/g, 'p').replace(/v/g, 'b').replace(/z/g, 's').replace(/j/g, 'dy').replace(/c/g, 'k').replace(/x/g, 'ks').replace(/q/g, 'k');
-  const vowels: Record<string, string> = {'a':'\u1700', 'e':'\u1701', 'i':'\u1701', 'o':'\u1702', 'u':'\u1702'};
-  const consonants: Record<string, string> = {'k':'\u1703', 'g':'\u1704', 'ng':'\u1705', 't':'\u1706', 'd':'\u1707', 'r':'\u1707','n':'\u1708', 'p':'\u1709', 'b':'\u170A', 'm':'\u170B', 'y':'\u170C', 'l':'\u170E','w':'\u170F', 's':'\u1710', 'h':'\u1711'};
+  const vowels: Record<string, string> = { 'a': '\u1700', 'e': '\u1701', 'i': '\u1701', 'o': '\u1702', 'u': '\u1702' };
+  const consonants: Record<string, string> = { 'k': '\u1703', 'g': '\u1704', 'ng': '\u1705', 't': '\u1706', 'd': '\u1707', 'r': '\u1707', 'n': '\u1708', 'p': '\u1709', 'b': '\u170A', 'm': '\u170B', 'y': '\u170C', 'l': '\u170E', 'w': '\u170F', 's': '\u1710', 'h': '\u1711' };
   let result = ""; let i = 0;
   while (i < str.length) {
-    let char = str[i]; let nextChar = str[i+1]; let twoChar = char + (nextChar || "");
+    let char = str[i]; let nextChar = str[i + 1]; let twoChar = char + (nextChar || "");
     if (twoChar === 'ng' && consonants['ng']) {
-       let third = str[i+2];
-       if (vowels[third]) {
-         if (third === 'a') result += consonants['ng'];
-         else if (third === 'e' || third === 'i') result += consonants['ng'] + '\u1712';
-         else if (third === 'o' || third === 'u') result += consonants['ng'] + '\u1713';
-         i += 3;
-       } else { result += consonants['ng'] + '\u1714'; i += 2; }
-       continue;
+      let third = str[i + 2];
+      if (vowels[third]) {
+        if (third === 'a') result += consonants['ng'];
+        else if (third === 'e' || third === 'i') result += consonants['ng'] + '\u1712';
+        else if (third === 'o' || third === 'u') result += consonants['ng'] + '\u1713';
+        i += 3;
+      } else { result += consonants['ng'] + '\u1714'; i += 2; }
+      continue;
     }
     if (consonants[char]) {
-       if (vowels[nextChar]) {
-          if (nextChar === 'a') result += consonants[char];
-          else if (nextChar === 'e' || nextChar === 'i') result += consonants[char] + '\u1712';
-          else if (nextChar === 'o' || nextChar === 'u') result += consonants[char] + '\u1713';
-          i += 2;
-       } else { result += consonants[char] + '\u1714'; i += 1; }
-    } else if (vowels[char]) { result += vowels[char]; i += 1; } 
+      if (vowels[nextChar]) {
+        if (nextChar === 'a') result += consonants[char];
+        else if (nextChar === 'e' || nextChar === 'i') result += consonants[char] + '\u1712';
+        else if (nextChar === 'o' || nextChar === 'u') result += consonants[char] + '\u1713';
+        i += 2;
+      } else { result += consonants[char] + '\u1714'; i += 1; }
+    } else if (vowels[char]) { result += vowels[char]; i += 1; }
     else { result += char; i += 1; }
   }
   return result;
@@ -138,17 +136,20 @@ export default function App() {
   const [exampleAudioUrl, setExampleAudioUrl] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isExampleCopied, setIsExampleCopied] = useState(false);
-  const [history, setHistory] = useState<{english: string, tagalog: string, direction?: 'en-tl' | 'tl-en'}[]>([]);
+  const [history, setHistory] = useState<{ english: string, tagalog: string, direction?: 'en-tl' | 'tl-en' }[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [direction, setDirection] = useState<'en-tl' | 'tl-en'>('en-tl');
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // ✅ NEW: Cooldown state for rate-limited example sentences
+  const [exampleCooldown, setExampleCooldown] = useState<number | null>(null);
+
   // Baybayin States
   const [baybayinInput, setBaybayinInput] = useState('');
   const [baybayinOutput, setBaybayinOutput] = useState('');
   const [isBaybayinCopied, setIsBaybayinCopied] = useState(false);
-  const [baybayinHistory, setBaybayinHistory] = useState<{input: string, output: string}[]>([]);
+  const [baybayinHistory, setBaybayinHistory] = useState<{ input: string, output: string }[]>([]);
   const [showBaybayinHistory, setShowBaybayinHistory] = useState(false);
 
   const englishSuggestions = ['hello', 'how are you?', 'thank you', 'good morning', 'I love you'];
@@ -161,8 +162,15 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const currentPlaceholder = direction === 'en-tl' 
-    ? englishSuggestions[placeholderIndex % englishSuggestions.length] 
+  // ✅ NEW: Countdown timer for cooldown
+  useEffect(() => {
+    if (exampleCooldown === null || exampleCooldown <= 0) return;
+    const timer = setTimeout(() => setExampleCooldown(prev => (prev ?? 1) - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [exampleCooldown]);
+
+  const currentPlaceholder = direction === 'en-tl'
+    ? englishSuggestions[placeholderIndex % englishSuggestions.length]
     : tagalogSuggestions[placeholderIndex % tagalogSuggestions.length];
 
   const handleModeSwitch = (mode: 'translator' | 'baybayin') => {
@@ -258,21 +266,21 @@ export default function App() {
 
   const handleTranslate = async () => {
     if (!englishWord.trim()) return;
-    
+
     setIsLoading(true);
     setTranslation('');
     setExample(null);
     setAudioUrl(null);
     setExampleAudioUrl(null);
     setErrorMsg(null);
-    
+
     try {
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ word: englishWord, direction }),
       });
-      
+
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
         throw new Error(errData.error || `Server returned ${response.status}`);
@@ -311,50 +319,48 @@ export default function App() {
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    
+
     recognition.lang = direction === 'en-tl' ? 'en-US' : 'fil-PH';
     recognition.interimResults = false;
-    
-    recognition.onstart = () => {
-      setIsRecording(true);
-    };
-    
+
+    recognition.onstart = () => { setIsRecording(true); };
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       setEnglishWord(transcript);
     };
-    
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error', event.error);
       setIsRecording(false);
     };
-    
-    recognition.onend = () => {
-      setIsRecording(false);
-    };
-    
+    recognition.onend = () => { setIsRecording(false); };
+
     recognition.start();
   };
 
+  // ✅ UPDATED: handleShowExample now handles 429 with cooldown
   const handleShowExample = async () => {
-    if (!translation) return;
-    
+    if (!translation || exampleCooldown) return;
+
     setIsLoadingExample(true);
-    
+
     try {
       const response = await fetch('/api/example', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          englishWord: direction === 'en-tl' ? englishWord : translation, 
+        body: JSON.stringify({
+          englishWord: direction === 'en-tl' ? englishWord : translation,
           tagalogWord: direction === 'tl-en' ? englishWord : translation,
-          direction 
+          direction
         }),
       });
-      
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}`);
+
+      if (response.status === 429) {
+        const data = await response.json();
+        setExampleCooldown(data.retryAfter ?? 60);
+        return;
       }
+
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
 
       const data = await response.json();
       const targetSentence = data.targetSentence || data.tagalogSentence;
@@ -377,7 +383,7 @@ export default function App() {
       {/* Loading Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -386,14 +392,14 @@ export default function App() {
           >
             {nextMode === 'baybayin' ? (
               <div className="flex flex-col items-center text-white">
-                <motion.div 
-                  animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
+                <motion.div
+                  animate={{ rotate: 360, scale: [1, 1.1, 1] }}
                   transition={{ rotate: { duration: 3, repeat: Infinity, ease: "linear" }, scale: { duration: 1.5, repeat: Infinity } }}
                   className="mb-8"
                 >
                   <TribalSun />
                 </motion.div>
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                   className="font-mono text-xl tracking-[0.3em] font-bold opacity-80"
                 >
@@ -402,14 +408,14 @@ export default function App() {
               </div>
             ) : (
               <div className="flex flex-col items-center text-[#1A1A1A]">
-                <motion.div 
-                  animate={{ y: [0, -20, 0], scale: [1, 1.05, 1], rotate: [-2, 2, -2] }} 
+                <motion.div
+                  animate={{ y: [0, -20, 0], scale: [1, 1.05, 1], rotate: [-2, 2, -2] }}
                   transition={{ duration: 0.6, repeat: Infinity }}
                   className="mb-8 bg-white border-[6px] border-[#1A1A1A] p-6 rounded-[20px] shadow-[8px_8px_0px_0px_#1A1A1A]"
                 >
                   <Sparkle />
                 </motion.div>
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                   className="font-black text-2xl uppercase tracking-widest text-center"
                 >
@@ -422,23 +428,22 @@ export default function App() {
       </AnimatePresence>
 
       {/* Main App Container */}
-      <div 
-        className={`min-h-[100dvh] font-sans p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#a5d6a7]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`} 
-        style={appMode === 'translator' 
+      <div
+        className={`min-h-[100dvh] font-sans p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#a5d6a7]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
+        style={appMode === 'translator'
           ? { backgroundColor: '#f1f8e9', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23dcedc8\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
           : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%232C2825\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M 30,20 Q 50,-10 70,20 T 110,10 T 140,30 Q 120,50 100,30 T 60,40 Q 40,20 30,20 Z\' /%3E%3Cpath d=\'M 160,20 L 190,20 L 190,80 L 140,80 L 140,50 L 160,50 Z M 160,65 L 175,65 L 175,35 L 160,35 Z\' fill-rule=\'evenodd\'/%3E%3Cpath d=\'M 20,70 Q 40,70 40,90 Q 40,110 20,110 Q 0,110 0,90 Q 0,70 20,70 Z M 20,82 Q 28,82 28,90 Q 28,98 20,98 Q 12,98 12,90 Q 12,82 20,82 Z\' fill-rule=\'evenodd\' /%3E%3Cpath d=\'M 60,80 L 110,80 L 110,130 L 60,130 Z M 75,95 L 95,95 L 95,115 L 75,115 Z\' fill-rule=\'evenodd\' /%3E%3Ccircle cx=\'85\' cy=\'105\' r=\'4\' /%3E%3Cpath d=\'M 130,100 Q 150,100 160,120 T 190,130 Q 180,150 160,140 T 140,120 Q 120,110 130,100 Z\' /%3E%3Cpath d=\'M 30,140 L 50,130 L 70,150 L 50,170 Q 30,190 20,160 Z\' /%3E%3Cpath d=\'M 120,160 Q 140,150 150,170 T 180,180 Q 160,200 140,190 T 110,170 Z\' /%3E%3Ccircle cx=\'170\' cy=\'90\' r=\'8\' /%3E%3Ccircle cx=\'50\' cy=\'60\' r=\'6\' /%3E%3Cpath d=\'M 10,130 Q 20,140 10,150 Q 0,140 10,130 Z\' /%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
         }
       >
-        
+
         {/* Top Controls */}
         <div className="w-full max-w-4xl flex justify-between items-center z-40 mb-2 relative">
-          <button 
+          <button
             onClick={() => handleModeSwitch(appMode === 'translator' ? 'baybayin' : 'translator')}
-            className={`flex items-center justify-center w-12 h-12 transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none rounded-[255px_15px_225px_15px/15px_225px_15px_255px] ${
-              appMode === 'translator'
-                ? 'bg-[#1A1A1A] border-[4px] border-[#1A1A1A] text-[#a5d6a7] shadow-[4px_4px_0px_0px_#a5d6a7] hover:bg-gray-800'
-                : 'bg-[#F6F5F2] border-[4px] border-[#2C2825] text-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] hover:bg-[#EAE6DF]'
-            }`}
+            className={`flex items-center justify-center w-12 h-12 transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none rounded-[255px_15px_225px_15px/15px_225px_15px_255px] ${appMode === 'translator'
+              ? 'bg-[#1A1A1A] border-[4px] border-[#1A1A1A] text-[#a5d6a7] shadow-[4px_4px_0px_0px_#a5d6a7] hover:bg-gray-800'
+              : 'bg-[#F6F5F2] border-[4px] border-[#2C2825] text-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] hover:bg-[#EAE6DF]'
+              }`}
             title={appMode === 'translator' ? 'Reveal the past...' : 'Return to translator'}
           >
             {appMode === 'translator' ? (
@@ -461,9 +466,9 @@ export default function App() {
               </svg>
             )}
           </button>
-          
+
           {appMode === 'translator' ? (
-            <button 
+            <button
               onClick={() => setShowHistory(true)}
               className="w-12 h-12 bg-white border-[4px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-gray-50"
               title="History"
@@ -471,7 +476,7 @@ export default function App() {
               <History className="w-5 h-5 stroke-[4] text-[#1A1A1A]" />
             </button>
           ) : (
-            <button 
+            <button
               onClick={() => setShowBaybayinHistory(true)}
               className="w-12 h-12 bg-[#F6F5F2] border-[4px] border-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-[#EAE6DF]"
               title="Baybayin History"
@@ -485,7 +490,7 @@ export default function App() {
         {showHistory && appMode === 'translator' && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px] p-6 w-full max-w-md relative max-h-[80vh] flex flex-col">
-              <button 
+              <button
                 onClick={() => setShowHistory(false)}
                 className="absolute top-4 right-4 w-10 h-10 bg-white border-[4px] border-[#1A1A1A] shadow-[3px_3px_0px_0px_#1A1A1A] rounded-full flex items-center justify-center transition-all duration-150 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none hover:bg-gray-50 z-10"
               >
@@ -520,7 +525,7 @@ export default function App() {
         {showBaybayinHistory && appMode === 'baybayin' && (
           <div className="fixed inset-0 bg-[#F6F5F2]/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-[#F6F5F2] border-[6px] border-[#2C2825] shadow-[12px_12px_0px_0px_#2C2825] rounded-[255px_25px_225px_25px/25px_225px_25px_255px] p-6 w-full max-w-md relative max-h-[80vh] flex flex-col">
-              <button 
+              <button
                 onClick={() => setShowBaybayinHistory(false)}
                 className="absolute top-4 right-4 w-10 h-10 bg-[#F6F5F2] border-[4px] border-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-[#EAE6DF] z-10"
               >
@@ -553,10 +558,10 @@ export default function App() {
             {/* Header */}
             <div className="text-center relative z-10 w-full mb-12 mt-6">
               <motion.div className="absolute -top-10 -left-6 z-0" animate={{ rotate: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4 }}>
-                 <Daisy />
+                <Daisy />
               </motion.div>
               <h1 className="text-[3.5rem] md:text-[5rem] font-black text-white text-center leading-[0.85] tracking-tighter transform -rotate-3" style={{ textShadow: '1px 1px 0px #1A1A1A, 2px 2px 0px #1A1A1A, 3px 3px 0px #1A1A1A, 4px 4px 0px #1A1A1A, 5px 5px 0px #1A1A1A, 6px 6px 0px #1A1A1A, 7px 7px 0px #1A1A1A, 8px 8px 0px #1A1A1A', WebkitTextStroke: '3px #1A1A1A' }}>
-                TAGALOG<br/>TRANSLATOR<br/><span className="text-[#FFE5B4]">SUPREME</span>
+                TAGALOG<br />TRANSLATOR<br /><span className="text-[#FFE5B4]">SUPREME</span>
               </h1>
             </div>
 
@@ -564,13 +569,13 @@ export default function App() {
             <div className="w-full space-y-3 z-10 relative mb-8">
               <div className="flex items-center justify-between px-2 mb-2">
                 <AnimatePresence mode="wait">
-                  <motion.label 
+                  <motion.label
                     key={direction}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    htmlFor="english-input" 
-                    className="text-xl font-black text-white tracking-widest uppercase" 
+                    htmlFor="english-input"
+                    className="text-xl font-black text-white tracking-widest uppercase"
                     style={{ textShadow: '3px 3px 0px #1A1A1A', WebkitTextStroke: '1.5px #1A1A1A' }}
                   >
                     {direction === 'en-tl' ? 'English Word' : 'Tagalog Word'}
@@ -608,7 +613,7 @@ export default function App() {
                   className="flex-1 bg-transparent text-3xl font-black italic outline-none placeholder:text-gray-300 min-h-[3rem] text-[#1A1A1A] w-full"
                   placeholder={`e.g. ${currentPlaceholder}`}
                 />
-                <button 
+                <button
                   onClick={handleMicClick}
                   className={`w-14 h-14 ml-3 rounded-[15px_225px_15px_255px/255px_15px_225px_15px] border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex flex-shrink-0 items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none ${isRecording ? 'bg-[#ffcdd2]' : 'bg-[#e8f5e9] hover:bg-[#c8e6c9]'}`}
                   title="Speak to translate"
@@ -616,9 +621,9 @@ export default function App() {
                   <Mic className="w-7 h-7 stroke-[4] text-[#1A1A1A]" />
                 </button>
               </div>
-              
+
               <motion.div className="absolute -bottom-16 -right-4 z-20 pointer-events-none" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
-                 <Sparkle />
+                <Sparkle />
               </motion.div>
             </div>
 
@@ -635,7 +640,7 @@ export default function App() {
                   'Translate!'
                 )}
               </button>
-              
+
               {errorMsg && (
                 <div className="mt-6 p-4 bg-red-100 border-[4px] border-[#1A1A1A] rounded-xl text-[#1A1A1A] font-black flex items-start gap-3 shadow-[4px_4px_0px_0px_#1A1A1A]">
                   <X className="w-6 h-6 shrink-0 mt-0.5 text-red-500" />
@@ -649,24 +654,24 @@ export default function App() {
               <div className="w-full space-y-3 z-10 relative mb-12 animate-in fade-in slide-in-from-bottom-6 duration-300">
                 <div className="flex items-center justify-between px-2 mb-2">
                   <AnimatePresence mode="wait">
-                    <motion.span 
+                    <motion.span
                       key={direction}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="text-xl font-black text-white tracking-widest uppercase" 
+                      className="text-xl font-black text-white tracking-widest uppercase"
                       style={{ textShadow: '3px 3px 0px #1A1A1A', WebkitTextStroke: '1.5px #1A1A1A' }}
                     >
                       {direction === 'en-tl' ? 'Tagalog Translation' : 'English Translation'}
                     </motion.span>
                   </AnimatePresence>
                 </div>
-                
+
                 <div className="relative">
                   <motion.div className="absolute -left-12 top-10 -z-10" animate={{ rotate: [0, -8, 0], x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 3.5 }}>
                     <Butterfly />
                   </motion.div>
-                  
+
                   <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[125px_25px_125px_25px/25px_125px_25px_125px] p-8 flex flex-col items-center justify-center relative min-h-[180px]">
                     {isLoading ? (
                       <div className="flex flex-col items-center justify-center w-full animate-pulse">
@@ -679,7 +684,7 @@ export default function App() {
                           {translation}
                         </span>
                         <div className="flex items-center gap-4 flex-wrap justify-center">
-                          <button 
+                          <button
                             onClick={() => handleSpeak(audioUrl)}
                             disabled={!audioUrl}
                             className="flex items-center gap-3 bg-white hover:bg-gray-50 text-[#1A1A1A] px-6 py-3 border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] text-lg font-black uppercase transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-wait min-h-[56px]"
@@ -705,17 +710,31 @@ export default function App() {
             {/* Example Section */}
             {translation && !isLoading && (
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
+
+                {/* ✅ UPDATED: Cooldown UI or normal button */}
                 {!example && (
-                  <button
-                    onClick={handleShowExample}
-                    disabled={isLoadingExample}
-                    className="w-full bg-white hover:bg-gray-50 text-[#1A1A1A] text-xl font-black py-5 px-6 border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px_125px_25px_125px/125px_25px_125px_25px] transition-all duration-150 active:translate-x-[8px] active:translate-y-[8px] active:shadow-none disabled:opacity-70 flex items-center justify-center mb-8 min-h-[64px] uppercase"
-                  >
-                    {isLoadingExample ? (
-                      <Loader2 className="w-8 h-8 mr-3 animate-spin stroke-[4]" />
-                    ) : null}
-                    Example Sentence
-                  </button>
+                  exampleCooldown ? (
+                    <div className="w-full bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px_125px_25px_125px/125px_25px_125px_25px] p-6 mb-8 flex flex-col items-center gap-2 text-center">
+                      <span className="text-5xl font-black text-[#1A1A1A]">⏳ {exampleCooldown}s</span>
+                      <p className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight leading-tight">
+                        Sentence examples on cooldown!
+                      </p>
+                      <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">
+                        You can keep translating words in the meantime ✌️
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleShowExample}
+                      disabled={isLoadingExample}
+                      className="w-full bg-white hover:bg-gray-50 text-[#1A1A1A] text-xl font-black py-5 px-6 border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px_125px_25px_125px/125px_25px_125px_25px] transition-all duration-150 active:translate-x-[8px] active:translate-y-[8px] active:shadow-none disabled:opacity-70 flex items-center justify-center mb-8 min-h-[64px] uppercase"
+                    >
+                      {isLoadingExample ? (
+                        <Loader2 className="w-8 h-8 mr-3 animate-spin stroke-[4]" />
+                      ) : null}
+                      Example Sentence
+                    </button>
+                  )
                 )}
 
                 {example && (
@@ -733,7 +752,7 @@ export default function App() {
                         "{example.englishTranslation}"
                       </p>
                       <div className="flex items-center gap-4 flex-wrap justify-center">
-                        <button 
+                        <button
                           onClick={() => handleSpeak(exampleAudioUrl)}
                           disabled={!exampleAudioUrl}
                           className="flex items-center gap-3 bg-white hover:bg-gray-50 text-[#1A1A1A] px-6 py-3 border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] text-lg font-black uppercase transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-wait min-h-[56px]"
@@ -760,7 +779,7 @@ export default function App() {
         {/* Baybayin Mode Layout */}
         {appMode === 'baybayin' && (
           <div className="w-full max-w-md z-10 flex flex-col items-center pt-8 pb-12 animate-in fade-in duration-500 relative">
-            
+
             {/* Background Petroglyphs */}
             <div className="absolute top-0 left-[-60px]"><TribalPetroglyph1 /></div>
             <div className="absolute top-[40%] right-[-70px]"><TribalPetroglyph2 /></div>
@@ -768,7 +787,7 @@ export default function App() {
             {/* Header */}
             <div className="text-center relative z-10 w-full mb-12">
               <h1 className="text-5xl font-black text-[#2C2825] text-center leading-[0.9] tracking-widest uppercase">
-                Baybayin<br/>Script
+                Baybayin<br />Script
               </h1>
               <div className="w-24 h-2 bg-[#2C2825] mx-auto mt-6 rounded-full opacity-80"></div>
             </div>
@@ -812,11 +831,11 @@ export default function App() {
                   <span className="text-7xl mb-10 text-[#2C2825] text-center break-words w-full" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
                     {baybayinOutput}
                   </span>
-                  
+
                   <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-l-8 border-b-8 border-[#2C2825] transform -rotate-12"></div>
                   <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-[#F6F5F2] border-r-8 border-t-8 border-[#2C2825] transform -rotate-12"></div>
                 </div>
-                
+
                 <div className="flex flex-col gap-3 mt-6">
                   <button
                     onClick={handleCopyBaybayin}
