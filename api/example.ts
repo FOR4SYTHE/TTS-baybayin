@@ -7,7 +7,6 @@ export default async function handler(req: Request) {
     const { englishWord, tagalogWord } = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Diagnostic Transmission Check
     if (!apiKey) {
       return new Response(JSON.stringify({
         tagalogSentence: "SYSTEM ERROR: API KEY MISSING",
@@ -26,7 +25,7 @@ export default async function handler(req: Request) {
     CRITICAL: Output ONLY a raw JSON object. NO markdown, NO code blocks.
     Format: {"tagalogSentence": "...", "englishTranslation": "..."}`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
       method: 'POST',
