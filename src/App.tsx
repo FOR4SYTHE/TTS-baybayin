@@ -91,10 +91,8 @@ const toBaybayin = (text: string) => {
   if (!text) return "";
   let str = text.toLowerCase();
   str = str.replace(/f/g, 'p').replace(/v/g, 'b').replace(/z/g, 's').replace(/j/g, 'dy').replace(/c/g, 'k').replace(/x/g, 'ks').replace(/q/g, 'k');
-
   const vowels: Record<string, string> = { 'a': '\u1700', 'e': '\u1701', 'i': '\u1701', 'o': '\u1702', 'u': '\u1702' };
   const consonants: Record<string, string> = { 'k': '\u1703', 'g': '\u1704', 'ng': '\u1705', 't': '\u1706', 'd': '\u1707', 'r': '\u1707', 'n': '\u1708', 'p': '\u1709', 'b': '\u170A', 'm': '\u170B', 'y': '\u170C', 'l': '\u170E', 'w': '\u170F', 's': '\u1710', 'h': '\u1711' };
-
   let result = ""; let i = 0;
   while (i < str.length) {
     let char = str[i];
@@ -415,6 +413,14 @@ export default function App() {
 
   return (
     <>
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Rock+Salt&display=swap');
+          .font-manic { font-family: 'Rock Salt', cursive; }
+          .font-hand { font-family: 'Caveat', cursive; }
+        `}
+      </style>
+      
       {/* Loading Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (
@@ -548,7 +554,7 @@ export default function App() {
                       setExampleAudioUrl(null);
                     }}>
                       <span className="text-sm font-black text-gray-500 uppercase">{item.direction === 'tl-en' ? 'Tagalog' : 'English'}: {item.english}</span>
-                      <span className="text-xl font-black text-[#1A1A1A] uppercase">{item.direction === 'tl-en' ? 'English' : 'Tagalog'}: {item.tagalog}</span>
+                      <span className="text-xl font-manic text-[#1A1A1A]">{item.tagalog}</span>
                     </div>
                   ))
                 )}
@@ -596,7 +602,7 @@ export default function App() {
               <motion.div className="absolute -top-10 -left-6 z-0" animate={{ rotate: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4 }}>
                 <Daisy />
               </motion.div>
-              <h1 className="text-[3.5rem] md:text-[5rem] font-black text-white text-center leading-[0.85] tracking-tighter transform -rotate-3" style={{ textShadow: '1px 1px 0px #1A1A1A, 2px 2px 0px #1A1A1A, 3px 3px 0px #1A1A1A, 4px 4px 0px #1A1A1A, 5px 5px 0px #1A1A1A, 6px 6px 0px #1A1A1A, 7px 7px 0px #1A1A1A, 8px 8px 0px #1A1A1A', WebkitTextStroke: '3px #1A1A1A' }}>
+              <h1 className="text-[2.5rem] md:text-[3.5rem] font-manic text-white text-center leading-[1.3] transform -rotate-3" style={{ textShadow: '1px 1px 0px #1A1A1A, 2px 2px 0px #1A1A1A, 3px 3px 0px #1A1A1A, 4px 4px 0px #1A1A1A, 5px 5px 0px #1A1A1A, 6px 6px 0px #1A1A1A, 7px 7px 0px #1A1A1A, 8px 8px 0px #1A1A1A', WebkitTextStroke: '2px #1A1A1A' }}>
                 TAGALOG<br />TRANSLATOR<br /><span className="text-[#FFE5B4]">SUPREME</span>
               </h1>
             </div>
@@ -647,7 +653,7 @@ export default function App() {
                     }
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handleTranslate()}
-                  className="flex-1 bg-transparent text-3xl font-black italic outline-none placeholder:text-gray-300 min-h-[3rem] text-[#1A1A1A] w-full"
+                  className="flex-1 bg-transparent text-3xl font-hand outline-none placeholder:text-gray-300 min-h-[3rem] text-[#1A1A1A] w-full"
                   placeholder={`e.g. ${currentPlaceholder}`}
                 />
                 <button
@@ -717,7 +723,7 @@ export default function App() {
                       </div>
                     ) : (
                       <>
-                        <span className="text-5xl font-black mb-8 text-[#1A1A1A] text-center break-words w-full uppercase tracking-tight">
+                        <span className="text-3xl md:text-4xl font-manic mb-8 text-[#1A1A1A] text-center break-words w-full">
                           {translation}
                         </span>
                         <div className="flex items-center gap-4 flex-wrap justify-center">
@@ -758,7 +764,7 @@ export default function App() {
                       <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-3/4"></div>
                     </div>
                   ) : (
-                    <p className="text-lg font-bold text-[#1A1A1A] leading-snug">
+                    <p className="text-2xl font-hand text-[#1A1A1A] leading-snug">
                       {funFact}
                     </p>
                   )}
@@ -804,10 +810,10 @@ export default function App() {
                       </span>
                     </div>
                     <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[50px] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
-                      <p className="text-3xl font-black mb-6 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
+                      <p className="text-2xl font-manic mb-6 break-words text-[#1A1A1A] text-center w-full leading-tight">
                         {example.tagalogSentence}
                       </p>
-                      <p className="text-xl font-black mb-8 text-[#1A1A1A] text-center w-full bg-gray-50 px-4 py-2 border-[4px] border-[#1A1A1A] rounded-xl transform -rotate-2 shadow-[4px_4px_0px_0px_#1A1A1A]">
+                      <p className="text-2xl font-hand mb-8 text-[#1A1A1A] text-center w-full bg-gray-50 px-4 py-2 border-[4px] border-[#1A1A1A] rounded-xl transform -rotate-2 shadow-[4px_4px_0px_0px_#1A1A1A]">
                         "{example.englishTranslation}"
                       </p>
                       <div className="flex items-center gap-4 flex-wrap justify-center">
