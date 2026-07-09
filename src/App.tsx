@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Download } from 'lucide-react';
+import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Download, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 
@@ -91,11 +91,15 @@ const toBaybayin = (text: string) => {
   if (!text) return "";
   let str = text.toLowerCase();
   str = str.replace(/f/g, 'p').replace(/v/g, 'b').replace(/z/g, 's').replace(/j/g, 'dy').replace(/c/g, 'k').replace(/x/g, 'ks').replace(/q/g, 'k');
+
   const vowels: Record<string, string> = { 'a': '\u1700', 'e': '\u1701', 'i': '\u1701', 'o': '\u1702', 'u': '\u1702' };
   const consonants: Record<string, string> = { 'k': '\u1703', 'g': '\u1704', 'ng': '\u1705', 't': '\u1706', 'd': '\u1707', 'r': '\u1707', 'n': '\u1708', 'p': '\u1709', 'b': '\u170A', 'm': '\u170B', 'y': '\u170C', 'l': '\u170E', 'w': '\u170F', 's': '\u1710', 'h': '\u1711' };
+
   let result = ""; let i = 0;
   while (i < str.length) {
-    let char = str[i]; let nextChar = str[i + 1]; let twoChar = char + (nextChar || "");
+    let char = str[i];
+    let nextChar = str[i + 1]; let twoChar = char + (nextChar || "");
+
     if (twoChar === 'ng' && consonants['ng']) {
       let third = str[i + 2];
       if (vowels[third]) {
@@ -112,8 +116,10 @@ const toBaybayin = (text: string) => {
         else if (nextChar === 'e' || nextChar === 'i') result += consonants[char] + '\u1712';
         else if (nextChar === 'o' || nextChar === 'u') result += consonants[char] + '\u1713';
         i += 2;
-      } else { result += consonants[char] + '\u1714'; i += 1; }
-    } else if (vowels[char]) { result += vowels[char]; i += 1; }
+      } else { result += consonants[char] + '\u1714'; i += 1;
+      }
+    } else if (vowels[char]) { result += vowels[char]; i += 1;
+    }
     else { result += char; i += 1; }
   }
   return result;
@@ -129,26 +135,35 @@ export default function App() {
   const [englishWord, setEnglishWord] = useState('');
   const [translation, setTranslation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // New Fun Fact States
+  const [funFact, setFunFact] = useState<string | null>(null);
+  const [isLoadingFunFact, setIsLoadingFunFact] = useState(false);
+
   const [example, setExample] = useState<{ tagalogSentence?: string; englishTranslation?: string } | null>(null);
   const [isLoadingExample, setIsLoadingExample] = useState(false);
+  
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [exampleAudioUrl, setExampleAudioUrl] = useState<string | null>(null);
+
   const [isCopied, setIsCopied] = useState(false);
   const [isExampleCopied, setIsExampleCopied] = useState(false);
+
   const [history, setHistory] = useState<{ english: string, tagalog: string, direction?: 'en-tl' | 'tl-en' }[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+
   const [direction, setDirection] = useState<'en-tl' | 'tl-en'>('en-tl');
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  // ✅ NEW: Cooldown state for rate-limited example sentences
+  
   const [exampleCooldown, setExampleCooldown] = useState<number | null>(null);
 
   // Baybayin States
   const [baybayinInput, setBaybayinInput] = useState('');
   const [baybayinOutput, setBaybayinOutput] = useState('');
   const [isBaybayinCopied, setIsBaybayinCopied] = useState(false);
+
   const [baybayinHistory, setBaybayinHistory] = useState<{ input: string, output: string }[]>([]);
   const [showBaybayinHistory, setShowBaybayinHistory] = useState(false);
 
@@ -162,7 +177,6 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ NEW: Countdown timer for cooldown
   useEffect(() => {
     if (exampleCooldown === null || exampleCooldown <= 0) return;
     const timer = setTimeout(() => setExampleCooldown(prev => (prev ?? 1) - 1), 1000);
@@ -187,6 +201,7 @@ export default function App() {
     setDirection(prev => prev === 'en-tl' ? 'tl-en' : 'en-tl');
     setTranslation('');
     setExample(null);
+    setFunFact(null);
     setAudioUrl(null);
     setExampleAudioUrl(null);
     setErrorMsg(null);
@@ -264,12 +279,33 @@ export default function App() {
     }
   };
 
+  const fetchFunFact = async (english: string, tagalog: string) => {
+    setIsLoadingFunFact(true);
+    setFunFact(null);
+    try {
+      const res = await fetch('/api/funfact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ englishWord: english, tagalogWord: tagalog })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.fact) setFunFact(data.fact);
+      }
+    } catch (err) {
+      console.error('Fun fact fetch failed', err);
+    } finally {
+      setIsLoadingFunFact(false);
+    }
+  };
+
   const handleTranslate = async () => {
     if (!englishWord.trim()) return;
 
     setIsLoading(true);
     setTranslation('');
     setExample(null);
+    setFunFact(null);
     setAudioUrl(null);
     setExampleAudioUrl(null);
     setErrorMsg(null);
@@ -294,7 +330,9 @@ export default function App() {
           const filtered = prev.filter(item => item.english.toLowerCase() !== englishWord.toLowerCase());
           return [newEntry, ...filtered].slice(0, 10);
         });
+        
         prefetchAudio(data.translation, setAudioUrl, direction === 'en-tl' ? 'fil-PH' : 'en-US');
+        fetchFunFact(englishWord, data.translation); 
       }
     } catch (error: any) {
       console.error('Translation error:', error);
@@ -319,7 +357,6 @@ export default function App() {
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-
     recognition.lang = direction === 'en-tl' ? 'en-US' : 'fil-PH';
     recognition.interimResults = false;
 
@@ -337,10 +374,8 @@ export default function App() {
     recognition.start();
   };
 
-  // ✅ UPDATED: handleShowExample now handles 429 with cooldown
   const handleShowExample = async () => {
     if (!translation || exampleCooldown) return;
-
     setIsLoadingExample(true);
 
     try {
@@ -361,9 +396,9 @@ export default function App() {
       }
 
       if (!response.ok) throw new Error(`Server returned ${response.status}`);
-
       const data = await response.json();
       const targetSentence = data.targetSentence || data.tagalogSentence;
+      
       if (targetSentence) {
         setExample({
           tagalogSentence: targetSentence,
@@ -508,6 +543,7 @@ export default function App() {
                       setTranslation(item.tagalog);
                       setShowHistory(false);
                       setExample(null);
+                      setFunFact(null);
                       setAudioUrl(null);
                       setExampleAudioUrl(null);
                     }}>
@@ -605,6 +641,7 @@ export default function App() {
                     if (val.trim() === '') {
                       setTranslation('');
                       setExample(null);
+                      setFunFact(null);
                       setAudioUrl(null);
                       setExampleAudioUrl(null);
                     }
@@ -707,11 +744,33 @@ export default function App() {
               </div>
             )}
 
+            {/* Fun Fact Card */}
+            {(funFact || isLoadingFunFact) && !isLoading && (
+              <div className="w-full z-10 relative mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="bg-[#FFE5B4] border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 pt-8 relative transform -rotate-1">
+                  <span className="absolute -top-4 left-6 bg-[#1A1A1A] text-[#FFE5B4] text-sm font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-[2px_2px_0px_0px_#FFE5B4] flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4 stroke-[3]" /> DID YOU KNOW?
+                  </span>
+                  {isLoadingFunFact ? (
+                    <div className="animate-pulse space-y-2 mt-2">
+                      <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-full"></div>
+                      <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-5/6"></div>
+                      <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-3/4"></div>
+                    </div>
+                  ) : (
+                    <p className="text-lg font-bold text-[#1A1A1A] leading-snug">
+                      {funFact}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Example Section */}
             {translation && !isLoading && (
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
 
-                {/* ✅ UPDATED: Cooldown UI or normal button */}
+                {/* Cooldown UI or normal button */}
                 {!example && (
                   exampleCooldown ? (
                     <div className="w-full bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px_125px_25px_125px/125px_25px_125px_25px] p-6 mb-8 flex flex-col items-center gap-2 text-center">
