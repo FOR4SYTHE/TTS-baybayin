@@ -254,6 +254,9 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
             </div>
           </>
         )}
+        
+        {/* Hidden Canvas for capturing image */}
+        <canvas ref={canvasRef} className="hidden" />
       </div>
 
       {/* CARTOON BOTTOM DASHBOARD */}
