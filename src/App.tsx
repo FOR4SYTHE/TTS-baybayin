@@ -415,8 +415,8 @@ export default function App() {
     <>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Caveat+Brush&display=swap');
-          .font-manic { font-family: 'Caveat Brush', cursive; }
+          @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Gloria+Hallelujah&display=swap');
+          .font-manic { font-family: 'Gloria Hallelujah', cursive; }
           .font-hand { font-family: 'Caveat', cursive; }
         `}
       </style>
@@ -602,7 +602,7 @@ export default function App() {
               <motion.div className="absolute -top-10 -left-6 z-0" animate={{ rotate: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4 }}>
                 <Daisy />
               </motion.div>
-              <h1 className="text-[2.5rem] md:text-[3.5rem] font-manic text-white text-center leading-[1.3] transform -rotate-3" style={{ textShadow: '1px 1px 0px #1A1A1A, 2px 2px 0px #1A1A1A, 3px 3px 0px #1A1A1A, 4px 4px 0px #1A1A1A, 5px 5px 0px #1A1A1A, 6px 6px 0px #1A1A1A, 7px 7px 0px #1A1A1A, 8px 8px 0px #1A1A1A', WebkitTextStroke: '2px #1A1A1A' }}>
+              <h1 className="text-[4rem] md:text-[5.5rem] font-manic text-white text-center leading-[1.1] transform -rotate-3" style={{ textShadow: '1px 1px 0px #1A1A1A, 2px 2px 0px #1A1A1A, 3px 3px 0px #1A1A1A, 4px 4px 0px #1A1A1A, 5px 5px 0px #1A1A1A, 6px 6px 0px #1A1A1A, 7px 7px 0px #1A1A1A, 8px 8px 0px #1A1A1A, 9px 9px 0px #1A1A1A, 10px 10px 0px #1A1A1A', WebkitTextStroke: '2.5px #1A1A1A' }}>
                 TAGALOG<br />TRANSLATOR<br /><span className="text-[#FFE5B4]">SUPREME</span>
               </h1>
             </div>
