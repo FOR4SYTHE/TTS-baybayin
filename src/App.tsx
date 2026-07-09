@@ -33,7 +33,7 @@ const Butterfly = () => (
     <circle cx="40" cy="70" r="3" fill="#1A1A1A" />
     <circle cx="60" cy="70" r="3" fill="#1A1A1A" />
     <rect x="47" y="35" width="6" height="40" rx="3" fill="#1A1A1A" />
-    <path d="M 48 35 Q 40 20 35 25 M 52 35 Q 60 20 65 25" fill="none" stroke="#1A1A1A" strokeWidth="3" strokeLinecap="round" />
+    <path d="M 48 35 Q 40 20 35 25 M 52 35 Q 60 20 65 25" fill="none" stroke="#1A1A1A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
   </motion.svg>
 );
 
@@ -236,7 +236,7 @@ export default function App() {
       setIsExampleCopied(true);
       setTimeout(() => setIsExampleCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy example', err);
+      console.error('Failed to copy text', err);
     }
   };
 
@@ -286,7 +286,6 @@ export default function App() {
           const filtered = prev.filter(item => item.english.toLowerCase() !== englishWord.toLowerCase());
           return [newEntry, ...filtered].slice(0, 10);
         });
-        // Fire-and-forget prefetch
         prefetchAudio(data.translation, setAudioUrl, direction === 'en-tl' ? 'fil-PH' : 'en-US');
       }
     } catch (error: any) {
@@ -427,7 +426,7 @@ export default function App() {
         className={`min-h-[100dvh] font-sans p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#a5d6a7]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`} 
         style={appMode === 'translator' 
           ? { backgroundColor: '#f1f8e9', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23dcedc8\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
-          : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'120\' height=\'120\' viewBox=\'0 0 120 120\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'1.5\' stroke-opacity=\'0.05\' fill=\'none\'%3E%3Cpath d=\'M0 60 L60 0 L120 60 L60 120 Z\' /%3E%3Cpath d=\'M15 60 L60 15 L105 60 L60 105 Z\' /%3E%3Cpath d=\'M30 60 L60 30 L90 60 L60 90 Z\' /%3E%3Ccircle cx=\'60\' cy=\'60\' r=\'4\' fill=\'%232C2825\' fill-opacity=\'0.04\' /%3E%3Cpath d=\'M0 0 L120 120 M120 0 L0 120\' stroke-dasharray=\'4 4\' /%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
+          : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%232C2825\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M 30,20 Q 50,-10 70,20 T 110,10 T 140,30 Q 120,50 100,30 T 60,40 Q 40,20 30,20 Z\' /%3E%3Cpath d=\'M 160,20 L 190,20 L 190,80 L 140,80 L 140,50 L 160,50 Z M 160,65 L 175,65 L 175,35 L 160,35 Z\' fill-rule=\'evenodd\'/%3E%3Cpath d=\'M 20,70 Q 40,70 40,90 Q 40,110 20,110 Q 0,110 0,90 Q 0,70 20,70 Z M 20,82 Q 28,82 28,90 Q 28,98 20,98 Q 12,98 12,90 Q 12,82 20,82 Z\' fill-rule=\'evenodd\' /%3E%3Cpath d=\'M 60,80 L 110,80 L 110,130 L 60,130 Z M 75,95 L 95,95 L 95,115 L 75,115 Z\' fill-rule=\'evenodd\' /%3E%3Ccircle cx=\'85\' cy=\'105\' r=\'4\' /%3E%3Cpath d=\'M 130,100 Q 150,100 160,120 T 190,130 Q 180,150 160,140 T 140,120 Q 120,110 130,100 Z\' /%3E%3Cpath d=\'M 30,140 L 50,130 L 70,150 L 50,170 Q 30,190 20,160 Z\' /%3E%3Cpath d=\'M 120,160 Q 140,150 150,170 T 180,180 Q 160,200 140,190 T 110,170 Z\' /%3E%3Ccircle cx=\'170\' cy=\'90\' r=\'8\' /%3E%3Ccircle cx=\'50\' cy=\'60\' r=\'6\' /%3E%3Cpath d=\'M 10,130 Q 20,140 10,150 Q 0,140 10,130 Z\' /%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
         }
       >
         
@@ -444,7 +443,6 @@ export default function App() {
           >
             {appMode === 'translator' ? (
               <svg width="26" height="26" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn tribal star/eye */}
                 <path d="M 50 15 Q 60 35 85 50 Q 60 65 50 85 Q 40 65 15 50 Q 40 35 50 15 Z" />
                 <circle cx="50" cy="50" r="8" fill="currentColor" />
                 <path d="M 30 30 Q 35 35 40 40" />
@@ -454,7 +452,6 @@ export default function App() {
               </svg>
             ) : (
               <svg width="26" height="26" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
-                {/* Hand-drawn daisy */}
                 <path d="M 50 45 Q 60 10 70 20 Q 60 35 55 50" />
                 <path d="M 55 50 Q 90 30 85 45 Q 65 55 50 55" />
                 <path d="M 50 55 Q 80 85 65 90 Q 45 65 45 50" />
@@ -674,7 +671,7 @@ export default function App() {
                     {isLoading ? (
                       <div className="flex flex-col items-center justify-center w-full animate-pulse">
                         <div className="h-12 bg-gray-300 border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] w-3/4 mb-6 opacity-50"></div>
-                        <div className="h-12 bg-gray-300 border-[4px] border-[#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] w-32 opacity-50"></div>
+                        <div className="h-12 bg-gray-300 border-[4px] border-[#15px_225px_15px_255px/255px_15px_225px_15px] w-32 opacity-50"></div>
                       </div>
                     ) : (
                       <>
@@ -794,7 +791,6 @@ export default function App() {
                   className="flex-1 bg-transparent text-2xl font-bold outline-none placeholder:text-[#2C2825]/40 w-full text-[#2C2825]"
                   placeholder="e.g. malaya"
                 />
-                {/* Rough corners overlay */}
                 <div className="absolute -top-2 -left-2 w-4 h-4 bg-[#F6F5F2] border-r-4 border-b-4 border-[#2C2825] transform rotate-45"></div>
                 <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-[#F6F5F2] border-l-4 border-t-4 border-[#2C2825] transform rotate-45"></div>
               </div>
@@ -817,7 +813,6 @@ export default function App() {
                     {baybayinOutput}
                   </span>
                   
-                  {/* Rough corners overlay */}
                   <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-l-8 border-b-8 border-[#2C2825] transform -rotate-12"></div>
                   <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-[#F6F5F2] border-r-8 border-t-8 border-[#2C2825] transform -rotate-12"></div>
                 </div>
