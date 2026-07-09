@@ -134,7 +134,7 @@ export default function App() {
   const [translation, setTranslation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // New Fun Fact States
+  // Fun Fact States
   const [funFact, setFunFact] = useState<string | null>(null);
   const [isLoadingFunFact, setIsLoadingFunFact] = useState(false);
 
@@ -415,9 +415,11 @@ export default function App() {
     <>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Gloria+Hallelujah&display=swap');
-          .font-manic { font-family: 'Gloria Hallelujah', cursive; }
-          .font-hand { font-family: 'Caveat', cursive; }
+          @import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&family=Knewave&family=Neucha&display=swap');
+          .font-title { font-family: 'Permanent Marker', cursive; }
+          .font-box { font-family: 'Gloria Hallelujah', cursive; }
+          .font-tribal-title { font-family: 'Knewave', cursive; }
+          .font-tribal-text { font-family: 'Neucha', cursive; }
         `}
       </style>
       
@@ -442,7 +444,7 @@ export default function App() {
                 </motion.div>
                 <motion.p
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                  className="font-mono text-xl tracking-[0.3em] font-bold opacity-80"
+                  className="font-tribal-title text-2xl tracking-[0.2em] opacity-80"
                 >
                   PAG-UKIT NG BAYBAYIN...
                 </motion.p>
@@ -554,7 +556,7 @@ export default function App() {
                       setExampleAudioUrl(null);
                     }}>
                       <span className="text-sm font-black text-gray-500 uppercase">{item.direction === 'tl-en' ? 'Tagalog' : 'English'}: {item.english}</span>
-                      <span className="text-xl font-manic text-[#1A1A1A]">{item.tagalog}</span>
+                      <span className="text-xl font-box text-[#1A1A1A]">{item.tagalog}</span>
                     </div>
                   ))
                 )}
@@ -573,10 +575,10 @@ export default function App() {
               >
                 <X className="w-6 h-6 stroke-[3] text-[#2C2825]" />
               </button>
-              <h2 className="text-2xl font-bold text-[#2C2825] mb-6 uppercase tracking-widest pr-12">Script History</h2>
+              <h2 className="text-2xl font-tribal-title text-[#2C2825] mb-6 uppercase tracking-wider pr-12">Script History</h2>
               <div className="overflow-y-auto flex-1 pr-2 space-y-4">
                 {baybayinHistory.length === 0 ? (
-                  <p className="text-[#2C2825]/60 font-bold text-center italic py-8 uppercase tracking-widest">No scripts carved yet.</p>
+                  <p className="text-[#2C2825]/60 font-tribal-text text-xl text-center italic py-8 uppercase tracking-widest">No scripts carved yet.</p>
                 ) : (
                   baybayinHistory.map((item, index) => (
                     <div key={index} className="bg-[#F6F5F2] border-[4px] border-[#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-4 flex flex-col gap-2 cursor-pointer hover:bg-[#EAE6DF] transition-colors" onClick={() => {
@@ -584,7 +586,7 @@ export default function App() {
                       setBaybayinOutput(item.output);
                       setShowBaybayinHistory(false);
                     }}>
-                      <span className="text-sm font-bold text-[#2C2825]/60 uppercase tracking-widest">{item.input}</span>
+                      <span className="text-lg font-tribal-text text-[#2C2825]/60 uppercase tracking-widest">{item.input}</span>
                       <span className="text-4xl text-[#2C2825] text-left" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>{item.output}</span>
                     </div>
                   ))
@@ -598,13 +600,23 @@ export default function App() {
         {appMode === 'translator' && (
           <div className="w-full max-w-md z-10 flex flex-col items-center pt-4 pb-12 animate-in fade-in duration-500">
             {/* Header */}
-            <div className="text-center relative z-10 w-full mb-12 mt-6">
-              <motion.div className="absolute -top-10 -left-6 z-0" animate={{ rotate: [-5, 5, -5] }} transition={{ repeat: Infinity, duration: 4 }}>
-                <Daisy />
-              </motion.div>
-              <h1 className="text-[4rem] md:text-[5.5rem] font-manic text-white text-center leading-[1.1] transform -rotate-3" style={{ textShadow: '1px 1px 0px #1A1A1A, 2px 2px 0px #1A1A1A, 3px 3px 0px #1A1A1A, 4px 4px 0px #1A1A1A, 5px 5px 0px #1A1A1A, 6px 6px 0px #1A1A1A, 7px 7px 0px #1A1A1A, 8px 8px 0px #1A1A1A, 9px 9px 0px #1A1A1A, 10px 10px 0px #1A1A1A', WebkitTextStroke: '2.5px #1A1A1A' }}>
-                TAGALOG<br />TRANSLATOR<br /><span className="text-[#FFE5B4]">SUPREME</span>
-              </h1>
+            <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-6 select-none">
+              <div className="relative inline-block transform -rotate-3 text-center">
+                <div className="absolute -top-12 -left-12 z-0 pointer-events-none">
+                  <Daisy />
+                </div>
+                <h1 
+                  className="text-[3.8rem] md:text-[5rem] font-title text-white leading-[1.05] tracking-wide relative z-10" 
+                  style={{ 
+                    filter: 'drop-shadow(6px 6px 0px #1A1A1A)',
+                    WebkitTextStroke: '3px #1A1A1A'
+                  }}
+                >
+                  TAGALOG<br />
+                  TRANSLATOR<br />
+                  <span className="text-[#FFE5B4]">SUPREME</span>
+                </h1>
+              </div>
             </div>
 
             {/* Input Box */}
@@ -653,7 +665,7 @@ export default function App() {
                     }
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handleTranslate()}
-                  className="flex-1 bg-transparent text-3xl font-hand outline-none placeholder:text-gray-300 min-h-[3rem] text-[#1A1A1A] w-full"
+                  className="flex-1 bg-transparent text-2xl font-box outline-none placeholder:text-gray-300 min-h-[3rem] text-[#1A1A1A] w-full"
                   placeholder={`e.g. ${currentPlaceholder}`}
                 />
                 <button
@@ -723,7 +735,7 @@ export default function App() {
                       </div>
                     ) : (
                       <>
-                        <span className="text-3xl md:text-4xl font-manic mb-8 text-[#1A1A1A] text-center break-words w-full">
+                        <span className="text-3xl md:text-4xl font-box mb-8 text-[#1A1A1A] text-center break-words w-full uppercase">
                           {translation}
                         </span>
                         <div className="flex items-center gap-4 flex-wrap justify-center">
@@ -764,7 +776,7 @@ export default function App() {
                       <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-3/4"></div>
                     </div>
                   ) : (
-                    <p className="text-2xl font-hand text-[#1A1A1A] leading-snug">
+                    <p className="text-xl font-box text-[#1A1A1A] leading-snug">
                       {funFact}
                     </p>
                   )}
@@ -810,10 +822,10 @@ export default function App() {
                       </span>
                     </div>
                     <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[50px] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
-                      <p className="text-2xl font-manic mb-6 break-words text-[#1A1A1A] text-center w-full leading-tight">
+                      <p className="text-2xl font-box mb-6 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
                         {example.tagalogSentence}
                       </p>
-                      <p className="text-2xl font-hand mb-8 text-[#1A1A1A] text-center w-full bg-gray-50 px-4 py-2 border-[4px] border-[#1A1A1A] rounded-xl transform -rotate-2 shadow-[4px_4px_0px_0px_#1A1A1A]">
+                      <p className="text-xl font-box mb-8 text-[#1A1A1A] text-center w-full bg-gray-50 px-4 py-2 border-[4px] border-[#1A1A1A] rounded-xl transform -rotate-2 shadow-[4px_4px_0px_0px_#1A1A1A]">
                         "{example.englishTranslation}"
                       </p>
                       <div className="flex items-center gap-4 flex-wrap justify-center">
@@ -850,16 +862,35 @@ export default function App() {
             <div className="absolute top-[40%] right-[-70px]"><TribalPetroglyph2 /></div>
 
             {/* Header */}
-            <div className="text-center relative z-10 w-full mb-12">
-              <h1 className="text-5xl font-black text-[#2C2825] text-center leading-[0.9] tracking-widest uppercase">
-                Baybayin<br />Script
+            <div className="text-center relative z-10 w-full mb-12 flex flex-col items-center">
+              <div className="flex items-center gap-4 mb-2 opacity-90">
+                <div className="w-6 h-1.5 bg-[#2C2825] rounded-sm"></div>
+                <span className="font-tribal-text text-xl md:text-2xl tracking-[0.3em] uppercase text-[#2C2825] font-black">
+                  Sinaunang
+                </span>
+                <div className="w-6 h-1.5 bg-[#2C2825] rounded-sm"></div>
+              </div>
+
+              <h1 className="text-[4rem] md:text-[5rem] font-tribal-title text-[#F6F5F2] text-center leading-[1] tracking-wider uppercase mb-1" 
+                  style={{ 
+                    WebkitTextStroke: '2px #2C2825', 
+                    filter: 'drop-shadow(6px 6px 0px #2C2825)' 
+                  }}>
+                Baybayin
               </h1>
-              <div className="w-24 h-2 bg-[#2C2825] mx-auto mt-6 rounded-full opacity-80"></div>
+
+              <div className="flex items-center gap-4 mt-4 opacity-90">
+                <div className="w-10 h-1 bg-[#2C2825] rounded-sm"></div>
+                <span className="font-tribal-text text-lg md:text-xl tracking-[0.2em] uppercase text-[#2C2825] font-bold">
+                  Script Generator
+                </span>
+                <div className="w-10 h-1 bg-[#2C2825] rounded-sm"></div>
+              </div>
             </div>
 
             {/* Input Box */}
             <div className="w-full space-y-3 z-10 relative mb-10">
-              <label htmlFor="baybayin-input" className="text-lg font-bold text-[#2C2825] uppercase tracking-[0.2em] px-2 block">
+              <label htmlFor="baybayin-input" className="text-2xl font-tribal-text text-[#2C2825] uppercase tracking-[0.1em] px-2 block font-bold">
                 Enter Word or Name
               </label>
               <div className="bg-transparent border-[8px] border-[#2C2825] p-6 relative">
@@ -872,7 +903,7 @@ export default function App() {
                     setBaybayinOutput('');
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handleGenerateBaybayin()}
-                  className="flex-1 bg-transparent text-2xl font-bold outline-none placeholder:text-[#2C2825]/40 w-full text-[#2C2825]"
+                  className="flex-1 bg-transparent text-3xl font-tribal-text font-bold outline-none placeholder:text-[#2C2825]/40 w-full text-[#2C2825]"
                   placeholder="e.g. malaya"
                 />
                 <div className="absolute -top-2 -left-2 w-4 h-4 bg-[#F6F5F2] border-r-4 border-b-4 border-[#2C2825] transform rotate-45"></div>
@@ -884,15 +915,17 @@ export default function App() {
             <button
               onClick={handleGenerateBaybayin}
               disabled={!baybayinInput.trim()}
-              className="w-full bg-[#2C2825] hover:bg-[#1A1815] text-[#F6F5F2] text-2xl font-bold py-6 border-4 border-transparent active:border-[#2C2825] active:bg-transparent active:text-[#2C2825] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed mb-12 uppercase tracking-widest"
+              className="w-full bg-[#2C2825] hover:bg-[#1A1815] text-[#F6F5F2] text-3xl font-tribal-text font-bold py-6 border-4 border-transparent active:border-[#2C2825] active:bg-transparent active:text-[#2C2825] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed mb-12 uppercase tracking-widest"
             >
-              GENERATE CHARACTERS!
+              Generate Characters!
             </button>
 
             {/* Output Box */}
             {baybayinOutput && (
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
                 <div ref={baybayinRef} className="bg-[#F6F5F2] border-[8px] border-[#2C2825] p-10 flex flex-col items-center justify-center relative min-h-[200px]">
+                  
+                  {/* DO NOT TOUCH: The actual Baybayin text MUST remain Noto Sans Tagalog */}
                   <span className="text-7xl mb-10 text-[#2C2825] text-center break-words w-full" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
                     {baybayinOutput}
                   </span>
@@ -904,14 +937,14 @@ export default function App() {
                 <div className="flex flex-col gap-3 mt-6">
                   <button
                     onClick={handleCopyBaybayin}
-                    className="flex items-center gap-3 bg-transparent hover:bg-[#2C2825] hover:text-[#F6F5F2] text-[#2C2825] px-6 py-4 border-4 border-[#2C2825] text-lg font-bold uppercase transition-colors duration-150 tracking-wider w-full justify-center"
+                    className="flex items-center gap-3 bg-transparent hover:bg-[#2C2825] hover:text-[#F6F5F2] text-[#2C2825] px-6 py-4 border-4 border-[#2C2825] text-xl font-tribal-text font-bold uppercase transition-colors duration-150 tracking-wider w-full justify-center"
                   >
                     {isBaybayinCopied ? <Check className="w-6 h-6 stroke-[3]" /> : <Copy className="w-6 h-6 stroke-[3]" />}
                     {isBaybayinCopied ? 'COPIED!' : 'COPY CHARACTERS'}
                   </button>
                   <button
                     onClick={handleDownloadImage}
-                    className="flex items-center gap-3 bg-transparent hover:bg-[#2C2825] hover:text-[#F6F5F2] text-[#2C2825] px-6 py-4 border-4 border-[#2C2825] text-lg font-bold uppercase transition-colors duration-150 tracking-wider w-full justify-center"
+                    className="flex items-center gap-3 bg-transparent hover:bg-[#2C2825] hover:text-[#F6F5F2] text-[#2C2825] px-6 py-4 border-4 border-[#2C2825] text-xl font-tribal-text font-bold uppercase transition-colors duration-150 tracking-wider w-full justify-center"
                   >
                     <Download className="w-6 h-6 stroke-[3]" />
                     SAVE AS IMAGE
