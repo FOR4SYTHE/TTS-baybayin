@@ -415,8 +415,8 @@ export default function App() {
     <>
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Rock+Salt&display=swap');
-          .font-manic { font-family: 'Rock Salt', cursive; }
+          @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Caveat+Brush&display=swap');
+          .font-manic { font-family: 'Caveat Brush', cursive; }
           .font-hand { font-family: 'Caveat', cursive; }
         `}
       </style>
