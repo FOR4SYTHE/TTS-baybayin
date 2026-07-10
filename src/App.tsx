@@ -151,6 +151,42 @@ const toBaybayin = (text: string) => {
   return result;
 };
 
+const fromBaybayin = (text: string) => {
+  if (!text) return "";
+  const reverseVowels: Record<string, string> = { '\u1700': 'a', '\u1701': 'i', '\u1702': 'o' };
+  const reverseConsonants: Record<string, string> = { '\u1703': 'k', '\u1704': 'g', '\u1705': 'ng', '\u1706': 't', '\u1707': 'd', '\u1708': 'n', '\u1709': 'p', '\u170A': 'b', '\u170B': 'm', '\u170C': 'y', '\u170E': 'l', '\u170F': 'w', '\u1710': 's', '\u1711': 'h' };
+  
+  let result = "";
+  let i = 0;
+  while (i < text.length) {
+    let char = text[i];
+    if (reverseVowels[char]) {
+      result += reverseVowels[char];
+      i++;
+    } else if (reverseConsonants[char]) {
+      let consonant = reverseConsonants[char];
+      let nextChar = text[i+1];
+      if (nextChar === '\u1712') {
+        result += consonant + 'i';
+        i += 2;
+      } else if (nextChar === '\u1713') {
+        result += consonant + 'o';
+        i += 2;
+      } else if (nextChar === '\u1714') {
+        result += consonant;
+        i += 2;
+      } else {
+        result += consonant + 'a';
+        i++;
+      }
+    } else {
+      result += char;
+      i++;
+    }
+  }
+  return result;
+};
+
 export default function App() {
   // App Mode State
   const [appMode, setAppMode] = useState<'translator' | 'baybayin'>('translator');
@@ -193,7 +229,12 @@ export default function App() {
   const [baybayinOutput, setBaybayinOutput] = useState('');
   const [isBaybayinCopied, setIsBaybayinCopied] = useState(false);
 
-  const [baybayinHistory, setBaybayinHistory] = useState<{ input: string, output: string }[]>([]);
+  const [isTranscribed, setIsTranscribed] = useState(false);
+  const [transcribedDisplayMode, setTranscribedDisplayMode] = useState<'RAW TL' | 'ENG'>('RAW TL');
+  const [transcribedEnglish, setTranscribedEnglish] = useState('');
+  const [isTranslatingBaybayin, setIsTranslatingBaybayin] = useState(false);
+
+  const [baybayinHistory, setBaybayinHistory] = useState<{ input: string, output: string, transcribed?: boolean }[]>([]);
   const [showBaybayinHistory, setShowBaybayinHistory] = useState(false);
 
   const englishSuggestions = ['hello', 'how are you?', 'thank you', 'good morning', 'I love you'];
@@ -238,9 +279,21 @@ export default function App() {
 
   const handleGenerateBaybayin = () => {
     if (!baybayinInput.trim()) return;
-    const output = toBaybayin(baybayinInput);
+    const isBaybayin = /[\u1700-\u171F]/.test(baybayinInput);
+    
+    let output = '';
+    if (isBaybayin) {
+      output = fromBaybayin(baybayinInput);
+      setIsTranscribed(true);
+      setTranscribedDisplayMode('RAW TL');
+      setTranscribedEnglish('');
+    } else {
+      output = toBaybayin(baybayinInput);
+      setIsTranscribed(false);
+    }
+    
     setBaybayinOutput(output);
-    setBaybayinHistory(prev => [{ input: baybayinInput, output: output }, ...prev]);
+    setBaybayinHistory(prev => [{ input: baybayinInput, output: output, transcribed: isBaybayin }, ...prev]);
   };
 
   const baybayinRef = useRef<HTMLDivElement>(null);
@@ -618,7 +671,9 @@ export default function App() {
                       setShowBaybayinHistory(false);
                     }}>
                       <span className="text-lg font-tribal-text text-[#2C2825]/60 uppercase tracking-widest">{item.input}</span>
-                      <span className="text-4xl text-[#2C2825] text-left" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>{item.output}</span>
+                      <span className="text-4xl text-[#2C2825] text-left" style={{ fontFamily: item.transcribed ? undefined : "'Noto Sans Tagalog', sans-serif" }}>
+                        {item.output}
+                      </span>
                     </div>
                   ))
                 )}
@@ -913,7 +968,7 @@ export default function App() {
               <div className="flex items-center gap-4 mt-4 opacity-90">
                 <div className="w-10 h-1 bg-[#2C2825] rounded-sm"></div>
                 <span className="font-tribal-text text-lg md:text-xl tracking-[0.2em] uppercase text-[#2C2825] font-bold">
-                  Script Generator
+                  Script Generator & Translator
                 </span>
                 <div className="w-10 h-1 bg-[#2C2825] rounded-sm"></div>
               </div>
@@ -948,7 +1003,7 @@ export default function App() {
               disabled={!baybayinInput.trim()}
               className="w-full bg-[#2C2825] hover:bg-[#1A1815] text-[#F6F5F2] text-3xl font-tribal-text font-bold py-6 border-4 border-transparent active:border-[#2C2825] active:bg-transparent active:text-[#2C2825] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed mb-12 uppercase tracking-widest"
             >
-              Generate Characters!
+              {/[\u1700-\u171F]/.test(baybayinInput) ? 'TRANSLATE / TRANSCRIBE' : 'GENERATE CHARACTERS!'}
             </button>
 
             {/* Output Box */}
@@ -956,9 +1011,50 @@ export default function App() {
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
                 <div ref={baybayinRef} className="bg-[#F6F5F2] border-[8px] border-[#2C2825] p-10 flex flex-col items-center justify-center relative min-h-[200px]">
                   
-                  {/* DO NOT TOUCH: The actual Baybayin text MUST remain Noto Sans Tagalog */}
-                  <span className="text-7xl mb-10 text-[#2C2825] text-center break-words w-full" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
-                    {baybayinOutput}
+                  {isTranscribed && (
+                    <div className="flex justify-center mb-6 z-20 relative w-full">
+                      <div className="bg-[#F6F5F2] border-[4px] border-[#2C2825] shadow-[4px_4px_0px_#2C2825] p-1 flex gap-1 rounded-lg">
+                        <button 
+                          onClick={() => setTranscribedDisplayMode('RAW TL')}
+                          className={`px-4 py-2 text-sm font-tribal-text font-bold tracking-widest uppercase transition-all rounded ${transcribedDisplayMode === 'RAW TL' ? 'bg-[#2C2825] text-[#F6F5F2]' : 'text-[#2C2825] hover:bg-[#EAE6DF]'}`}
+                        >
+                          RAW TL
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            setTranscribedDisplayMode('ENG');
+                            if (!transcribedEnglish) {
+                              setIsTranslatingBaybayin(true);
+                              try {
+                                const response = await fetch('/api/translate', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ word: baybayinOutput, direction: 'tl-en' }),
+                                });
+                                const data = await response.json();
+                                setTranscribedEnglish(data.translation || 'Error translating');
+                              } catch (e) {
+                                setTranscribedEnglish('Error translating');
+                              } finally {
+                                setIsTranslatingBaybayin(false);
+                              }
+                            }
+                          }}
+                          className={`px-4 py-2 text-sm font-tribal-text font-bold tracking-widest uppercase transition-all rounded ${transcribedDisplayMode === 'ENG' ? 'bg-[#2C2825] text-[#F6F5F2]' : 'text-[#2C2825] hover:bg-[#EAE6DF]'}`}
+                        >
+                          ENG
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* DO NOT TOUCH: The actual Baybayin text MUST remain Noto Sans Tagalog unless transcribed */}
+                  <span className={`text-6xl mb-10 text-[#2C2825] text-center break-words w-full ${isTranscribed ? 'font-tribal-text uppercase tracking-widest' : ''}`} style={{ fontFamily: isTranscribed ? undefined : "'Noto Sans Tagalog', sans-serif" }}>
+                    {isTranscribed ? (
+                      transcribedDisplayMode === 'ENG' ? (
+                        isTranslatingBaybayin ? <Loader2 className="w-12 h-12 animate-spin stroke-[4] mx-auto text-[#2C2825]" /> : transcribedEnglish
+                      ) : baybayinOutput
+                    ) : baybayinOutput}
                   </span>
 
                   <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-l-8 border-b-8 border-[#2C2825] transform -rotate-12"></div>

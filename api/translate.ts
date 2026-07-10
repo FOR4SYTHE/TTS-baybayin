@@ -58,7 +58,8 @@ export default async function handler(req: Request) {
     const targetLang = direction === "tl-en" ? "en" : "tl";
 
     // Direct Google Translate API Fetch
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const sanitizedText = text.trim().toLowerCase();
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(sanitizedText)}`;
     const response = await fetch(url);
 
     if (!response.ok) {
