@@ -2,9 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { X, Info, Zap, ZapOff, RefreshCcw, Camera } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 const toBaybayin = (text: string) => {
   if (!text) return "";
@@ -55,6 +52,9 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
   const [resultText, setResultText] = useState('');
   const [displayedText, setDisplayedText] = useState('');
 
+  const [scanTime, setScanTime] = useState(0);
+  const [lensCooldown, setLensCooldown] = useState<number | null>(null);
+
   // Hardware States
   const [flashOn, setFlashOn] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -66,11 +66,17 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
   const scanlineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let currentStream: MediaStream | null = null;
     async function startCamera() {
       try {
+        if (videoRef.current && videoRef.current.srcObject) {
+          const oldStream = videoRef.current.srcObject as MediaStream;
+          oldStream.getTracks().forEach(track => track.stop());
+        }
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment', advanced: [{ zoom: 1 }] }
         });
+        currentStream = mediaStream;
         setStream(mediaStream);
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
@@ -79,11 +85,17 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
         console.error("Camera access denied", err);
       }
     }
-    startCamera();
+
+    if (!capturedImage) {
+      startCamera();
+    }
+
     return () => {
-      if (stream) stream.getTracks().forEach(track => track.stop());
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
     };
-  }, []);
+  }, [capturedImage]);
 
   useEffect(() => {
     if (stream) {
@@ -103,52 +115,101 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
     }
   }, [flashOn, zoomLevel, stream]);
 
+  // Dynamic Scan Timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isProcessing) {
+      interval = setInterval(() => setScanTime(prev => prev + 1), 1000);
+    } else {
+      setScanTime(0);
+    }
+    return () => clearInterval(interval);
+  }, [isProcessing]);
+
+  // Rate Limit Cooldown Timer
+  useEffect(() => {
+    if (lensCooldown === null || lensCooldown <= 0) return;
+    const timer = setTimeout(() => setLensCooldown(prev => (prev ?? 1) - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [lensCooldown]);
+
+  // GSAP Animation Lifecycle Fix
+  useEffect(() => {
+    if (isProcessing && scanlineRef.current) {
+      // Start the scanline at the top, then animate down
+      gsap.fromTo(scanlineRef.current, 
+        { y: 0 }, 
+        { y: window.innerHeight * 0.7, duration: 1.5, repeat: -1, yoyo: true, ease: "linear" }
+      );
+    }
+  }, [isProcessing]);
+
   const handleSnap = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+
+    // --- BEYOND PLUS ULTRA DOWNSCALING ---
+    const MAX_WIDTH = 600;
+    const scale = MAX_WIDTH / video.videoWidth;
+
+    canvas.width = MAX_WIDTH;
+    canvas.height = video.videoHeight * scale;
     const ctx = canvas.getContext('2d');
 
+    // Draw the image using the original video dimensions for the source, 
+    // and the scaled canvas dimensions for the destination.
     if (zoomLevel > 1) {
-      const w = canvas.width / zoomLevel;
-      const h = canvas.height / zoomLevel;
-      const x = (canvas.width - w) / 2;
-      const y = (canvas.height - h) / 2;
-      ctx?.drawImage(video, x, y, w, h, 0, 0, canvas.width, canvas.height);
+      const srcW = video.videoWidth / zoomLevel;
+      const srcH = video.videoHeight / zoomLevel;
+      const srcX = (video.videoWidth - srcW) / 2;
+      const srcY = (video.videoHeight - srcH) / 2;
+      ctx?.drawImage(video, srcX, srcY, srcW, srcH, 0, 0, canvas.width, canvas.height);
     } else {
       ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
     }
 
-    const base64Image = canvas.toDataURL('image/jpeg');
+    // Heavy compression guarantees the Vercel payload is tiny
+    const base64Image = canvas.toDataURL('image/jpeg', 0.4);
     setCapturedImage(base64Image);
     setIsProcessing(true);
 
     if (stream) stream.getTracks().forEach(track => track.stop());
 
-    if (scanlineRef.current) {
-      gsap.to(scanlineRef.current, { y: window.innerHeight * 0.7, duration: 1.5, repeat: -1, yoyo: true, ease: "linear" });
-    }
-
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      let promptObj = "";
-      if (mode === 'EN') promptObj = "Extract the text in this image and translate it to English. Give a brief, cool description. No fluff.";
-      if (mode === 'TL') promptObj = "Extract the text in this image and translate it to Tagalog. Give a brief description in Tagalog. No fluff.";
-      if (mode === 'BAY') promptObj = "Extract the text in this image and translate it into simple, Romanized Tagalog words (standard alphabet, no special characters). Do not describe it, just give the literal Tagalog words.";
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image, mode })
+      });
 
-      const result = await model.generateContent([promptObj, { inlineData: { data: base64Image.split(',')[1], mimeType: "image/jpeg" } }]);
-      let text = result.response.text();
+      if (response.status === 429) {
+        const data = await response.json();
+        setLensCooldown(data.retryAfter ?? 60);
+        return; // Stop execution, cooldown triggered
+      }
+
+      if (!response.ok) throw new Error("API error");
+
+      const data = await response.json();
+      let text = data.translation || data.text || "";
+      
+      // BEYOND PLUS ULTRA: Strip markdown asterisks and hashtags for a premium, clean look
+      text = text.replace(/[*#]/g, '');
+      
       if (mode === 'BAY') text = toBaybayin(text);
 
       setResultText(text);
-      setIsProcessing(false);
-      gsap.killTweensOf(scanlineRef.current);
     } catch (error) {
       setResultText("Error communicating with the oracle.");
+    } finally {
       setIsProcessing(false);
+      // Let the useEffect handle the GSAP cleanup automatically, or force kill it here:
+      if (scanlineRef.current) {
+        gsap.killTweensOf(scanlineRef.current);
+        gsap.set(scanlineRef.current, { clearProps: "all" });
+      }
     }
   };
 
@@ -163,6 +224,15 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
       return () => clearInterval(interval);
     }
   }, [resultText, isProcessing, mode]);
+
+  const getWaitingMessage = (time: number) => {
+    if (time > 25) return "ALMOST THERE, PROMISE... 😅";
+    if (time > 20) return "STILL THINKING (IT'S A TOUGH ONE) 🤔";
+    if (time > 15) return "HANG IN THERE... ⏳";
+    if (time > 10) return "DECODING THE VIBES... ✨";
+    if (time > 5) return "ANALYZING PIXELS... 🔍";
+    return "SCANNING... 👁️";
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
@@ -201,8 +271,8 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
               key={m}
               onClick={() => { setMode(m as any); setResultText(''); setDisplayedText(''); setCapturedImage(null); }}
               className={`px-4 py-2 rounded-xl font-black text-sm tracking-widest transition-all ${mode === m
-                  ? 'bg-[#1A1A1A] text-[#FDE047] shadow-[inset_0px_4px_0px_rgba(255,255,255,0.2)]'
-                  : 'text-[#1A1A1A] hover:bg-gray-200'
+                ? 'bg-[#1A1A1A] text-[#FDE047] shadow-[inset_0px_4px_0px_rgba(255,255,255,0.2)]'
+                : 'text-[#1A1A1A] hover:bg-gray-200'
                 }`}
             >
               {m}
@@ -247,14 +317,42 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
 
         {isProcessing && (
           <>
-            <div className="absolute inset-0 bg-black/40 z-10" />
+            <div className="absolute inset-0 bg-black/50 z-10" />
             <div ref={scanlineRef} className="absolute top-0 left-0 w-full h-4 bg-[#FDE047] shadow-[0_0_20px_#FDE047] opacity-80 z-20" />
-            <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-              <span className="text-white font-title text-4xl tracking-widest uppercase animate-pulse" style={{ WebkitTextStroke: '2px #1A1A1A' }}>Scanning...</span>
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none px-6">
+              
+              <div className="relative flex justify-center items-center w-full mb-4">
+                 {/* Reusing your animated sparkle for a premium loading feel */}
+                 <div className="absolute -top-10 -right-4 scale-75 opacity-80">
+                   <CartoonSparkle />
+                 </div>
+                 <span className="text-white font-title text-3xl md:text-4xl tracking-widest uppercase text-center animate-pulse" style={{ WebkitTextStroke: '2px #1A1A1A' }}>
+                   {getWaitingMessage(scanTime)}
+                 </span>
+              </div>
+
+              {scanTime > 0 && (
+                <span className="text-[#FDE047] font-black text-xl tracking-widest border-[3px] border-[#1A1A1A] bg-[#1A1A1A]/80 px-5 py-1.5 rounded-full shadow-[4px_4px_0px_#1A1A1A]">
+                  {scanTime}s
+                </span>
+              )}
             </div>
           </>
         )}
-        
+
+        {/* Cooldown Overlay */}
+        {lensCooldown && !isProcessing && (
+          <div className="absolute inset-0 bg-black/80 z-40 flex flex-col items-center justify-center">
+             <span className="text-6xl mb-4">⏳</span>
+             <span className="text-white font-title text-3xl tracking-widest uppercase text-center" style={{ WebkitTextStroke: '1px #1A1A1A' }}>
+               LENS COOLING DOWN
+             </span>
+             <span className="text-[#FDE047] font-black text-4xl mt-2">
+               {lensCooldown}s
+             </span>
+          </div>
+        )}
+
         {/* Hidden Canvas for capturing image */}
         <canvas ref={canvasRef} className="hidden" />
       </div>
@@ -292,8 +390,8 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
                   key={z}
                   onClick={() => setZoomLevel(z)}
                   className={`w-10 h-10 rounded-full font-black text-sm tracking-tighter transition-all flex items-center justify-center ${zoomLevel === z
-                      ? 'bg-[#1A1A1A] text-[#FDE047]'
-                      : 'text-[#1A1A1A] hover:bg-gray-200'
+                    ? 'bg-[#1A1A1A] text-[#FDE047]'
+                    : 'text-[#1A1A1A] hover:bg-gray-200'
                     }`}
                 >
                   {z}x
