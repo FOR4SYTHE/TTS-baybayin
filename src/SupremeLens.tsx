@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
-import { X, Info, Zap, ZapOff, RefreshCcw, Camera } from 'lucide-react';
+import { X, Info, Zap, ZapOff, RefreshCcw, Camera, Copy, Check } from 'lucide-react';
 
 const toBaybayin = (text: string) => {
   if (!text) return "";
@@ -54,6 +54,7 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
 
   const [scanTime, setScanTime] = useState(0);
   const [lensCooldown, setLensCooldown] = useState<number | null>(null);
+  const [isLensCopied, setIsLensCopied] = useState(false);
 
   // Hardware States
   const [flashOn, setFlashOn] = useState(false);
@@ -187,6 +188,7 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
       if (response.status === 429) {
         const data = await response.json();
         setLensCooldown(data.retryAfter ?? 60);
+        setResultText("We've temporarily exceeded our scan quota! The Oracle is taking a quick breath. Please try again after the cooldown clears.");
         return; // Stop execution, cooldown triggered
       }
 
@@ -201,8 +203,12 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
       if (mode === 'BAY') text = toBaybayin(text);
 
       setResultText(text);
-    } catch (error) {
-      setResultText("Error communicating with the oracle.");
+    } catch (error: any) {
+      if (lensCooldown !== null && lensCooldown > 0) {
+        setResultText("We've temporarily exceeded our scan quota! The Oracle is taking a quick breath. Please try again after the cooldown clears.");
+      } else {
+        setResultText("Error communicating with the oracle.");
+      }
     } finally {
       setIsProcessing(false);
       // Let the useEffect handle the GSAP cleanup automatically, or force kill it here:
@@ -210,6 +216,17 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
         gsap.killTweensOf(scanlineRef.current);
         gsap.set(scanlineRef.current, { clearProps: "all" });
       }
+    }
+  };
+
+  const handleCopyLens = async () => {
+    if (!resultText) return;
+    try {
+      await navigator.clipboard.writeText(resultText);
+      setIsLensCopied(true);
+      setTimeout(() => setIsLensCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text', err);
     }
   };
 
@@ -405,10 +422,26 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
       {/* TEXT OUTPUT BOARD */}
       <AnimatePresence>
         {displayedText && (
-          <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute bottom-[20%] left-6 right-6 bg-[#F6F5F2] border-[6px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 shadow-[8px_8px_0px_#1A1A1A] z-40 max-h-[40vh] overflow-y-auto">
-            <p className={`text-[#1A1A1A] font-medium leading-relaxed whitespace-pre-wrap ${mode === 'BAY' ? 'text-5xl font-["Noto_Sans_Tagalog"] text-center mt-4' : 'text-xl font-box'}`}>
-              {displayedText}
-            </p>
+          <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute bottom-[20%] left-6 right-6 bg-[#F6F5F2] border-[6px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 shadow-[8px_8px_0px_#1A1A1A] z-40 max-h-[40vh] flex flex-col">
+            
+            {/* Copy Button Header */}
+            {!resultText.includes("Error") && (
+              <div className="w-full flex justify-end mb-2">
+                <button
+                  onClick={handleCopyLens}
+                  className="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#1A1A1A] px-3 py-1.5 border-[3px] border-[#1A1A1A] shadow-[2px_2px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] text-xs font-black uppercase transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                >
+                  {isLensCopied ? <Check className="w-4 h-4 text-green-600" strokeWidth={4} /> : <Copy className="w-4 h-4" strokeWidth={4} />}
+                  {isLensCopied ? 'COPIED' : 'COPY'}
+                </button>
+              </div>
+            )}
+
+            <div className="overflow-y-auto pr-2">
+              <p className={`text-[#1A1A1A] font-medium leading-relaxed whitespace-pre-wrap ${mode === 'BAY' ? 'text-5xl font-["Noto_Sans_Tagalog"] text-center mt-4' : 'text-xl font-box'}`}>
+                {displayedText}
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -424,7 +457,16 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
               <h3 className="text-3xl font-title uppercase mb-6 text-[#1A1A1A] border-b-[4px] border-[#1A1A1A] pb-2 inline-block">LENS GUIDE</h3>
               <ul className="space-y-6 text-lg font-black text-[#1A1A1A] uppercase tracking-tight">
                 <li className="flex items-center gap-4"><Zap strokeWidth={4} className="text-[#EF4444]" /> Hardware Flash Toggle</li>
-                <li className="flex items-center gap-4"><span className="px-3 py-1 bg-[#1A1A1A] text-[#FDE047] rounded-lg">EN/TL</span> Translation Engine</li>
+                <li className="flex flex-col gap-2">
+                  <div className="flex items-center gap-4">
+                    <span className="px-3 py-1 bg-[#1A1A1A] text-[#FDE047] rounded-lg tracking-widest">EN/TL/BAY</span> Translation Engine
+                  </div>
+                  <div className="text-xs font-black text-[#1A1A1A]/70 uppercase tracking-widest pl-[6rem] leading-relaxed">
+                    EN = Image to English<br />
+                    TL = Image to Tagalog<br />
+                    BAY = Image to Baybayin
+                  </div>
+                </li>
                 <li className="flex items-center gap-4"><span className="w-8 h-8 rounded-full border-[4px] border-[#1A1A1A] flex items-center justify-center text-sm bg-white">1x</span> Camera Zoom Scale</li>
                 <li className="flex items-center gap-4"><Camera strokeWidth={4} className="text-[#38BDF8]" /> Snap to translate!</li>
               </ul>
