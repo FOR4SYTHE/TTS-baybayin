@@ -5,20 +5,43 @@ import html2canvas from 'html2canvas';
 import SupremeLens from './SupremeLens'; // Added SupremeLens component
 
 // Character Components
-const Daisy = () => (
-  <motion.svg width="100" height="100" viewBox="0 0 100 100"
-    animate={{ rotate: [0, 5, -5, 0], scale: [0.98, 1.02, 0.98] }}
-    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}>
-    <path d="M 50 15 C 65 15, 65 40, 50 50 C 35 40, 35 15, 50 15 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 50 85 C 65 85, 65 60, 50 50 C 35 60, 35 85, 50 85 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 15 50 C 15 35, 40 35, 50 50 C 40 65, 15 65, 15 50 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 85 50 C 85 35, 60 35, 50 50 C 60 65, 85 65, 85 50 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 25 25 C 40 15, 50 40, 50 50 C 40 60, 15 40, 25 25 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 75 75 C 60 85, 50 60, 50 50 C 60 40, 85 60, 75 75 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 75 25 C 85 40, 60 50, 50 50 C 40 50, 60 15, 75 25 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <path d="M 25 75 C 15 60, 40 50, 50 50 C 60 50, 40 85, 25 75 Z" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
-    <circle cx="50" cy="50" r="12" fill="#1A1A1A" />
-    <circle cx="46" cy="46" r="3" fill="#FFF" />
+const Sampaguita = () => (
+  <motion.svg width="120" height="120" viewBox="0 0 100 100"
+    animate={{ rotate: [0, 5, -5, 0], scale: [0.98, 1.05, 0.98] }}
+    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+    className="overflow-visible"
+  >
+    {/* Petals */}
+    <g fill="#FFF" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round">
+      {[0, 72, 144, 216, 288].map(angle => (
+        <path key={angle} d="M 50 50 C 15 -15, 85 -15, 50 50" style={{ transformOrigin: '50px 50px', transform: `rotate(${angle}deg)` }} />
+      ))}
+    </g>
+    
+    {/* Spikes / Stamen */}
+    <g stroke="#1A1A1A" strokeWidth="3.5" strokeLinecap="round">
+      {[36, 108, 180, 252, 324].map(angle => (
+        <line key={angle} x1="50" y1="50" x2="50" y2="20" style={{ transformOrigin: '50px 50px', transform: `rotate(${angle}deg)` }} />
+      ))}
+    </g>
+
+    {/* Center Face */}
+    <circle cx="50" cy="50" r="18" fill="#FFF" stroke="#1A1A1A" strokeWidth="4" />
+    
+    {/* Blushes */}
+    <circle cx="38" cy="53" r="3" fill="#FFB6C1" />
+    <circle cx="62" cy="53" r="3" fill="#FFB6C1" />
+    
+    {/* Eyes */}
+    <ellipse cx="43" cy="47" rx="3.5" ry="5.5" fill="#1A1A1A" />
+    <ellipse cx="57" cy="47" rx="3.5" ry="5.5" fill="#1A1A1A" />
+    
+    {/* Eye Highlights */}
+    <circle cx="42" cy="45" r="1.5" fill="#FFF" />
+    <circle cx="56" cy="45" r="1.5" fill="#FFF" />
+    
+    {/* Smile */}
+    <path d="M 41 55 Q 50 63 59 55" fill="none" stroke="#1A1A1A" strokeWidth="3.5" strokeLinecap="round" />
   </motion.svg>
 );
 
@@ -568,7 +591,7 @@ export default function App() {
           <button
             onClick={() => handleModeSwitch(appMode === 'translator' ? 'baybayin' : 'translator')}
             className={`flex items-center justify-center w-12 h-12 transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none rounded-[255px_15px_225px_15px/15px_225px_15px_255px] ${appMode === 'translator'
-              ? 'bg-[#1A1A1A] border-[4px] border-[#1A1A1A] text-[#a5d6a7] shadow-[4px_4px_0px_0px_#a5d6a7] hover:bg-gray-800'
+              ? 'bg-[#1A1A1A] border-[4px] border-[#1A1A1A] text-[#FED141] shadow-[4px_4px_0px_0px_#0032A0] hover:bg-gray-800'
               : 'bg-[#F6F5F2] border-[4px] border-[#2C2825] text-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] hover:bg-[#EAE6DF]'
               }`}
             title={appMode === 'translator' ? 'Reveal the past...' : 'Return to translator'}
@@ -686,11 +709,11 @@ export default function App() {
             {/* Header */}
             <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-6 select-none">
               <div className="relative inline-block transform -rotate-3 text-center">
-                <div className="absolute -top-12 -left-12 z-0 pointer-events-none">
-                  <Daisy />
+                <div className="absolute -top-14 -left-10 z-0 pointer-events-none">
+                  <Sampaguita />
                 </div>
                 <h1 
-                  className="text-[3.8rem] md:text-[5rem] font-title leading-[1.05] tracking-wide relative z-10" 
+                  className="text-[2.6rem] sm:text-[3.5rem] md:text-[5rem] font-title leading-[1.1] md:leading-[1.05] tracking-wide relative z-10" 
                   style={{ 
                     filter: 'drop-shadow(6px 6px 0px #1A1A1A)',
                     WebkitTextStroke: '3px #1A1A1A'
