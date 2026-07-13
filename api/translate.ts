@@ -30,7 +30,12 @@ export default async function handler(req: Request) {
         contents: [
           { text: promptText },
           { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } }
-        ]
+        ],
+        config: {
+          // Keeps 3.5 Flash's quality for image extraction but trims
+          // the reasoning effort to cut latency on this call.
+          thinkingConfig: { thinkingLevel: 'low' }
+        }
       });
 
       let text = response.text ?? '';
@@ -48,8 +53,10 @@ export default async function handler(req: Request) {
       const targetLang = direction === "tl-en" ? "English" : "Tagalog";
       const prompt = `You are an expert translator. Translate the following ${sourceLang} text to ${targetLang}. Only return the direct translation. Do not include any explanations, quotes, or markdown.\nText to translate: ${word}`;
 
+      // Plain word/sentence translation — Flash-Lite is fast enough
+      // and accurate enough for this, no reasoning overhead needed.
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.1-flash-lite',
         contents: prompt
       });
 

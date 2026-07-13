@@ -21,8 +21,10 @@ export default async function handler(req: Request) {
 
     const prompt = `You are a Tagalog tutor. Write ONE short, conversational Tagalog sentence using the phrase: "${tagalogWord}". Provide the English translation.\nCRITICAL: Output ONLY a raw JSON object. NO markdown, NO code blocks.\nFormat: {"tagalogSentence": "...", "englishTranslation": "..."}`;
 
+    // Lightweight text task — no reasoning depth needed, so we use
+    // Flash-Lite instead of 3.5 Flash for lower latency + cost.
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: prompt
     });
 
