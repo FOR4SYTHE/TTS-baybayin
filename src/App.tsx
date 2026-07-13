@@ -126,14 +126,24 @@ const TribalSun = () => (
 );
 
 const TribalPetroglyph1 = () => (
-  <svg width="80" height="80" viewBox="0 0 100 100" className="text-[#2C2825] opacity-30">
-    <path d="M 50 20 L 50 80 M 30 40 L 70 40 M 35 60 L 65 60 M 20 20 L 30 40 M 80 20 L 70 40" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+  <svg width="100" height="150" viewBox="0 0 100 150" className="text-[#2C2825] opacity-15">
+    {/* Wave & Sun Motif */}
+    <path d="M 20 40 L 35 55 L 50 40 L 65 55 L 80 40 M 20 55 L 35 70 L 50 55 L 65 70 L 80 55" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="50" cy="100" r="12" fill="none" stroke="currentColor" strokeWidth="4" />
+    {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
+      <line key={angle} x1="50" y1="80" x2="50" y2="72" stroke="currentColor" strokeWidth="3" strokeLinecap="round" style={{ transformOrigin: '50px 100px', transform: `rotate(${angle}deg)` }} />
+    ))}
+    <path d="M 40 10 L 50 20 L 60 10 M 50 20 L 50 30" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const TribalPetroglyph2 = () => (
-  <svg width="80" height="80" viewBox="0 0 100 100" className="text-[#2C2825] opacity-30">
-    <path d="M 30 80 C 30 40, 70 40, 70 80 M 50 30 C 50 10, 80 10, 80 30 C 80 50, 50 50, 50 30 Z" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+  <svg width="80" height="180" viewBox="0 0 80 180" className="text-[#2C2825] opacity-15">
+    {/* Centipede (Alupihan) & Diamond Motif */}
+    <path d="M 40 20 L 25 35 M 40 20 L 55 35 M 40 35 L 25 50 M 40 35 L 55 50 M 40 50 L 25 65 M 40 50 L 55 65 M 40 20 L 40 65" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M 40 90 L 55 105 L 40 120 L 25 105 Z" fill="none" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+    <circle cx="40" cy="105" r="4" fill="currentColor" />
+    <path d="M 30 140 L 40 130 L 50 140 M 30 155 L 40 145 L 50 155 M 30 170 L 40 160 L 50 170 M 40 130 L 40 170" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -582,7 +592,7 @@ export default function App() {
         className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#93C5FD]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
         style={appMode === 'translator'
           ? { backgroundColor: '#EEF2FF', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
-          : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%232C2825\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M 30,20 Q 50,-10 70,20 T 110,10 T 140,30 Q 120,50 100,30 T 60,40 Q 40,20 30,20 Z\' /%3E%3Cpath d=\'M 160,20 L 190,20 L 190,80 L 140,80 L 140,50 L 160,50 Z M 160,65 L 175,65 L 175,35 L 160,35 Z\' fill-rule=\'evenodd\'/%3E%3Cpath d=\'M 20,70 Q 40,70 40,90 Q 40,110 20,110 Q 0,110 0,90 Q 0,70 20,70 Z M 20,82 Q 28,82 28,90 Q 28,98 20,98 Q 12,98 12,90 Q 12,82 20,82 Z\' fill-rule=\'evenodd\' /%3E%3Cpath d=\'M 60,80 L 110,80 L 110,130 L 60,130 Z M 75,95 L 95,95 L 95,115 L 75,115 Z\' fill-rule=\'evenodd\' /%3E%3Ccircle cx=\'85\' cy=\'105\' r=\'4\' /%3E%3Cpath d=\'M 130,100 Q 150,100 160,120 T 190,130 Q 180,150 160,140 T 140,120 Q 120,110 130,100 Z\' /%3E%3Cpath d=\'M 30,140 L 50,130 L 70,150 L 50,170 Q 30,190 20,160 Z\' /%3E%3Cpath d=\'M 120,160 Q 140,150 150,170 T 180,180 Q 160,200 140,190 T 110,170 Z\' /%3E%3Ccircle cx=\'170\' cy=\'90\' r=\'8\' /%3E%3Ccircle cx=\'50\' cy=\'60\' r=\'6\' /%3E%3Cpath d=\'M 10,130 Q 20,140 10,150 Q 0,140 10,130 Z\' /%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
+          : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'240\' height=\'240\' viewBox=\'0 0 240 240\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\' opacity=\'0.06\'%3E%3Ccircle cx=\'120\' cy=\'120\' r=\'12\'/%3E%3Cpath d=\'M 120 100 L 120 92 M 120 140 L 120 148 M 100 120 L 92 120 M 140 120 L 148 120\' stroke-width=\'3\'/%3E%3Cpath d=\'M 106 106 L 98 98 M 134 134 L 142 142 M 106 134 L 98 142 M 134 106 L 142 98\' stroke-width=\'2\'/%3E%3Cpath d=\'M 110 70 L 120 80 L 130 70 M 110 60 L 120 70 L 130 60 M 110 50 L 120 60 L 130 50\'/%3E%3Cpath d=\'M 110 170 L 120 160 L 130 170 M 110 180 L 120 170 L 130 180 M 110 190 L 120 180 L 130 190\'/%3E%3Cpath d=\'M 40 100 L 50 110 L 40 120 L 30 110 Z\'/%3E%3Cpath d=\'M 40 130 L 50 140 L 40 150 L 30 140 Z\'/%3E%3Cpath d=\'M 25 80 L 35 90 L 45 80 L 55 90 M 25 90 L 35 100 L 45 90 L 55 100\'/%3E%3Cpath d=\'M 200 100 L 210 110 L 200 120 L 190 110 Z\'/%3E%3Cpath d=\'M 200 130 L 210 140 L 200 150 L 190 140 Z\'/%3E%3Cpath d=\'M 185 80 L 195 90 L 205 80 L 215 90 M 185 90 L 195 100 L 205 90 L 215 100\'/%3E%3Ccircle cx=\'120\' cy=\'30\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'120\' cy=\'210\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'40\' cy=\'60\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'200\' cy=\'190\' r=\'1.5\' fill=\'%232C2825\'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
         }
       >
 
