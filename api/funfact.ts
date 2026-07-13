@@ -1,3 +1,5 @@
+import { GoogleGenAI } from '@google/genai';
+
 export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request) {
@@ -15,20 +17,15 @@ export default async function handler(req: Request) {
     CRITICAL: Output ONLY a raw JSON object. NO markdown, NO code blocks.
     Format: {"fact": "..."}`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const ai = new GoogleGenAI({ apiKey });
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }]
-      })
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: prompt
     });
 
-    if (!response.ok) return new Response(JSON.stringify({ fact: null }), { status: 200 });
+    const textResponse = response.text ?? '';
 
-    const responseData = await response.json();
-    const textResponse = responseData.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return new Response(JSON.stringify({ fact: null }), { status: 200 });
 
@@ -37,7 +34,8 @@ export default async function handler(req: Request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch {
+  } catch (error) {
+    console.error("Fun Fact Error:", error);
     return new Response(JSON.stringify({ fact: null }), { status: 200 });
   }
 }

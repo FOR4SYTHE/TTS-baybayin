@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@google/genai": "^1.15.0",
     "@tailwindcss/vite": "^4.3.2",
     "framer-motion": "^10.18.0",
     "gsap": "^3.15.0",

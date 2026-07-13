@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
 export const config = { runtime: 'edge' };
 
@@ -10,29 +10,23 @@ export default async function handler(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return new Response(JSON.stringify({
-        error: 'missing_key',
-        message: "GEMINI_API_KEY not found in environment variables."
-      }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: "missing_key" }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
     if (!englishWord || !tagalogWord) {
-      return new Response(JSON.stringify({
-        error: 'missing_input',
-        message: "Input words missing."
-      }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: 'missing_input' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const prompt = `You are a Tagalog tutor. Write ONE short, conversational Tagalog sentence using the phrase: "${tagalogWord}". Provide the English translation.
-    CRITICAL: Output ONLY a raw JSON object. NO markdown, NO code blocks.
-    Format: {"tagalogSentence": "...", "englishTranslation": "..."}`;
+    const ai = new GoogleGenAI({ apiKey });
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+    const prompt = `You are a Tagalog tutor. Write ONE short, conversational Tagalog sentence using the phrase: "${tagalogWord}". Provide the English translation.\nCRITICAL: Output ONLY a raw JSON object. NO markdown, NO code blocks.\nFormat: {"tagalogSentence": "...", "englishTranslation": "..."}`;
 
-    const result = await model.generateContent(prompt);
-    const textResponse = result.response.text();
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: prompt
+    });
 
+    const textResponse = response.text ?? '';
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
 
     if (!jsonMatch) throw new Error("AI response was not valid JSON.");
@@ -44,16 +38,10 @@ export default async function handler(req: Request) {
     });
 
   } catch (error: any) {
+    console.error("Example Error:", error);
     if (error.message?.includes('429') || error.status === 429) {
-      return new Response(JSON.stringify({
-        error: 'rate_limited',
-        retryAfter: 60,
-      }), { status: 429, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: 'rate_limited', retryAfter: 60 }), { status: 429, headers: { 'Content-Type': 'application/json' } });
     }
-
-    return new Response(JSON.stringify({
-      error: 'api_error',
-      message: error.message
-    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ error: 'api_error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
