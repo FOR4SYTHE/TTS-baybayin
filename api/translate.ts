@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 
 export const config = { runtime: 'edge' };
 
@@ -34,7 +34,7 @@ export default async function handler(req: Request) {
         config: {
           // Keeps 3.5 Flash's quality for image extraction but trims
           // the reasoning effort to cut latency on this call.
-          thinkingConfig: { thinkingLevel: 'low' }
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }
         }
       });
 
