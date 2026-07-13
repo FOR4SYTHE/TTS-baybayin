@@ -709,11 +709,11 @@ export default function App() {
             {/* Header */}
             <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-6 select-none">
               <div className="relative inline-block transform -rotate-3 text-center">
-                <div className="absolute -top-14 -left-10 z-0 pointer-events-none">
+                <div className="absolute -top-14 -left-4 sm:-top-20 sm:-left-8 z-0 pointer-events-none">
                   <Sampaguita />
                 </div>
                 <h1 
-                  className="text-[2.6rem] sm:text-[3.5rem] md:text-[5rem] font-title leading-[1.1] md:leading-[1.05] tracking-wide relative z-10" 
+                  className="text-[2.9rem] sm:text-[4rem] md:text-[5.5rem] font-title leading-[1.05] tracking-normal sm:tracking-wide relative z-10" 
                   style={{ 
                     filter: 'drop-shadow(6px 6px 0px #1A1A1A)',
                     WebkitTextStroke: '3px #1A1A1A'
