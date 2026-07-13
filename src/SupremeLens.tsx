@@ -52,6 +52,8 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
   const [resultText, setResultText] = useState('');
   const [displayedText, setDisplayedText] = useState('');
 
+  const [scanData, setScanData] = useState<{ text: string, lang: 'EN'|'TL' } | null>(null);
+
   const [scanTime, setScanTime] = useState(0);
   const [lensCooldown, setLensCooldown] = useState<number | null>(null);
   const [isLensCopied, setIsLensCopied] = useState(false);
@@ -145,6 +147,28 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
     }
   }, [isProcessing]);
 
+  const translateCachedText = async (text: string, direction: 'en-tl' | 'tl-en') => {
+    const response = await fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word: text, direction })
+    });
+
+    if (response.status === 503) {
+      throw new Error("503");
+    }
+
+    if (response.status === 429) {
+      const data = await response.json();
+      setLensCooldown(data.retryAfter ?? 3600);
+      throw new Error("429");
+    }
+
+    if (!response.ok) throw new Error("API error");
+    const data = await response.json();
+    return data.translation;
+  };
+
   const handleSnap = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -185,9 +209,14 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
         body: JSON.stringify({ image: base64Image, mode })
       });
 
+      if (response.status === 503) {
+        setResultText("ORACLE OVERLOADED: GOOGLE SERVERS BUSY. PLEASE TRY AGAIN LATER.");
+        return;
+      }
+
       if (response.status === 429) {
         const data = await response.json();
-        setLensCooldown(data.retryAfter ?? 60);
+        setLensCooldown(data.retryAfter ?? 3600);
         return; // Stop execution, cooldown triggered
       }
 
@@ -198,6 +227,9 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
       
       // BEYOND PLUS ULTRA: Strip markdown asterisks and hashtags for a premium, clean look
       text = text.replace(/[*#]/g, '');
+      
+      const extractedLang = mode === 'BAY' ? 'TL' : mode;
+      setScanData({ text, lang: extractedLang });
       
       if (mode === 'BAY') text = toBaybayin(text);
 
@@ -246,6 +278,8 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
     return "SCANNING... 👁️";
   };
 
+  const isErrorState = resultText.includes("ORACLE OVERLOADED") || resultText.includes("Error communicating");
+
   return (
     <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
       className="fixed inset-0 z-50 flex flex-col font-sans bg-[#cdddb7] overflow-hidden"
@@ -281,7 +315,49 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
           {['EN', 'TL', 'BAY'].map((m) => (
             <button
               key={m}
-              onClick={() => { setMode(m as any); setResultText(''); setDisplayedText(''); setCapturedImage(null); }}
+              onClick={async () => {
+                const newMode = m as 'EN' | 'TL' | 'BAY';
+                if (newMode === mode) return;
+
+                if (!capturedImage || !scanData) {
+                  setMode(newMode);
+                  return;
+                }
+
+                setMode(newMode);
+                setDisplayedText('');
+                setResultText('');
+
+                const targetLang = newMode === 'BAY' ? 'TL' : newMode;
+                let finalRawText = scanData.text;
+
+                if (scanData.lang !== targetLang) {
+                  setIsProcessing(true);
+                  try {
+                    const direction = scanData.lang === 'EN' ? 'en-tl' : 'tl-en';
+                    finalRawText = await translateCachedText(scanData.text, direction);
+                    setScanData({ text: finalRawText, lang: targetLang });
+                  } catch (e: any) {
+                    console.error(e);
+                    if (e.message === "429") {
+                      return; // Stop execution, cooldown triggered
+                    }
+                    if (e.message === "503") {
+                      finalRawText = "ORACLE OVERLOADED: GOOGLE SERVERS BUSY. PLEASE TRY AGAIN LATER.";
+                    } else {
+                      finalRawText = "Error communicating with the oracle.";
+                    }
+                  } finally {
+                    setIsProcessing(false);
+                  }
+                }
+
+                if (finalRawText !== "Error communicating with the oracle." && finalRawText !== "ORACLE OVERLOADED: GOOGLE SERVERS BUSY. PLEASE TRY AGAIN LATER.") {
+                  setResultText(newMode === 'BAY' ? toBaybayin(finalRawText) : finalRawText);
+                } else {
+                  setResultText(finalRawText);
+                }
+              }}
               className={`px-4 py-2 rounded-xl font-black text-sm tracking-widest transition-all ${mode === m
                 ? 'bg-[#1A1A1A] text-[#FDE047] shadow-[inset_0px_4px_0px_rgba(255,255,255,0.2)]'
                 : 'text-[#1A1A1A] hover:bg-gray-200'
@@ -375,7 +451,7 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
         {/* Left: Retake Button */}
         <div className="w-20">
           {capturedImage && (
-            <button onClick={() => { setCapturedImage(null); setResultText(''); setDisplayedText(''); }} className="w-16 h-16 bg-[#F6F5F2] rounded-full border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none flex items-center justify-center text-[#1A1A1A] transition-all">
+            <button onClick={() => { setCapturedImage(null); setResultText(''); setDisplayedText(''); setScanData(null); }} className="w-16 h-16 bg-[#F6F5F2] rounded-full border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none flex items-center justify-center text-[#1A1A1A] transition-all">
               <RefreshCcw strokeWidth={4} size={24} />
             </button>
           )}
@@ -420,15 +496,17 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
           <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute bottom-[20%] left-6 right-6 bg-[#F6F5F2] border-[6px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 shadow-[8px_8px_0px_#1A1A1A] z-40 max-h-[40vh] flex flex-col">
             
             {/* Copy Button Header */}
-            <div className="w-full flex justify-end mb-2">
-              <button
-                onClick={handleCopyLens}
-                className="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#1A1A1A] px-3 py-1.5 border-[3px] border-[#1A1A1A] shadow-[2px_2px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] text-xs font-black uppercase transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-              >
-                {isLensCopied ? <Check className="w-4 h-4 text-green-600" strokeWidth={4} /> : <Copy className="w-4 h-4" strokeWidth={4} />}
-                {isLensCopied ? 'COPIED' : 'COPY'}
-              </button>
-            </div>
+            {!isErrorState && (
+              <div className="w-full flex justify-end mb-2">
+                <button
+                  onClick={handleCopyLens}
+                  className="flex items-center gap-2 bg-white hover:bg-gray-100 text-[#1A1A1A] px-3 py-1.5 border-[3px] border-[#1A1A1A] shadow-[2px_2px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] text-xs font-black uppercase transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                >
+                  {isLensCopied ? <Check className="w-4 h-4 text-green-600" strokeWidth={4} /> : <Copy className="w-4 h-4" strokeWidth={4} />}
+                  {isLensCopied ? 'COPIED' : 'COPY'}
+                </button>
+              </div>
+            )}
 
             <div className="overflow-y-auto pr-2">
               <p className={`text-[#1A1A1A] font-medium leading-relaxed whitespace-pre-wrap ${mode === 'BAY' ? 'text-5xl font-["Noto_Sans_Tagalog"] text-center mt-4' : 'text-xl font-box'}`}>

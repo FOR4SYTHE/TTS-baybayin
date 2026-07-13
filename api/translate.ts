@@ -28,7 +28,7 @@ export default async function handler(req: Request) {
       const response = await ai.models.generateContent({
         model: 'gemini-3.5-flash',
         contents: [
-          { text: promptText },
+          promptText,
           { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } }
         ],
         config: {
@@ -49,8 +49,12 @@ export default async function handler(req: Request) {
 
     // 2. TEXT TRANSLATOR PIPELINE
     else if (word) {
-      const sourceLang = direction === "tl-en" ? "Tagalog" : "English";
-      const targetLang = direction === "tl-en" ? "English" : "Tagalog";
+      let sourceLang = "Tagalog";
+      let targetLang = "English";
+      if (direction === "tl-en") { sourceLang = "Tagalog"; targetLang = "English"; }
+      else if (direction === "en-tl") { sourceLang = "English"; targetLang = "Tagalog"; }
+      else if (direction === "bay-tl") { sourceLang = "Baybayin"; targetLang = "Tagalog"; }
+      else if (direction === "bay-en") { sourceLang = "Baybayin"; targetLang = "English"; }
       const prompt = `You are an expert translator. Translate the following ${sourceLang} text to ${targetLang}. Only return the direct translation. Do not include any explanations, quotes, or markdown.\nText to translate: ${word}`;
 
       // Plain word/sentence translation — Flash-Lite is fast enough
@@ -74,8 +78,12 @@ export default async function handler(req: Request) {
   } catch (error: any) {
     console.error("Endpoint error:", error);
 
+    if (error.status === 503 || error.message?.includes('503')) {
+      return new Response(JSON.stringify({ error: 'server_busy' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    }
+
     if (error.message?.includes('429') || error.status === 429) {
-      return new Response(JSON.stringify({ error: 'rate_limited', retryAfter: 60 }), { status: 429, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: 'rate_limited', retryAfter: 3600 }), { status: 429, headers: { 'Content-Type': 'application/json' } });
     }
 
     return new Response(JSON.stringify({ error: "Failed to process request" }), { status: 500, headers: { 'Content-Type': 'application/json' } });

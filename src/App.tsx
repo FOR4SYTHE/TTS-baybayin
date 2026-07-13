@@ -189,6 +189,11 @@ export default function App() {
   const [exampleCooldown, setExampleCooldown] = useState<number | null>(null);
 
   // Baybayin States
+  const [baybayinMode, setBaybayinMode] = useState<'encode' | 'decode'>('encode');
+  const [decodeTarget, setDecodeTarget] = useState<'TL' | 'EN'>('TL');
+  const [decodedCache, setDecodedCache] = useState<{TL?: string, EN?: string}>({});
+  const [isDecoding, setIsDecoding] = useState(false);
+
   const [baybayinInput, setBaybayinInput] = useState('');
   const [baybayinOutput, setBaybayinOutput] = useState('');
   const [isBaybayinCopied, setIsBaybayinCopied] = useState(false);
@@ -241,6 +246,54 @@ export default function App() {
     const output = toBaybayin(baybayinInput);
     setBaybayinOutput(output);
     setBaybayinHistory(prev => [{ input: baybayinInput, output: output }, ...prev]);
+  };
+
+  const handleDecodeBaybayin = async (targetOverride?: 'TL' | 'EN') => {
+    if (!baybayinInput.trim()) return;
+
+    const target = targetOverride || decodeTarget;
+    if (targetOverride) setDecodeTarget(target);
+
+    if (decodedCache[target]) {
+      setBaybayinOutput(decodedCache[target]!);
+      return;
+    }
+
+    setIsDecoding(true);
+    setBaybayinOutput('');
+    try {
+      const direction = target === 'TL' ? 'bay-tl' : 'bay-en';
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: baybayinInput, direction })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Server returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.translation) {
+        setDecodedCache(prev => ({ ...prev, [target]: data.translation }));
+        setBaybayinOutput(data.translation);
+        if (!targetOverride) {
+          setBaybayinHistory(prev => [{ input: baybayinInput, output: data.translation }, ...prev]);
+        }
+      }
+    } catch (error: any) {
+      console.error('Decode error:', error);
+      if (error.message === 'server_busy') {
+         setBaybayinOutput("ORACLE OVERLOADED: GOOGLE SERVERS BUSY. PLEASE TRY AGAIN LATER.");
+      } else if (error.message === 'rate_limited') {
+         setBaybayinOutput("Error: Rate Limited");
+      } else {
+         setBaybayinOutput("Error communicating with the oracle.");
+      }
+    } finally {
+      setIsDecoding(false);
+    }
   };
 
   const baybayinRef = useRef<HTMLDivElement>(null);
@@ -917,12 +970,28 @@ export default function App() {
                 </span>
                 <div className="w-10 h-1 bg-[#2C2825] rounded-sm"></div>
               </div>
+
+              {/* Mode Toggle */}
+              <div className="flex mt-8 bg-transparent border-[4px] border-[#2C2825] p-1 rounded-[255px_15px_225px_15px/15px_225px_15px_255px]">
+                <button 
+                  onClick={() => { setBaybayinMode('encode'); setBaybayinOutput(''); setDecodedCache({}); }}
+                  className={`px-4 py-2 font-tribal-text font-bold uppercase tracking-widest transition-colors rounded-xl ${baybayinMode === 'encode' ? 'bg-[#2C2825] text-[#F6F5F2]' : 'text-[#2C2825] hover:bg-[#2C2825]/10'}`}
+                >
+                  CARVE (To Baybayin)
+                </button>
+                <button 
+                  onClick={() => { setBaybayinMode('decode'); setBaybayinOutput(''); setDecodedCache({}); }}
+                  className={`px-4 py-2 font-tribal-text font-bold uppercase tracking-widest transition-colors rounded-xl ${baybayinMode === 'decode' ? 'bg-[#2C2825] text-[#F6F5F2]' : 'text-[#2C2825] hover:bg-[#2C2825]/10'}`}
+                >
+                  DECODE (From Baybayin)
+                </button>
+              </div>
             </div>
 
             {/* Input Box */}
             <div className="w-full space-y-3 z-10 relative mb-10">
               <label htmlFor="baybayin-input" className="text-2xl font-tribal-text text-[#2C2825] uppercase tracking-[0.1em] px-2 block font-bold">
-                Enter Word or Name
+                {baybayinMode === 'decode' ? 'Paste Baybayin Characters' : 'Enter Word or Name'}
               </label>
               <div className="bg-transparent border-[8px] border-[#2C2825] p-6 relative">
                 <input
@@ -932,10 +1001,11 @@ export default function App() {
                   onChange={(e) => {
                     setBaybayinInput(e.target.value);
                     setBaybayinOutput('');
+                    setDecodedCache({});
                   }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleGenerateBaybayin()}
+                  onKeyDown={(e) => e.key === 'Enter' && (baybayinMode === 'decode' ? handleDecodeBaybayin() : handleGenerateBaybayin())}
                   className="flex-1 bg-transparent text-3xl font-tribal-text font-bold outline-none placeholder:text-[#2C2825]/40 w-full text-[#2C2825]"
-                  placeholder="e.g. malaya"
+                  placeholder={baybayinMode === 'decode' ? 'e.g. \u170E\u1700\u170C\u1700' : 'e.g. malaya'}
                 />
                 <div className="absolute -top-2 -left-2 w-4 h-4 bg-[#F6F5F2] border-r-4 border-b-4 border-[#2C2825] transform rotate-45"></div>
                 <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-[#F6F5F2] border-l-4 border-t-4 border-[#2C2825] transform rotate-45"></div>
@@ -944,11 +1014,12 @@ export default function App() {
 
             {/* Generate Button */}
             <button
-              onClick={handleGenerateBaybayin}
-              disabled={!baybayinInput.trim()}
-              className="w-full bg-[#2C2825] hover:bg-[#1A1815] text-[#F6F5F2] text-3xl font-tribal-text font-bold py-6 border-4 border-transparent active:border-[#2C2825] active:bg-transparent active:text-[#2C2825] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed mb-12 uppercase tracking-widest"
+              onClick={() => baybayinMode === 'decode' ? handleDecodeBaybayin() : handleGenerateBaybayin()}
+              disabled={!baybayinInput.trim() || isDecoding}
+              className="w-full bg-[#2C2825] hover:bg-[#1A1815] text-[#F6F5F2] text-3xl font-tribal-text font-bold py-6 border-4 border-transparent active:border-[#2C2825] active:bg-transparent active:text-[#2C2825] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed mb-12 uppercase tracking-widest flex items-center justify-center"
             >
-              Generate Characters!
+              {isDecoding ? <Loader2 className="w-8 h-8 mr-3 animate-spin stroke-[4]" /> : null}
+              {baybayinMode === 'decode' ? 'DECODE SCRIPT!' : 'Generate Characters!'}
             </button>
 
             {/* Output Box */}
@@ -956,10 +1027,33 @@ export default function App() {
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
                 <div ref={baybayinRef} className="bg-[#F6F5F2] border-[8px] border-[#2C2825] p-10 flex flex-col items-center justify-center relative min-h-[200px]">
                   
+                  {baybayinMode === 'decode' && (
+                    <div className="absolute top-4 border-[4px] border-[#2C2825] shadow-[4px_4px_0px_#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex p-1 mb-6">
+                      {['TL', 'EN'].map((lang) => (
+                        <button
+                          key={lang}
+                          onClick={() => handleDecodeBaybayin(lang as 'TL' | 'EN')}
+                          className={`px-4 py-1.5 rounded-xl font-tribal-text font-bold text-lg tracking-widest transition-all ${decodeTarget === lang
+                            ? 'bg-[#2C2825] text-[#F6F5F2]'
+                            : 'text-[#2C2825] hover:bg-[#2C2825]/10'
+                            }`}
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   {/* DO NOT TOUCH: The actual Baybayin text MUST remain Noto Sans Tagalog */}
-                  <span className="text-7xl mb-10 text-[#2C2825] text-center break-words w-full" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
-                    {baybayinOutput}
-                  </span>
+                  {baybayinMode === 'encode' ? (
+                    <span className="text-7xl mb-10 text-[#2C2825] text-center break-words w-full" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
+                      {baybayinOutput}
+                    </span>
+                  ) : (
+                    <span className="text-4xl mt-12 mb-10 text-[#2C2825] text-center break-words w-full font-tribal-text tracking-widest uppercase font-bold">
+                      {baybayinOutput}
+                    </span>
+                  )}
 
                   <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-l-8 border-b-8 border-[#2C2825] transform -rotate-12"></div>
                   <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-[#F6F5F2] border-r-8 border-t-8 border-[#2C2825] transform -rotate-12"></div>
