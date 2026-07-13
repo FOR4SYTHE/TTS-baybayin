@@ -515,7 +515,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className={`fixed inset-0 z-50 flex flex-col items-center justify-center ${nextMode === 'baybayin' ? 'bg-[#12100E]' : 'bg-[#f1f8e9]'}`}
+            className={`fixed inset-0 z-50 flex flex-col items-center justify-center ${nextMode === 'baybayin' ? 'bg-[#12100E]' : 'bg-[#EEF2FF]'}`}
           >
             {nextMode === 'baybayin' ? (
               <div className="flex flex-col items-center text-white">
@@ -556,9 +556,9 @@ export default function App() {
 
       {/* Main App Container */}
       <div
-        className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#a5d6a7]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
+        className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#93C5FD]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
         style={appMode === 'translator'
-          ? { backgroundColor: '#f1f8e9', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23dcedc8\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
+          ? { backgroundColor: '#EEF2FF', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
           : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%232C2825\' fill-opacity=\'0.06\'%3E%3Cpath d=\'M 30,20 Q 50,-10 70,20 T 110,10 T 140,30 Q 120,50 100,30 T 60,40 Q 40,20 30,20 Z\' /%3E%3Cpath d=\'M 160,20 L 190,20 L 190,80 L 140,80 L 140,50 L 160,50 Z M 160,65 L 175,65 L 175,35 L 160,35 Z\' fill-rule=\'evenodd\'/%3E%3Cpath d=\'M 20,70 Q 40,70 40,90 Q 40,110 20,110 Q 0,110 0,90 Q 0,70 20,70 Z M 20,82 Q 28,82 28,90 Q 28,98 20,98 Q 12,98 12,90 Q 12,82 20,82 Z\' fill-rule=\'evenodd\' /%3E%3Cpath d=\'M 60,80 L 110,80 L 110,130 L 60,130 Z M 75,95 L 95,95 L 95,115 L 75,115 Z\' fill-rule=\'evenodd\' /%3E%3Ccircle cx=\'85\' cy=\'105\' r=\'4\' /%3E%3Cpath d=\'M 130,100 Q 150,100 160,120 T 190,130 Q 180,150 160,140 T 140,120 Q 120,110 130,100 Z\' /%3E%3Cpath d=\'M 30,140 L 50,130 L 70,150 L 50,170 Q 30,190 20,160 Z\' /%3E%3Cpath d=\'M 120,160 Q 140,150 150,170 T 180,180 Q 160,200 140,190 T 110,170 Z\' /%3E%3Ccircle cx=\'170\' cy=\'90\' r=\'8\' /%3E%3Ccircle cx=\'50\' cy=\'60\' r=\'6\' /%3E%3Cpath d=\'M 10,130 Q 20,140 10,150 Q 0,140 10,130 Z\' /%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
         }
       >
@@ -690,15 +690,15 @@ export default function App() {
                   <Daisy />
                 </div>
                 <h1 
-                  className="text-[3.8rem] md:text-[5rem] font-title text-white leading-[1.05] tracking-wide relative z-10" 
+                  className="text-[3.8rem] md:text-[5rem] font-title leading-[1.05] tracking-wide relative z-10" 
                   style={{ 
                     filter: 'drop-shadow(6px 6px 0px #1A1A1A)',
                     WebkitTextStroke: '3px #1A1A1A'
                   }}
                 >
-                  TAGALOG<br />
-                  TRANSLATOR<br />
-                  <span className="text-[#FFE5B4]">SUPREME</span>
+                  <span className="text-[#0032A0]">TAGALOG</span><br />
+                  <span className="text-[#BF0D3E]">TRANSLATOR</span><br />
+                  <span className="text-[#FED141]">SUPREME</span>
                 </h1>
               </div>
             </div>
