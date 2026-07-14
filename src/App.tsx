@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Volume2, Loader2, Copy, Check, History, X, ArrowLeftRight, Download, Lightbulb, Camera } from 'lucide-react'; // Added Camera
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import SupremeLens from './SupremeLens'; // Added SupremeLens component
 
 // Character Components
@@ -248,6 +249,10 @@ export default function App() {
   const [baybayinOutput, setBaybayinOutput] = useState('');
   const [isBaybayinCopied, setIsBaybayinCopied] = useState(false);
 
+  const [isArtMode, setIsArtMode] = useState(false);
+  const [isGeneratingArt, setIsGeneratingArt] = useState(false);
+  const [artBgIndex, setArtBgIndex] = useState(1);
+
   const [baybayinHistory, setBaybayinHistory] = useState<{ input: string, output: string }[]>([]);
   const [showBaybayinHistory, setShowBaybayinHistory] = useState(false);
 
@@ -309,6 +314,7 @@ export default function App() {
     const output = toBaybayin(baybayinInput);
     setBaybayinOutput(output);
     setBaybayinHistory(prev => [{ input: baybayinInput, output: output }, ...prev]);
+    setIsArtMode(false);
   };
 
   const handleDecodeBaybayin = async (targetOverride?: 'TL' | 'EN') => {
@@ -344,6 +350,7 @@ export default function App() {
         if (!targetOverride) {
           setBaybayinHistory(prev => [{ input: baybayinInput, output: data.translation }, ...prev]);
         }
+        setIsArtMode(false);
       }
     } catch (error: any) {
       console.error('Decode error:', error);
@@ -373,6 +380,17 @@ export default function App() {
     } catch (err) {
       console.error('Failed to download image', err);
     }
+  };
+
+  const handleMorphToArt = () => {
+    if (isArtMode) return;
+    setIsGeneratingArt(true);
+    // Fake loading sequence
+    setTimeout(() => {
+      setArtBgIndex(Math.floor(Math.random() * 11) + 1);
+      setIsArtMode(true);
+      setIsGeneratingArt(false);
+    }, 1500); // 1.5 second anticipation
   };
 
   const handleCopyBaybayin = async () => {
@@ -1117,10 +1135,59 @@ export default function App() {
             {/* Output Box */}
             {baybayinOutput && (
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
-                <div ref={baybayinRef} className="bg-[#F6F5F2] border-[8px] border-[#2C2825] p-10 flex flex-col items-center justify-center relative min-h-[200px]">
+                <motion.div
+                  ref={baybayinRef}
+                  animate={isGeneratingArt ? { x: [-2, 2, -2, 2, 0], transition: { repeat: Infinity, duration: 0.2 } } : {}}
+                  className={`relative flex flex-col items-center justify-center transition-all duration-500 w-full min-h-[200px] sm:min-h-[250px] ${ 
+                    isArtMode 
+                      ? 'shadow-[0_10px_30px_rgba(0,0,0,0.5)]' 
+                      : 'bg-[#F6F5F2] border-[8px] border-[#2C2825]'
+                  }`}
+                  style={isArtMode ? {
+                    backgroundColor: 'transparent',
+                    backgroundImage: `radial-gradient(circle at 8px 8px, transparent 8px, #F6F5F2 8.5px)`,
+                    backgroundSize: '24px 24px',
+                    backgroundPosition: '-12px -12px',
+                    padding: '24px' // Thick border for the stamp
+                  } : { padding: '2.5rem' }}
+                >
                   
-                  {baybayinMode === 'decode' && (
-                    <div className="absolute top-4 border-[4px] border-[#2C2825] shadow-[4px_4px_0px_#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex p-1 mb-6">
+                  {/* The Tiny Floating Trigger Button (Hidden during Art Mode or Loading) */}
+                  {!isArtMode && !isGeneratingArt && (
+                    <button 
+                      onClick={handleMorphToArt}
+                      className="absolute -right-3 -top-3 z-50 bg-[#FED141] border-[3px] border-[#1A1A1A] w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-[2px_2px_0px_0px_#1A1A1A]"
+                      title="Transform to Art Stamp"
+                    >
+                      🎨
+                    </button>
+                  )}
+                  
+                  {/* Loading State Overlay */}
+                  {isGeneratingArt && (
+                    <div className="absolute inset-0 z-40 bg-[#F6F5F2]/80 backdrop-blur-sm flex items-center justify-center font-black uppercase text-[#1A1A1A] animate-pulse">
+                      Visualizing...
+                    </div>
+                  )}
+
+                  {/* Art Mode Inner Wrapper (Image + Overlay) */}
+                  {isArtMode && (
+                    <div className="absolute inset-[24px] border-[3px] border-[#1A1A1A] overflow-hidden z-0 bg-[#1A1A1A]">
+                      <img src={`/art/${artBgIndex}.webp`} alt="Art Background" className="absolute inset-0 w-full h-full object-cover opacity-90" crossOrigin="anonymous" />
+                      <div className="absolute inset-0 bg-black/40"></div>
+                    </div>
+                  )}
+
+                  {/* Original Tape Corners (Hide in Art Mode) */}
+                  {!isArtMode && (
+                     <>
+                        <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-l-8 border-b-8 border-[#2C2825] transform -rotate-12 z-20"></div>
+                        <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-r-8 border-t-8 border-[#2C2825] transform -rotate-12 z-20"></div>
+                     </>
+                  )}
+
+                  {baybayinMode === 'decode' && !isArtMode && (
+                    <div className="absolute top-4 border-[4px] border-[#2C2825] shadow-[4px_4px_0px_#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex p-1 mb-6 z-20">
                       {['TL', 'EN'].map((lang) => (
                         <button
                           key={lang}
@@ -1136,20 +1203,25 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* DO NOT TOUCH: The actual Baybayin text MUST remain Noto Sans Tagalog */}
-                  {baybayinMode === 'encode' ? (
-                    <span className="text-7xl mb-10 text-[#2C2825] text-center break-words w-full" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
-                      {baybayinOutput}
-                    </span>
-                  ) : (
-                    <span className="text-4xl mt-12 mb-10 text-[#2C2825] text-center break-words w-full font-tribal-text tracking-widest uppercase font-bold">
-                      {baybayinOutput}
-                    </span>
-                  )}
+                  {/* The Baybayin Characters (Adaptive Color) */}
+                  <div className={`relative z-20 flex flex-wrap justify-center items-center gap-2 w-full ${ 
+                    isArtMode 
+                      ? 'text-[#F6F5F2] drop-shadow-[0_4px_12px_rgba(0,0,0,1)]' 
+                      : 'text-[#2C2825]'
+                  }`}>
+                    {/* DO NOT TOUCH: The actual Baybayin text MUST remain Noto Sans Tagalog */}
+                    {baybayinMode === 'encode' ? (
+                      <span className="text-7xl mb-10 text-center break-words w-full block" style={{ fontFamily: "'Noto Sans Tagalog', sans-serif" }}>
+                        {baybayinOutput}
+                      </span>
+                    ) : (
+                      <span className="text-4xl mt-12 mb-10 text-center break-words w-full block font-tribal-text tracking-widest uppercase font-bold">
+                        {baybayinOutput}
+                      </span>
+                    )}
+                  </div>
 
-                  <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#F6F5F2] border-l-8 border-b-8 border-[#2C2825] transform -rotate-12"></div>
-                  <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-[#F6F5F2] border-r-8 border-t-8 border-[#2C2825] transform -rotate-12"></div>
-                </div>
+                </motion.div>
 
                 <div className="flex flex-col gap-3 mt-6">
                   <button
