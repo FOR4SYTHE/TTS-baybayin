@@ -291,27 +291,31 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-10 w-full max-w-2xl px-2">
               {archive.map((entry, idx) => (
-                <div key={idx} className="flex flex-col items-center relative">
-                   {(idx === 0 || archive[idx-1].date !== entry.date) && (
-                     <span className="col-span-2 sm:col-span-3 w-full text-left text-[#1A1A1A] font-black text-sm uppercase tracking-widest mt-6 mb-4 border-b-4 border-[#1A1A1A]/10 pb-2">{entry.date}</span>
-                   )}
-                   <motion.div 
-                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} 
-                     onClick={() => setSelectedStampIndex(idx)}
-                     className="relative aspect-[260/340] w-full flex items-center justify-center drop-shadow-[4px_6px_8px_rgba(0,0,0,0.15)] hover:scale-105 hover:z-50 transition-transform cursor-pointer"
-                     style={{ transform: `rotate(${Math.random() * 6 - 3}deg)` }}
-                   >
-                     {/* Masking Tape Overlay */}
-                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/70 backdrop-blur-sm shadow-sm z-40 border border-black/5" style={{ transform: `rotate(${Math.random() * 10 - 5}deg)` }}></div>
-                     
-                     <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
-                       <path fill="#F6F5F2" d={stampPath} />
-                     </svg>
-                     <div className="relative z-10 w-[84%] h-[88%] border-[2px] border-[#1A1A1A] overflow-hidden bg-white">
-                       <img src={entry.data} className="w-full h-full object-cover grayscale-[0.1] contrast-[1.1]" />
-                     </div>
-                   </motion.div>
-                </div>
+                <React.Fragment key={idx}>
+                  {(idx === 0 || archive[idx-1].date !== entry.date) && (
+                    <div className="col-span-2 sm:col-span-3 w-full text-left text-[#1A1A1A] font-black text-sm uppercase tracking-widest mt-6 mb-2 border-b-4 border-[#1A1A1A]/10 pb-2">
+                      {entry.date}
+                    </div>
+                  )}
+                  <div className="flex flex-col items-center relative">
+                     <motion.div 
+                       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} 
+                       onClick={() => setSelectedStampIndex(idx)}
+                       className="relative aspect-[260/340] w-full flex items-center justify-center drop-shadow-[4px_6px_8px_rgba(0,0,0,0.15)] hover:scale-105 hover:z-50 transition-transform cursor-pointer"
+                       style={{ transform: `rotate(${Math.random() * 6 - 3}deg)` }}
+                     >
+                       {/* Masking Tape Overlay */}
+                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/70 backdrop-blur-sm shadow-sm z-40 border border-black/5" style={{ transform: `rotate(${Math.random() * 10 - 5}deg)` }}></div>
+                       
+                       <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
+                         <path fill="#F6F5F2" d={stampPath} />
+                       </svg>
+                       <div className="relative z-10 w-[84%] h-[88%] border-[2px] border-[#1A1A1A] overflow-hidden bg-white">
+                         <img src={entry.data} className="w-full h-full object-cover grayscale-[0.1] contrast-[1.1]" />
+                       </div>
+                     </motion.div>
+                  </div>
+                </React.Fragment>
               ))}
             </div>
           )}
