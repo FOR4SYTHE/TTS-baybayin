@@ -336,23 +336,31 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
                onClick={() => { setActiveTab('camera'); setPunchState('viewfinder'); setHqImage(null); }} 
                className={`w-[120px] flex items-center justify-center gap-2 py-3 rounded-full transition-colors duration-200 ${activeTab === 'camera' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
              >
-                {/* Custom Sketch Stamp Icon */}
+                {/* Cartoon Sketch Stamp Icon */}
                 <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
-                   <path d="M 20 80 L 80 80 M 30 80 L 30 50 C 30 20 50 20 50 20 C 70 20 70 50 70 80" />
+                   {/* Stamp Base */}
+                   <path d="M 20 80 Q 50 90 80 80 L 80 65 L 20 65 Z" />
+                   {/* Stamp Stem */}
+                   <path d="M 40 65 L 45 35 M 60 65 L 55 35" />
+                   {/* Stamp Knob */}
+                   <path d="M 35 35 L 65 35 C 70 15, 30 15, 35 35 Z" />
                 </svg>
-                <span className="text-xs font-black uppercase tracking-widest">Stamp</span>
+                <span className="text-[14px] font-bold uppercase tracking-widest mt-1" style={{ fontFamily: "'Mali', cursive", transform: 'rotate(-2deg)' }}>Stamp</span>
              </button>
              <button 
                onClick={() => setActiveTab('archive')} 
                className={`w-[120px] flex items-center justify-center gap-2 py-3 rounded-full transition-colors duration-200 ${activeTab === 'archive' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
              >
-                {/* Custom Sketch Book Icon */}
+                {/* Cartoon Sketch Book Icon */}
                 <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
-                   <rect x="20" y="20" width="60" height="60" rx="5" />
-                   <line x1="20" y1="40" x2="80" y2="40" />
-                   <line x1="20" y1="60" x2="80" y2="60" />
+                   <path d="M 15 25 C 25 15, 40 15, 50 25 C 60 15, 75 15, 85 25 L 85 80 C 75 70, 60 70, 50 80 C 40 70, 25 70, 15 80 Z" />
+                   <path d="M 50 25 L 50 80" />
+                   <path d="M 25 45 Q 32 40 40 45" />
+                   <path d="M 25 60 Q 32 55 40 60" />
+                   <path d="M 60 45 Q 68 40 75 45" />
+                   <path d="M 60 60 Q 68 55 75 60" />
                 </svg>
-                <span className="text-xs font-black uppercase tracking-widest">Book</span>
+                <span className="text-[14px] font-bold uppercase tracking-widest mt-1" style={{ fontFamily: "'Mali', cursive", transform: 'rotate(2deg)' }}>Book</span>
              </button>
           </div>
         </div>
