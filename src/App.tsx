@@ -318,27 +318,31 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
 
       {/* ---------------- CENTERED BOTTOM NAVIGATION BAR ---------------- */}
       {punchState !== 'punching' && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex bg-[#E5E7EB] border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] z-[9999]">
-           <button 
-             onClick={() => { setActiveTab('camera'); setPunchState('viewfinder'); setHqImage(null); }} 
-             className={`flex items-center justify-center gap-2 px-6 py-3 rounded-[255px_15px_225px_15px/15px_225px_15px_255px] transition-colors duration-200 ${activeTab === 'camera' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
-           >
-              {/* Custom Sketch Stamp Icon */}
-              <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
-                 <path d="M 20 80 L 80 80 M 30 80 L 30 50 C 30 20 50 20 50 20 C 70 20 70 50 70 80" />
-              </svg>
-              <span className="text-xs font-black uppercase tracking-widest">Stamp</span>
-           </button>
-           <button 
-             onClick={() => setActiveTab('archive')} 
-             className={`flex items-center justify-center gap-2 px-6 py-3 rounded-[15px_225px_15px_255px/255px_15px_225px_15px] transition-colors duration-200 ${activeTab === 'archive' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
-           >
-              {/* Custom Sketch Book Icon */}
-              <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
-                 <path d="M 20 20 L 80 20 L 80 80 L 20 80 Z M 40 20 L 40 80 M 60 40 L 70 40 M 60 60 L 70 60" />
-              </svg>
-              <span className="text-xs font-black uppercase tracking-widest">Book</span>
-           </button>
+        <div className="absolute inset-x-0 bottom-8 flex justify-center z-[9999] pointer-events-none">
+          <div className="flex bg-[#E5E7EB] border-[4px] border-[#1A1A1A] rounded-full p-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] pointer-events-auto">
+             <button 
+               onClick={() => { setActiveTab('camera'); setPunchState('viewfinder'); setHqImage(null); }} 
+               className={`w-[120px] flex items-center justify-center gap-2 py-3 rounded-full transition-colors duration-200 ${activeTab === 'camera' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
+             >
+                {/* Custom Sketch Stamp Icon */}
+                <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                   <path d="M 20 80 L 80 80 M 30 80 L 30 50 C 30 20 50 20 50 20 C 70 20 70 50 70 80" />
+                </svg>
+                <span className="text-xs font-black uppercase tracking-widest">Stamp</span>
+             </button>
+             <button 
+               onClick={() => setActiveTab('archive')} 
+               className={`w-[120px] flex items-center justify-center gap-2 py-3 rounded-full transition-colors duration-200 ${activeTab === 'archive' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
+             >
+                {/* Custom Sketch Book Icon */}
+                <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                   <rect x="20" y="20" width="60" height="60" rx="5" />
+                   <line x1="20" y1="40" x2="80" y2="40" />
+                   <line x1="20" y1="60" x2="80" y2="60" />
+                </svg>
+                <span className="text-xs font-black uppercase tracking-widest">Book</span>
+             </button>
+          </div>
         </div>
       )}
 
