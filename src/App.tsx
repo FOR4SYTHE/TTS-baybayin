@@ -234,34 +234,51 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
 
       {/* ---------------- RETAKE / SAVE CONTROLS ---------------- */}
       {punchState === 'done' && activeTab === 'camera' && (
-        <div className="mt-20 flex flex-row gap-4 w-full max-w-sm z-30 px-4">
+        <div className="mt-20 flex flex-row justify-center gap-5 w-full max-w-sm z-30 px-2">
+          {/* RETAKE */}
           <motion.button 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
             onClick={() => { setHqImage(null); setArchiveImage(null); setPunchState('viewfinder'); }}
-            className="flex-1 py-4 bg-[#F6F5F2] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-lg rounded-[255px_15px_225px_15px/15px_225px_15px_255px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+            className="w-[90px] h-[90px] bg-[#F6F5F2] text-[#1A1A1A] border-[4px] border-[#1A1A1A] rounded-[25px_10px_25px_10px/10px_25px_10px_25px] shadow-[4px_4px_0px_0px_#1A1A1A] flex flex-col items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
           >
-            <svg width="24" height="24" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
                <path d="M 25 50 C 25 30 40 15 60 15 C 75 15 85 25 90 35" />
                <path d="M 90 20 L 90 35 L 75 35" />
                <path d="M 75 50 C 75 70 60 85 40 85 C 25 85 15 75 10 65" />
                <path d="M 10 80 L 10 65 L 25 65" />
             </svg>
+            <span className="text-[12px] font-bold uppercase tracking-widest leading-none" style={{ fontFamily: "'Mali', cursive" }}>Retake</span>
           </motion.button>
           
+          {/* EXPORT */}
           <motion.button 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
             onClick={handleDownload} 
-            className="flex-1 py-4 bg-[#1A1A1A] text-[#F6F5F2] border-[4px] border-[#1A1A1A] font-black uppercase text-sm rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_0px_#F6F5F2] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+            className="w-[90px] h-[90px] bg-[#1A1A1A] text-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[10px_25px_10px_25px/25px_10px_25px_10px] shadow-[4px_4px_0px_0px_#F6F5F2] flex flex-col items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
           >
-            📥 EXPORT
+            <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M 50 15 L 50 60" />
+               <path d="M 30 40 L 50 60 L 70 40" />
+               <path d="M 20 85 L 80 85" />
+            </svg>
+            <span className="text-[12px] font-bold uppercase tracking-widest leading-none" style={{ fontFamily: "'Mali', cursive" }}>Export</span>
           </motion.button>
 
+          {/* SAVE TO BOOK */}
           <motion.button 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
             onClick={handleSaveToArchive} 
-            className="flex-[1.5] py-4 bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-sm rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+            className="w-[90px] h-[90px] bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] rounded-[20px_20px_20px_20px/20px_20px_20px_20px] shadow-[4px_4px_0px_0px_#1A1A1A] flex flex-col items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
           >
-            📖 SAVE TO BOOK
+            <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M 15 25 C 25 15, 40 15, 50 25 C 60 15, 75 15, 85 25 L 85 80 C 75 70, 60 70, 50 80 C 40 70, 25 70, 15 80 Z" />
+               <path d="M 50 25 L 50 80" />
+               {/* Plus Sign */}
+               <path d="M 32 45 L 32 65 M 22 55 L 42 55" />
+               {/* Squiggles */}
+               <path d="M 60 45 Q 68 40 75 45 M 60 60 Q 68 55 75 60" />
+            </svg>
+            <span className="text-[12px] font-bold uppercase tracking-widest leading-none" style={{ fontFamily: "'Mali', cursive" }}>Save</span>
           </motion.button>
         </div>
       )}
