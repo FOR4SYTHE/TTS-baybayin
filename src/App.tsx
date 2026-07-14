@@ -184,6 +184,22 @@ const toBaybayin = (text: string) => {
   return result;
 };
 
+const PhParticles = ({ triggerKey }: { triggerKey: string }) => (
+  <div key={triggerKey} className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center">
+    {/* Left Star */}
+    <motion.svg initial={{ scale: 0, x: 0, y: 0, rotate: 0, opacity: 1 }} animate={{ scale: [0, 1.5, 1.5, 0], x: -80, y: -50, rotate: -120, opacity: [1, 1, 1, 0] }} transition={{ duration: 0.7, ease: "easeOut" }} className="absolute w-8 h-8 text-[#FED141] fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></motion.svg>
+    {/* Right Star */}
+    <motion.svg initial={{ scale: 0, x: 0, y: 0, rotate: 0, opacity: 1 }} animate={{ scale: [0, 1.5, 1.5, 0], x: 80, y: -50, rotate: 120, opacity: [1, 1, 1, 0] }} transition={{ duration: 0.7, ease: "easeOut" }} className="absolute w-8 h-8 text-[#FED141] fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></motion.svg>
+    {/* Top Sun */}
+    <motion.svg initial={{ scale: 0, y: 0, rotate: -45, opacity: 1 }} animate={{ scale: [0, 2, 2, 0], y: -90, rotate: 45, opacity: [1, 1, 1, 0] }} transition={{ duration: 0.8, ease: "easeOut" }} className="absolute w-12 h-12 text-[#FED141] fill-current" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="20" />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
+        <polygon key={angle} points="50,15 54,28 46,28" style={{ transformOrigin: '50px 50px', transform: `rotate(${angle}deg)` }} />
+      ))}
+    </motion.svg>
+  </div>
+);
+
 export default function App() {
   // App Mode State
   const [appMode, setAppMode] = useState<'translator' | 'baybayin'>('translator');
@@ -825,17 +841,21 @@ export default function App() {
 
             {/* Translate Button */}
             <div className="relative self-center z-10 w-full mb-12 mt-4">
-              <button
+              <motion.button
+                whileHover={isLoading ? {} : { scale: 1.02 }}
+                whileTap={isLoading ? {} : { scale: 0.96, x: 4, y: 4, boxShadow: "0px 0px 0px 0px #1A1A1A" }}
+                animate={{ backgroundColor: isLoading ? ["#F6F5F2", "#FED141", "#BF0D3E", "#0032A0", "#F6F5F2"] : "#F6F5F2" }}
+                transition={{ backgroundColor: isLoading ? { repeat: Infinity, duration: 0.6, ease: "linear" } : { duration: 0.1 } }}
                 onClick={handleTranslate}
                 disabled={isLoading || !englishWord.trim()}
-                className="w-full bg-white hover:bg-gray-50 text-[#1A1A1A] text-3xl font-black py-5 border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[100px_25px_100px_25px/25px_100px_25px_100px] transition-all duration-150 active:translate-x-[8px] active:translate-y-[8px] active:shadow-none disabled:opacity-70 disabled:cursor-not-allowed min-h-[64px] uppercase tracking-wider flex items-center justify-center"
+                className="w-full text-[#1A1A1A] text-3xl font-black py-5 border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[100px_25px_100px_25px/25px_100px_25px_100px] disabled:opacity-70 disabled:cursor-not-allowed min-h-[64px] uppercase tracking-wider flex items-center justify-center"
               >
                 {isLoading ? (
                   <Loader2 className="w-10 h-10 animate-spin stroke-[4]" />
                 ) : (
                   'Translate!'
                 )}
-              </button>
+              </motion.button>
 
               {errorMsg && (
                 <div className="mt-6 p-4 bg-red-100 border-[4px] border-[#1A1A1A] rounded-xl text-[#1A1A1A] font-black flex items-start gap-3 shadow-[4px_4px_0px_0px_#1A1A1A]">
@@ -868,7 +888,18 @@ export default function App() {
                     <Butterfly />
                   </motion.div>
 
-                  <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[125px_25px_125px_25px/25px_125px_25px_125px] p-8 flex flex-col items-center justify-center relative min-h-[180px]">
+                  <motion.div
+                    key={translation ? `result-${translation.substring(0,10)}` : 'empty'}
+                    initial={translation && !isLoading ? { scale: 0.8, rotate: -3, backgroundColor: "#FED141", opacity: 0 } : { opacity: 1, backgroundColor: "#F6F5F2" }}
+                    animate={{ scale: 1, rotate: 0, backgroundColor: "#F6F5F2", opacity: 1 }}
+                    transition={translation && !isLoading ? {
+                      scale: { type: "spring", bounce: 0.7, duration: 0.6 },
+                      backgroundColor: { duration: 0.5, ease: "easeOut", delay: 0.1 },
+                      opacity: { duration: 0.2 }
+                    } : { duration: 0.2 }}
+                    className="relative border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[125px_25px_125px_25px/25px_125px_25px_125px] p-8 flex flex-col items-center justify-center min-h-[180px]"
+                  >
+                    {translation && !isLoading && <PhParticles triggerKey={translation} />}
                     {isLoading ? (
                       <div className="flex flex-col items-center justify-center w-full animate-pulse">
                         <div className="h-12 bg-gray-300 border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] w-3/4 mb-6 opacity-50"></div>
@@ -902,7 +933,7 @@ export default function App() {
                         </div>
                       </>
                     )}
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             )}
