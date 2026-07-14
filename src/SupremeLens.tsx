@@ -282,8 +282,8 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
-      className="fixed inset-0 z-50 flex flex-col font-sans bg-[#cdddb7] overflow-hidden"
-      style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23dcedc8\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }}
+      className="fixed inset-0 z-50 flex flex-col font-sans bg-[#EEF2FF] overflow-hidden"
+      style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }}
     >
 
       {/* CARTOON TOP DASHBOARD */}
