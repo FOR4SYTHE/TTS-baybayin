@@ -5,6 +5,155 @@ import html2canvas from 'html2canvas';
 import { toPng } from 'html-to-image';
 import SupremeLens from './SupremeLens'; // Added SupremeLens component
 
+// 1. Dynamic Vector Path Generator for Perfect Perforated Edges
+const generateStampPath = (width: number, height: number) => {
+  const r = 5; // Radius of perforations
+  const spacing = 22; // Space between perforation cuts
+  let path = `M 0,0 `;
+  
+  // Top edge
+  for (let x = spacing; x < width; x += spacing) {
+    if (x + r < width) path += `L ${x - r},0 A ${r},${r} 0 0,0 ${x + r},0 `;
+  }
+  path += `L ${width},0 `;
+  
+  // Right edge
+  for (let y = spacing; y < height; y += spacing) {
+    if (y + r < height) path += `L ${width},${y - r} A ${r},${r} 0 0,0 ${width},${y + r} `;
+  }
+  path += `L ${width},${height} `;
+  
+  // Bottom edge
+  for (let x = width - spacing; x > 0; x -= spacing) {
+    if (x - r > 0) path += `L ${x + r},${height} A ${r},${r} 0 0,0 ${x - r},${height} `;
+  }
+  path += `L 0,${height} `;
+  
+  // Left edge
+  for (let y = height - spacing; y > 0; y -= spacing) {
+    if (y - r > 0) path += `L 0,${y + r} A ${r},${r} 0 0,0 0,${y - r} `;
+  }
+  path += `Z`;
+  
+  return path;
+};
+
+// 2. The Isolated Stamp Machine Component
+const StampMachine = ({ onClose }: { onClose: () => void }) => {
+  const [image, setImage] = useState<string | null>(null);
+  const [punchState, setPunchState] = useState<'idle' | 'punching' | 'done'>('idle');
+  const stampRef = useRef<HTMLDivElement>(null);
+  
+  const stampWidth = 260;
+  const stampHeight = 340;
+  const stampPath = generateStampPath(stampWidth, stampHeight);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => setImage(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePunch = () => {
+    setPunchState('punching');
+    setTimeout(() => setPunchState('done'), 800); // Heavy 0.8s hydraulic punch
+  };
+
+  const handleDownload = () => {
+    if (!stampRef.current) return;
+    toPng(stampRef.current, { cacheBust: true, pixelRatio: 3, skipFonts: true })
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `supreme-stamp-${Date.now()}.png`;
+        link.href = dataUrl;
+        link.click();
+      });
+  };
+
+  return (
+    <div className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
+      <button onClick={onClose} className="absolute top-6 right-6 text-white font-black text-xl hover:text-[#BF0D3E] z-50 transition-colors">
+        X CLOSE
+      </button>
+      
+      {/* Industrial Machine & Stamp Canvas */}
+      <div className="relative w-full max-w-sm aspect-[3/4] flex items-center justify-center mt-8">
+        
+        {/* Heavy Metallic Die-Punch Frame */}
+        <motion.div 
+          animate={
+            punchState === 'punching' ? { scale: [1, 0.95, 0.97], y: [0, 15, -5, 0] } :
+            punchState === 'done' ? { opacity: 0, scale: 0.9 } : { scale: 1 }
+          }
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 sm:inset-[-1rem] rounded-[48px] bg-gradient-to-br from-[#E5E7EB] via-[#9CA3AF] to-[#4B5563] shadow-[inset_0_4px_15px_rgba(255,255,255,0.7),0_30px_60px_rgba(0,0,0,0.9)] border-[4px] border-[#374151] flex items-center justify-center overflow-hidden"
+        >
+          {/* Inner Machine Cavity */}
+          <div className="absolute inset-8 sm:inset-10 bg-[#0a0a0a] rounded-2xl shadow-[inset_0_15px_40px_rgba(0,0,0,1)] border-[3px] border-[#1f2937] flex items-center justify-center overflow-hidden">
+            {!image && (
+              <label className="cursor-pointer text-gray-500 font-black text-center p-6 hover:text-white transition-colors w-full h-full flex flex-col items-center justify-center gap-3">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                </svg>
+                <span className="tracking-widest">INSERT PHOTO</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              </label>
+            )}
+            
+            {/* Raw Image Loaded Before Punching */}
+            {image && punchState === 'idle' && (
+              <img src={image} className="w-full h-full object-cover opacity-70 grayscale" alt="Preview" />
+            )}
+          </div>
+        </motion.div>
+
+        {/* The Final Punched Stamp Output */}
+        {image && punchState !== 'idle' && (
+          <motion.div
+            ref={stampRef}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={
+              punchState === 'punching' ? { scale: 0.85, opacity: 1, filter: "brightness(2)" } :
+              { scale: 1.05, y: -20, rotate: -3, opacity: 1, filter: "brightness(1)" }
+            }
+            transition={punchState === 'done' ? { type: "spring", bounce: 0.6 } : { duration: 0.2 }}
+            className={`relative z-20 flex items-center justify-center ${punchState === 'done' ? 'drop-shadow-[0_30px_40px_rgba(0,0,0,0.8)]' : ''}`}
+            style={{ width: stampWidth, height: stampHeight }}
+          >
+            {/* The True Vector Perforated Paper */}
+            <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
+              <path fill="#F6F5F2" d={stampPath} />
+            </svg>
+            
+            {/* The Cropped Image Inside the Stamp */}
+            <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
+              <img src={image} alt="Custom Stamp" className="w-full h-full object-cover" crossOrigin="anonymous" />
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Controls */}
+      <div className="mt-12 flex flex-col gap-4 w-full max-w-xs z-30">
+        {punchState === 'idle' && image && (
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={handlePunch} className="w-full py-4 bg-[#BF0D3E] text-[#F6F5F2] font-black uppercase text-xl rounded-lg border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A]">
+            🔨 PUNCH STAMP
+          </motion.button>
+        )}
+        
+        {punchState === 'done' && (
+          <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={handleDownload} className="w-full py-4 bg-[#FED141] text-[#1A1A1A] border-[3px] border-[#1A1A1A] font-black uppercase text-lg rounded-lg shadow-[4px_4px_0px_0px_#1A1A1A]">
+            📥 SAVE TO GALLERY
+          </motion.button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Character Components
 const Sampaguita = () => (
   <motion.svg width="120" height="120" viewBox="0 0 100 100"
@@ -209,6 +358,7 @@ export default function App() {
 
   // Lens State (Added for Supreme Lens)
   const [isLensOpen, setIsLensOpen] = useState(false);
+  const [showStampMachine, setShowStampMachine] = useState(false);
 
   // Translator States
   const [englishWord, setEnglishWord] = useState('');
@@ -1289,6 +1439,24 @@ export default function App() {
         <AnimatePresence>
           {isLensOpen && <SupremeLens onClose={() => setIsLensOpen(false)} />}
         </AnimatePresence>
+
+        {isLensOpen && (
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowStampMachine(true)}
+            className="fixed bottom-6 left-6 z-[999] bg-[#F6F5F2] text-[#1A1A1A] w-14 h-14 rounded-lg border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center hover:bg-[#BF0D3E] hover:text-[#F6F5F2] transition-colors"
+            title="Open Stamp Machine"
+          >
+            {/* Perforated Stamp SVG Icon */}
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" strokeDasharray="4 4" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </motion.button>
+        )}
+
+        {showStampMachine && <StampMachine onClose={() => setShowStampMachine(false)} />}
 
       </main>
     </>
