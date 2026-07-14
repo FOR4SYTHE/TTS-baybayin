@@ -293,8 +293,14 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
               {archive.map((entry, idx) => (
                 <React.Fragment key={idx}>
                   {(idx === 0 || archive[idx-1].date !== entry.date) && (
-                    <div className="col-span-2 sm:col-span-3 w-full text-left text-[#1A1A1A] font-black text-sm uppercase tracking-widest mt-6 mb-2 border-b-4 border-[#1A1A1A]/10 pb-2">
-                      {entry.date}
+                    <div className="col-span-2 sm:col-span-3 w-full text-left mt-6 mb-2 pb-2 relative overflow-visible">
+                      <span className="text-[#1A1A1A] font-bold text-lg uppercase tracking-widest inline-block" style={{ fontFamily: "'Mali', cursive", transform: 'rotate(-1deg)' }}>
+                        {entry.date}
+                      </span>
+                      {/* Pen Scribbled Line */}
+                      <svg className="absolute bottom-0 left-0 w-full h-2 opacity-30" preserveAspectRatio="none" viewBox="0 0 100 10" fill="none" stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M 2 5 C 20 2, 40 8, 60 4 C 80 0, 95 6, 98 4" />
+                      </svg>
                     </div>
                   )}
                   <div className="flex flex-col items-center relative">
