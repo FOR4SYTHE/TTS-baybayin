@@ -7,7 +7,7 @@ export default async function handler(req: Request) {
 
   try {
     const body = await req.json();
-    const { word, direction = "en-tl", image, mode } = body;
+    const { word, direction = "en-tl", image, mode, inputMode } = body;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -55,7 +55,20 @@ export default async function handler(req: Request) {
       else if (direction === "en-tl") { sourceLang = "English"; targetLang = "Tagalog"; }
       else if (direction === "bay-tl") { sourceLang = "Baybayin"; targetLang = "Tagalog"; }
       else if (direction === "bay-en") { sourceLang = "Baybayin"; targetLang = "English"; }
-      const prompt = `You are an expert translator. Translate the following ${sourceLang} text to ${targetLang}. Only return the direct translation. Do not include any explanations, quotes, or markdown.\nText to translate: ${word}`;
+      let prompt = `Translate the following from ${sourceLang} to ${targetLang}. Return ONLY the direct translation. Do not include notes, options, or markdown. Word: ${word}`;
+
+      if (inputMode === 'conversation') {
+        prompt = `You are a strict translation engine. Translate the following text from ${sourceLang} to ${targetLang}.
+
+STRICT REQUIREMENTS:
+1. Translate into natural, conversational language as spoken by a local.
+2. Output EXACTLY ONE version of the translation.
+3. RETURN ONLY THE TRANSLATED TEXT. 
+4. ABSOLUTELY NO options, NO notes, NO explanations, NO bullet points, and NO quotes.
+
+Text to translate:
+${word}`;
+      }
 
       // Plain word/sentence translation — Flash-Lite is fast enough
       // and accurate enough for this, no reasoning overhead needed.

@@ -216,6 +216,7 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false);
 
   const [direction, setDirection] = useState<'en-tl' | 'tl-en'>('en-tl');
+  const [inputMode, setInputMode] = useState<'word' | 'conversation'>('word');
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
@@ -429,7 +430,7 @@ export default function App() {
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: englishWord, direction }),
+        body: JSON.stringify({ word: englishWord, direction, inputMode }),
       });
 
       if (!response.ok) {
@@ -738,6 +739,10 @@ export default function App() {
 
             {/* Input Box */}
             <div className="w-full space-y-3 z-10 relative mb-8">
+              <div className="flex bg-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] p-1 mb-4 shadow-[4px_4px_0px_0px_#1A1A1A] self-start z-10 w-full sm:w-auto">
+                <button onClick={() => setInputMode('word')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'word' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Word</button>
+                <button onClick={() => setInputMode('conversation')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'conversation' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Conversation</button>
+              </div>
               <div className="flex items-center justify-between px-2 mb-2">
                 <AnimatePresence mode="wait">
                   <motion.label
@@ -765,12 +770,12 @@ export default function App() {
                 </button>
               </div>
               <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 flex items-center relative min-h-[100px]">
-                <input
+                <textarea
                   id="english-input"
-                  type="text"
                   value={englishWord}
                   onChange={(e) => {
                     const val = e.target.value;
+                    if (inputMode === 'conversation' && val.length > 500) return;
                     setEnglishWord(val);
                     setErrorMsg(null);
                     if (val.trim() === '') {
@@ -781,10 +786,16 @@ export default function App() {
                       setExampleAudioUrl(null);
                     }
                   }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleTranslate()}
-                  className="flex-1 bg-transparent text-2xl font-box outline-none placeholder:text-gray-300 min-h-[3rem] text-[#1A1A1A] w-full"
-                  placeholder={`e.g. ${currentPlaceholder}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleTranslate();
+                    }
+                  }}
+                  className={`flex-1 bg-transparent outline-none placeholder:text-gray-300 w-full text-[#1A1A1A] resize-none transition-all duration-300 ${inputMode === 'conversation' ? 'min-h-[120px] text-lg font-sans font-bold leading-relaxed' : 'min-h-[3rem] text-2xl font-box overflow-hidden'}`}
+                  placeholder={inputMode === 'conversation' ? 'Type a full sentence or paragraph here...' : `e.g. ${currentPlaceholder}`}
                 />
+                {inputMode === 'conversation' && <span className="absolute bottom-2 right-24 text-xs font-black text-gray-400">{englishWord.length}/500</span>}
                 <button
                   onClick={handleMicClick}
                   className={`w-14 h-14 ml-3 rounded-[15px_225px_15px_255px/255px_15px_225px_15px] border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex flex-shrink-0 items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none ${isRecording ? 'bg-[#ffcdd2]' : 'bg-[#e8f5e9] hover:bg-[#c8e6c9]'}`}
@@ -852,18 +863,22 @@ export default function App() {
                       </div>
                     ) : (
                       <>
-                        <span className="text-3xl md:text-4xl font-box mb-8 text-[#1A1A1A] text-center break-words w-full uppercase">
-                          {translation}
-                        </span>
+                        <div className={`w-full ${inputMode === 'conversation' ? 'max-h-[250px] overflow-y-auto pr-4 mb-6' : 'mb-8'}`}>
+                          <span className={`${inputMode === 'conversation' ? 'text-lg md:text-xl font-sans font-bold normal-case text-left block' : 'text-3xl md:text-4xl font-box uppercase text-center'} text-[#1A1A1A] break-words w-full`}>
+                            {translation}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-4 flex-wrap justify-center">
-                          <button
-                            onClick={() => handleSpeak(audioUrl)}
-                            disabled={!audioUrl}
-                            className="flex items-center gap-3 bg-white hover:bg-gray-50 text-[#1A1A1A] px-6 py-3 border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] text-lg font-black uppercase transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-wait min-h-[56px]"
-                          >
-                            <Volume2 className="w-6 h-6 stroke-[4]" />
-                            SPEAK
-                          </button>
+                          {inputMode === 'word' && (
+                            <button
+                              onClick={() => handleSpeak(audioUrl)}
+                              disabled={!audioUrl}
+                              className="flex items-center gap-3 bg-white hover:bg-gray-50 text-[#1A1A1A] px-6 py-3 border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] text-lg font-black uppercase transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-wait min-h-[56px]"
+                            >
+                              <Volume2 className="w-6 h-6 stroke-[4]" />
+                              SPEAK
+                            </button>
+                          )}
                           <button
                             onClick={handleCopy}
                             className="flex items-center justify-center w-14 h-14 bg-white hover:bg-gray-50 text-[#1A1A1A] border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
@@ -880,7 +895,7 @@ export default function App() {
             )}
 
             {/* Fun Fact Card */}
-            {(funFact || isLoadingFunFact) && !isLoading && (
+            {inputMode === 'word' && (funFact || isLoadingFunFact) && !isLoading && (
               <div className="w-full z-10 relative mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-[#FFE5B4] border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 pt-8 relative transform -rotate-1">
                   <span className="absolute -top-4 left-6 bg-[#1A1A1A] text-[#FFE5B4] text-sm font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-[2px_2px_0px_0px_#FFE5B4] flex items-center gap-2">
@@ -902,7 +917,7 @@ export default function App() {
             )}
 
             {/* Example Section */}
-            {translation && !isLoading && (
+            {inputMode === 'word' && translation && !isLoading && (
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
 
                 {/* Cooldown UI or normal button */}
