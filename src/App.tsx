@@ -1638,7 +1638,7 @@ export default function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowStampMachine(true)}
-            className="fixed bottom-10 left-8 z-[9999] bg-[#E5E7EB] text-[#1A1A1A] w-[60px] h-[60px] rounded-xl border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center overflow-hidden hover:bg-[#D1D5DB] transition-colors"
+            className="fixed bottom-12 left-8 z-[9999] bg-[#E5E7EB] text-[#1A1A1A] w-[68px] h-[68px] rounded-xl border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center overflow-hidden hover:bg-[#D1D5DB] transition-colors"
             title="Open Stamp Gallery"
           >
             {/* Gallery Thumbnail Vibe */}
