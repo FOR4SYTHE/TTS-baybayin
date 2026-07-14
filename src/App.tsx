@@ -267,6 +267,19 @@ export default function App() {
 
   const handleSwap = () => {
     setDirection(prev => prev === 'en-tl' ? 'tl-en' : 'en-tl');
+    setEnglishWord(''); // New strict clear
+    setTranslation('');
+    setExample(null);
+    setFunFact(null);
+    setAudioUrl(null);
+    setExampleAudioUrl(null);
+    setErrorMsg(null);
+  };
+
+  const handleInputModeChange = (mode: 'word' | 'conversation') => {
+    if (mode === inputMode) return;
+    setInputMode(mode);
+    setEnglishWord('');
     setTranslation('');
     setExample(null);
     setFunFact(null);
@@ -740,8 +753,8 @@ export default function App() {
             {/* Input Box */}
             <div className="w-full space-y-3 z-10 relative mb-8">
               <div className="flex bg-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] p-1 mb-4 shadow-[4px_4px_0px_0px_#1A1A1A] self-start z-10 w-full sm:w-auto">
-                <button onClick={() => setInputMode('word')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'word' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Word</button>
-                <button onClick={() => setInputMode('conversation')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'conversation' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Conversation</button>
+                <button onClick={() => handleInputModeChange('word')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'word' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Word</button>
+                <button onClick={() => handleInputModeChange('conversation')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'conversation' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Conversation</button>
               </div>
               <div className="flex items-center justify-between px-2 mb-2">
                 <AnimatePresence mode="wait">
