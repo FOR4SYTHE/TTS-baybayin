@@ -43,16 +43,17 @@ const CartoonSparkle = () => (
 
 interface SupremeLensProps {
   onClose: () => void;
+  onCapturedChange?: (captured: boolean) => void;
 }
 
-export default function SupremeLens({ onClose }: SupremeLensProps) {
+export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [resultText, setResultText] = useState('');
   const [displayedText, setDisplayedText] = useState('');
 
-  const [scanData, setScanData] = useState<{ text: string, lang: 'EN'|'TL' } | null>(null);
+  const [scanData, setScanData] = useState<{ text: string, lang: 'EN' | 'TL' } | null>(null);
 
   const [scanTime, setScanTime] = useState(0);
   const [lensCooldown, setLensCooldown] = useState<number | null>(null);
@@ -67,6 +68,10 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scanlineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    onCapturedChange?.(!!capturedImage);
+  }, [capturedImage, onCapturedChange]);
 
   useEffect(() => {
     let currentStream: MediaStream | null = null;
@@ -140,8 +145,8 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
   useEffect(() => {
     if (isProcessing && scanlineRef.current) {
       // Start the scanline at the top, then animate down
-      gsap.fromTo(scanlineRef.current, 
-        { y: 0 }, 
+      gsap.fromTo(scanlineRef.current,
+        { y: 0 },
         { y: window.innerHeight * 0.7, duration: 1.5, repeat: -1, yoyo: true, ease: "linear" }
       );
     }
@@ -224,13 +229,13 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
 
       const data = await response.json();
       let text = data.translation || data.text || "";
-      
+
       // BEYOND PLUS ULTRA: Strip markdown asterisks and hashtags for a premium, clean look
       text = text.replace(/[*#]/g, '');
-      
+
       const extractedLang = mode === 'BAY' ? 'TL' : mode;
       setScanData({ text, lang: extractedLang });
-      
+
       if (mode === 'BAY') text = toBaybayin(text);
 
       setResultText(text);
@@ -408,15 +413,15 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
             <div className="absolute inset-0 bg-black/50 z-10" />
             <div ref={scanlineRef} className="absolute top-0 left-0 w-full h-4 bg-[#FDE047] shadow-[0_0_20px_#FDE047] opacity-80 z-20" />
             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none px-6">
-              
+
               <div className="relative flex justify-center items-center w-full mb-4">
-                 {/* Reusing your animated sparkle for a premium loading feel */}
-                 <div className="absolute -top-10 -right-4 scale-75 opacity-80">
-                   <CartoonSparkle />
-                 </div>
-                 <span className="text-white font-title text-3xl md:text-4xl tracking-widest uppercase text-center animate-pulse" style={{ WebkitTextStroke: '2px #1A1A1A' }}>
-                   {getWaitingMessage(scanTime)}
-                 </span>
+                {/* Reusing your animated sparkle for a premium loading feel */}
+                <div className="absolute -top-10 -right-4 scale-75 opacity-80">
+                  <CartoonSparkle />
+                </div>
+                <span className="text-white font-title text-3xl md:text-4xl tracking-widest uppercase text-center animate-pulse" style={{ WebkitTextStroke: '2px #1A1A1A' }}>
+                  {getWaitingMessage(scanTime)}
+                </span>
               </div>
 
               {scanTime > 0 && (
@@ -431,13 +436,13 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
         {/* Cooldown Overlay */}
         {lensCooldown && !isProcessing && (
           <div className="absolute inset-0 bg-black/80 z-40 flex flex-col items-center justify-center">
-             <span className="text-6xl mb-4">⏳</span>
-             <span className="text-white font-title text-3xl tracking-widest uppercase text-center" style={{ WebkitTextStroke: '1px #1A1A1A' }}>
-               LENS COOLING DOWN
-             </span>
-             <span className="text-[#FDE047] font-black text-4xl mt-2">
-               {lensCooldown}s
-             </span>
+            <span className="text-6xl mb-4">⏳</span>
+            <span className="text-white font-title text-3xl tracking-widest uppercase text-center" style={{ WebkitTextStroke: '1px #1A1A1A' }}>
+              LENS COOLING DOWN
+            </span>
+            <span className="text-[#FDE047] font-black text-4xl mt-2">
+              {lensCooldown}s
+            </span>
           </div>
         )}
 
@@ -494,7 +499,7 @@ export default function SupremeLens({ onClose }: SupremeLensProps) {
       <AnimatePresence>
         {displayedText && (
           <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="absolute bottom-[20%] left-6 right-6 bg-[#F6F5F2] border-[6px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 shadow-[8px_8px_0px_#1A1A1A] z-40 max-h-[40vh] flex flex-col">
-            
+
             {/* Copy Button Header */}
             {!isErrorState && (
               <div className="w-full flex justify-end mb-2">
