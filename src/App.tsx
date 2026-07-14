@@ -6,34 +6,16 @@ import { toPng } from 'html-to-image';
 import SupremeLens from './SupremeLens'; // Added SupremeLens component
 
 // ============================================================================
-// SUPREME ARCHITECT: LIVE CAMERA STAMP MACHINE (PERFECTED)
+// SUPREME ARCHITECT: LIVE CAMERA STAMP MACHINE (PERFECT PHYSICS & SKETCH UI)
 // ============================================================================
 
-// Flawless math: 260 width (13 cuts), 340 height (17 cuts) exactly 20px apart.
 const generateStampPath = (width: number, height: number) => {
-  const r = 5;
-  const spacing = 20;
-  let path = `M 0,0 `;
-  
-  // Top edge
-  for (let x = spacing; x <= width; x += spacing) {
-    path += `L ${x - (spacing/2) - r},0 A ${r},${r} 0 0,0 ${x - (spacing/2) + r},0 L ${x},0 `;
-  }
-  // Right edge
-  for (let y = spacing; y <= height; y += spacing) {
-    path += `L ${width},${y - (spacing/2) - r} A ${r},${r} 0 0,0 ${width},${y - (spacing/2) + r} L ${width},${y} `;
-  }
-  // Bottom edge
-  for (let x = width - spacing; x >= 0; x -= spacing) {
-    path += `L ${x + (spacing/2) + r},${height} A ${r},${r} 0 0,0 ${x + (spacing/2) - r},${height} L ${x},${height} `;
-  }
-  // Left edge
-  for (let y = height - spacing; y >= 0; y -= spacing) {
-    path += `L 0,${y + (spacing/2) + r} A ${r},${r} 0 0,0 0,${y + (spacing/2) - r} L 0,${y} `;
-  }
-  
-  path += `Z`;
-  return path;
+  const r = 5; const spacing = 20; let path = `M 0,0 `;
+  for (let x = spacing; x <= width; x += spacing) { path += `L ${x - (spacing/2) - r},0 A ${r},${r} 0 0,0 ${x - (spacing/2) + r},0 L ${x},0 `; }
+  for (let y = spacing; y <= height; y += spacing) { path += `L ${width},${y - (spacing/2) - r} A ${r},${r} 0 0,0 ${width},${y - (spacing/2) + r} L ${width},${y} `; }
+  for (let x = width - spacing; x >= 0; x -= spacing) { path += `L ${x + (spacing/2) + r},${height} A ${r},${r} 0 0,0 ${x + (spacing/2) - r},${height} L ${x},${height} `; }
+  for (let y = height - spacing; y >= 0; y -= spacing) { path += `L 0,${y + (spacing/2) + r} A ${r},${r} 0 0,0 0,${y + (spacing/2) - r} L 0,${y} `; }
+  path += `Z`; return path;
 };
 
 const StampMachine = ({ onClose }: { onClose: () => void }) => {
@@ -50,31 +32,19 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
   const stampHeight = 340;
   const stampPath = generateStampPath(stampWidth, stampHeight);
 
-  // Initialize Camera
   useEffect(() => {
     let stream: MediaStream | null = null;
-    
     const startCamera = async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: { ideal: facingMode } } 
-        });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facingMode } } });
+        if (videoRef.current) videoRef.current.srcObject = stream;
       } catch (err) {
-        console.error("Camera access denied or unavailable", err);
+        console.error("Camera access denied", err);
         setHasCameraError(true);
       }
     };
-
-    if (punchState === 'viewfinder') {
-      startCamera();
-    }
-
-    return () => {
-      if (stream) stream.getTracks().forEach(track => track.stop());
-    };
+    if (punchState === 'viewfinder') startCamera();
+    return () => { if (stream) stream.getTracks().forEach(track => track.stop()); };
   }, [punchState, facingMode]);
 
   const handleFallbackUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,145 +61,162 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
 
   const handlePunch = () => {
     if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current; const canvas = canvasRef.current;
     
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+    const targetW = 220; const targetH = 300;
+    const targetRatio = targetW / targetH;
+    const videoRatio = video.videoWidth / video.videoHeight;
+    let sW = video.videoWidth; let sH = video.videoHeight;
+    let sX = 0; let sY = 0;
     
-    // Copy exact raw video dimensions to avoid stretching
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    if (videoRatio > targetRatio) {
+      sW = video.videoHeight * targetRatio;
+      sX = (video.videoWidth - sW) / 2;
+    } else {
+      sH = video.videoWidth / targetRatio;
+      sY = (video.videoHeight - sH) / 2;
+    }
+    
+    canvas.width = targetW * 3; canvas.height = targetH * 3;
     const ctx = canvas.getContext('2d');
     
     if (ctx) {
-      // Mirror the canvas if using the front camera so the stamp isn't backwards
-      if (facingMode === 'user') {
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-      }
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      if (facingMode === 'user') { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
+      ctx.drawImage(video, sX, sY, sW, sH, 0, 0, canvas.width, canvas.height);
       setCapturedImage(canvas.toDataURL('image/jpeg', 0.95));
     }
 
     setPunchState('punching');
-    setTimeout(() => setPunchState('done'), 800); // 0.8s hydraulic smash
+    setTimeout(() => setPunchState('done'), 250); 
   };
 
   const handleDownload = () => {
     if (!stampRef.current) return;
     toPng(stampRef.current, { cacheBust: true, pixelRatio: 3, skipFonts: true })
       .then((dataUrl) => {
-        const link = document.createElement('a');
-        link.download = `supreme-stamp-${Date.now()}.png`;
-        link.href = dataUrl;
-        link.click();
+        const link = document.createElement('a'); link.download = `supreme-stamp-${Date.now()}.png`; link.href = dataUrl; link.click();
       });
   };
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
-      <button onClick={onClose} className="absolute top-6 right-6 text-white font-black text-xl hover:text-[#BF0D3E] z-50 transition-colors tracking-widest">
-        X CLOSE
+      
+      {/* Cartoon Sketch Close X - No Words */}
+      <button onClick={onClose} className="absolute top-8 right-8 text-[#F6F5F2] z-50 hover:text-[#BF0D3E] transition-colors drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:drop-shadow-none">
+        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M 20 20 L 80 80 M 80 20 L 20 80" />
+        </svg>
       </button>
       
       <canvas ref={canvasRef} className="hidden" />
       
-      {/* Container perfectly sizes the machine frame */}
       <div className="relative w-[340px] h-[420px] flex items-center justify-center mt-4">
         
-        {/* Heavy Metallic Die-Punch Frame */}
+        {/* Base Machine Frame - ALWAYS stays mounted, just smashes down */}
         <motion.div 
-          animate={
-            punchState === 'punching' ? { scale: [1, 0.95, 0.98], y: [0, 15, -5, 0] } :
-            punchState === 'done' ? { opacity: 0, scale: 0.9 } : { scale: 1 }
-          }
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0 rounded-[48px] bg-gradient-to-br from-[#E5E7EB] via-[#9CA3AF] to-[#4B5563] shadow-[inset_0_4px_15px_rgba(255,255,255,0.7),0_30px_60px_rgba(0,0,0,0.9)] border-[4px] border-[#374151] flex items-center justify-center"
+          animate={ punchState === 'punching' ? { scale: 0.95, y: 15 } : { scale: 1, y: 0 } }
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="absolute inset-0 rounded-[48px] bg-gradient-to-br from-[#E5E7EB] via-[#9CA3AF] to-[#4B5563] shadow-[inset_0_4px_15px_rgba(255,255,255,0.7),0_30px_60px_rgba(0,0,0,0.9)] border-[4px] border-[#374151] flex items-center justify-center z-10"
         >
-          {/* Inner Machine Cavity (EXACTLY 260x340 to match the output stamp 1:1) */}
           <div 
             className="relative w-[260px] h-[340px] bg-[#0a0a0a] rounded shadow-[inset_0_15px_40px_rgba(0,0,0,1)] border-[2px] border-[#1f2937] overflow-hidden group cursor-pointer"
             onClick={punchState === 'viewfinder' && !hasCameraError ? handlePunch : undefined}
           >
-            
             {hasCameraError ? (
                <label className="cursor-pointer text-gray-500 font-black text-center p-6 hover:text-white transition-colors w-full h-full flex flex-col items-center justify-center gap-3">
-                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-                 </svg>
                  <span className="tracking-widest text-sm">CAMERA UNAVAILABLE<br/>TAP TO UPLOAD</span>
                  <input type="file" accept="image/*" className="hidden" onChange={handleFallbackUpload} />
                </label>
             ) : (
               <>
-                {/* Live Camera Feed */}
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  className={`absolute inset-0 w-full h-full object-cover opacity-90 transition-transform ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
-                />
-                
-                {/* The "Teeth" Blade Overlay (Using evenodd fill rule for perfect hole punching) */}
-                <div className="absolute inset-0 z-10 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] pointer-events-none transition-transform group-active:scale-95 duration-75">
+                {/* 
+                  Anti-Flicker Magic: 
+                  We keep the live video mounted during 'punching'. 
+                  We ONLY unmount it when 'done', leaving a pitch black crater inside the machine! 
+                */}
+                {punchState !== 'done' && (
+                  <video ref={videoRef} autoPlay playsInline muted className={`absolute inset-0 w-full h-full object-cover opacity-90 transition-transform ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`} />
+                )}
+
+                {/* Scalloped Teeth Overlay */}
+                <div className="absolute inset-0 z-20 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] pointer-events-none transition-transform group-active:scale-95 duration-75">
                    <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0 w-full h-full">
-                     {/* The solid metal sheet with the exact stamp path cut out */}
                      <path fill="#2a2a2a" fillRule="evenodd" d={`M -100,-100 L ${stampWidth + 100},-100 L ${stampWidth + 100},${stampHeight + 100} L -100,${stampHeight + 100} Z ${stampPath}`} />
                      <path fill="none" stroke="#555" strokeWidth="2" d={stampPath} />
                      <path fill="none" stroke="#000" strokeWidth="6" strokeOpacity="0.5" d={stampPath} />
                    </svg>
                 </div>
-
-                {/* Camera Flip Button (Only in viewfinder mode) */}
-                {punchState === 'viewfinder' && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setFacingMode(prev => prev === 'environment' ? 'user' : 'environment'); }}
-                    className="absolute top-3 right-3 z-50 bg-black/40 text-white p-2.5 rounded-full hover:bg-black/70 backdrop-blur-md transition-colors"
-                    title="Flip Camera"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
-                    </svg>
-                  </button>
-                )}
               </>
             )}
-            
           </div>
         </motion.div>
+
+        {/* Cartoon Flip Camera Button (Outside the frame) */}
+        {punchState === 'viewfinder' && !hasCameraError && (
+          <motion.button 
+            whileHover={{ scale: 1.1, rotate: 15 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setFacingMode(prev => prev === 'environment' ? 'user' : 'environment')}
+            className="absolute -bottom-24 right-4 z-50 text-[#1A1A1A] bg-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-[#FED141] transition-colors"
+            title="Flip Camera"
+          >
+            <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M 25 50 C 25 30 40 15 60 15 C 75 15 85 25 90 35" />
+               <path d="M 90 20 L 90 35 L 75 35" />
+               <path d="M 75 50 C 75 70 60 85 40 85 C 25 85 15 75 10 65" />
+               <path d="M 10 80 L 10 65 L 25 65" />
+            </svg>
+          </motion.button>
+        )}
 
         {/* The Final Punched Stamp Output */}
         {capturedImage && punchState !== 'viewfinder' && (
           <motion.div
             ref={stampRef}
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.95, y: 15, opacity: 1 }} // Spawn EXACTLY where the machine pressed down
             animate={
-              punchState === 'punching' ? { scale: 0.85, opacity: 1, filter: "brightness(2)" } :
-              { scale: 1.05, y: -20, rotate: -3, opacity: 1, filter: "brightness(1)" }
+              punchState === 'punching' ? { scale: 0.95, y: 15, opacity: 1 } : // Hold in the crater
+              { scale: 1.05, y: -25, rotate: -3, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.9))', opacity: 1 } // Pop out!
             }
-            transition={punchState === 'done' ? { type: "spring", bounce: 0.6 } : { duration: 0.2 }}
-            className={`absolute z-20 flex items-center justify-center ${punchState === 'done' ? 'drop-shadow-[0_30px_40px_rgba(0,0,0,0.8)]' : ''}`}
+            transition={punchState === 'done' ? { type: "spring", bounce: 0.5, delay: 0.05 } : { duration: 0 }}
+            className="absolute z-30 flex items-center justify-center"
             style={{ width: stampWidth, height: stampHeight }}
           >
-            {/* The True Vector Perforated Paper */}
             <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
               <path fill="#F6F5F2" d={stampPath} />
             </svg>
-            
-            {/* Object-Cover ensures aspect ratio remains perfect without stretching */}
             <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
-              <img src={capturedImage} alt="Custom Stamp" className="w-full h-full object-cover" crossOrigin="anonymous" />
+              <img src={capturedImage} alt="Custom Stamp" className="w-[220px] h-[300px] object-cover" crossOrigin="anonymous" />
             </div>
           </motion.div>
         )}
       </div>
 
-      {/* Save Button */}
-      <div className="mt-12 flex flex-col gap-4 w-full max-w-xs z-30 min-h-[64px]">
+      {/* Retake & Save Controls (Cartoon Sketch Vibe) */}
+      <div className="mt-24 flex flex-row gap-4 w-full max-w-sm z-30 px-4">
         {punchState === 'done' && (
-          <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={handleDownload} className="w-full py-4 bg-[#FED141] text-[#1A1A1A] border-[3px] border-[#1A1A1A] font-black uppercase text-lg rounded-lg shadow-[4px_4px_0px_0px_#1A1A1A]">
-            📥 SAVE TO GALLERY
-          </motion.button>
+          <>
+            <motion.button 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
+              onClick={() => { setCapturedImage(null); setPunchState('viewfinder'); }}
+              className="flex-1 py-4 bg-[#F6F5F2] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-lg rounded-[255px_15px_225px_15px/15px_225px_15px_255px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+            >
+              <svg width="24" height="24" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                 <path d="M 25 50 C 25 30 40 15 60 15 C 75 15 85 25 90 35" />
+                 <path d="M 90 20 L 90 35 L 75 35" />
+                 <path d="M 75 50 C 75 70 60 85 40 85 C 25 85 15 75 10 65" />
+                 <path d="M 10 80 L 10 65 L 25 65" />
+              </svg>
+            </motion.button>
+            
+            <motion.button 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} 
+              onClick={handleDownload} 
+              className="flex-[2] py-4 bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-xl rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-3 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+            >
+              📥 SAVE
+            </motion.button>
+          </>
         )}
       </div>
     </div>
@@ -1522,8 +1509,8 @@ export default function App() {
           {isLensOpen && <SupremeLens onClose={() => setIsLensOpen(false)} />}
         </AnimatePresence>
 
-        {/* The Stamp Gallery Button - Forced to highest z-index */}
-        {isLensOpen && (
+        {/* The Stamp Gallery Button - Hidden when Stamp Machine is active */}
+        {isLensOpen && !showStampMachine && (
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
