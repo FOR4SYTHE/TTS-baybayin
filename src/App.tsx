@@ -6,7 +6,7 @@ import { toPng } from 'html-to-image';
 import SupremeLens from './SupremeLens'; // Added SupremeLens component
 
 // ============================================================================
-// SUPREME ARCHITECT: LIVE CAMERA STAMP MACHINE (PERFECT PHYSICS & SKETCH UI)
+// SUPREME ARCHITECT: LIVE CAMERA STAMP MACHINE (AWWWARDS SOTD FINAL)
 // ============================================================================
 
 const generateStampPath = (width: number, height: number) => {
@@ -18,19 +18,29 @@ const generateStampPath = (width: number, height: number) => {
   path += `Z`; return path;
 };
 
+const MAX_ARCHIVE = 18; 
+
 const StampMachine = ({ onClose }: { onClose: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stampRef = useRef<HTMLDivElement>(null);
   
-  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [hqImage, setHqImage] = useState<string | null>(null);
+  const [archiveImage, setArchiveImage] = useState<string | null>(null);
+  
   const [punchState, setPunchState] = useState<'viewfinder' | 'punching' | 'done'>('viewfinder');
   const [hasCameraError, setHasCameraError] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
+  const [activeTab, setActiveTab] = useState<'camera' | 'archive'>('camera');
   
   const stampWidth = 260;
   const stampHeight = 340;
   const stampPath = generateStampPath(stampWidth, stampHeight);
+
+  const [archive, setArchive] = useState<{date: string, data: string}[]>(() => {
+    try { const saved = localStorage.getItem('supreme_stamps_archive'); return saved ? JSON.parse(saved) : []; } 
+    catch { return []; }
+  });
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -43,16 +53,18 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
         setHasCameraError(true);
       }
     };
-    if (punchState === 'viewfinder') startCamera();
+    if (punchState === 'viewfinder' && activeTab === 'camera') startCamera();
     return () => { if (stream) stream.getTracks().forEach(track => track.stop()); };
-  }, [punchState, facingMode]);
+  }, [punchState, facingMode, activeTab]);
 
   const handleFallbackUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setCapturedImage(e.target?.result as string);
+        const result = e.target?.result as string;
+        setHqImage(result);
+        setArchiveImage(result);
         setPunchState('done');
       };
       reader.readAsDataURL(file);
@@ -60,7 +72,7 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
   };
 
   const handlePunch = () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || punchState !== 'viewfinder') return;
     const video = videoRef.current; const canvas = canvasRef.current;
     
     const targetW = 220; const targetH = 300;
@@ -77,32 +89,62 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
       sY = (video.videoHeight - sH) / 2;
     }
     
+    // HQ Render
     canvas.width = targetW * 3; canvas.height = targetH * 3;
     const ctx = canvas.getContext('2d');
-    
     if (ctx) {
       if (facingMode === 'user') { ctx.translate(canvas.width, 0); ctx.scale(-1, 1); }
       ctx.drawImage(video, sX, sY, sW, sH, 0, 0, canvas.width, canvas.height);
-      setCapturedImage(canvas.toDataURL('image/jpeg', 0.95));
+      setHqImage(canvas.toDataURL('image/jpeg', 1.0));
+      
+      // Low-Res Render
+      const lowResCanvas = document.createElement('canvas');
+      lowResCanvas.width = targetW; lowResCanvas.height = targetH;
+      const lrCtx = lowResCanvas.getContext('2d');
+      if (lrCtx) {
+         if (facingMode === 'user') { lrCtx.translate(lowResCanvas.width, 0); lrCtx.scale(-1, 1); }
+         lrCtx.drawImage(video, sX, sY, sW, sH, 0, 0, lowResCanvas.width, lowResCanvas.height);
+         setArchiveImage(lowResCanvas.toDataURL('image/jpeg', 0.6)); 
+      }
     }
 
     setPunchState('punching');
-    setTimeout(() => setPunchState('done'), 250); 
+    setTimeout(() => setPunchState('done'), 600); // Exact mechanical delay
   };
 
   const handleDownload = () => {
     if (!stampRef.current) return;
-    toPng(stampRef.current, { cacheBust: true, pixelRatio: 3, skipFonts: true })
+    toPng(stampRef.current, { cacheBust: true, pixelRatio: 4, skipFonts: true }) // Premium 4x Export
       .then((dataUrl) => {
         const link = document.createElement('a'); link.download = `supreme-stamp-${Date.now()}.png`; link.href = dataUrl; link.click();
       });
   };
 
+  const handleSaveToArchive = () => {
+    if (!archiveImage) return;
+    
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+    const newEntry = { date: today, data: archiveImage };
+    const newArchive = [newEntry, ...archive].slice(0, MAX_ARCHIVE);
+    setArchive(newArchive);
+    localStorage.setItem('supreme_stamps_archive', JSON.stringify(newArchive));
+    
+    setHqImage(null);
+    setArchiveImage(null);
+    setPunchState('viewfinder');
+    setActiveTab('archive');
+  };
+
   return (
-    <div className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
+    <div className={`fixed inset-0 z-[1000] flex flex-col items-center justify-center p-4 transition-colors duration-500 overflow-hidden ${activeTab === 'archive' ? 'bg-[#F4F0EB]' : 'bg-black/95 backdrop-blur-md'}`}>
       
-      {/* Cartoon Sketch Close X - No Words */}
-      <button onClick={onClose} className="absolute top-8 right-8 text-[#F6F5F2] z-50 hover:text-[#BF0D3E] transition-colors drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] active:translate-y-1 active:translate-x-1 active:drop-shadow-none">
+      {/* Texture Layer for Scrapbook */}
+      {activeTab === 'archive' && (
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+      )}
+
+      {/* Cartoon Sketch Close X */}
+      <button onClick={onClose} className={`absolute top-8 right-8 z-50 transition-transform active:scale-90 ${activeTab === 'archive' ? 'text-[#1A1A1A] drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]' : 'text-[#F6F5F2] hover:text-[#BF0D3E] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]'}`}>
         <svg width="40" height="40" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
           <path d="M 20 20 L 80 80 M 80 20 L 20 80" />
         </svg>
@@ -110,115 +152,196 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
       
       <canvas ref={canvasRef} className="hidden" />
       
-      <div className="relative w-[340px] h-[420px] flex items-center justify-center mt-4">
-        
-        {/* Base Machine Frame - ALWAYS stays mounted, just smashes down */}
-        <motion.div 
-          animate={ punchState === 'punching' ? { scale: 0.95, y: 15 } : { scale: 1, y: 0 } }
-          transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="absolute inset-0 rounded-[48px] bg-gradient-to-br from-[#E5E7EB] via-[#9CA3AF] to-[#4B5563] shadow-[inset_0_4px_15px_rgba(255,255,255,0.7),0_30px_60px_rgba(0,0,0,0.9)] border-[4px] border-[#374151] flex items-center justify-center z-10"
-        >
-          <div 
-            className="relative w-[260px] h-[340px] bg-[#0a0a0a] rounded shadow-[inset_0_15px_40px_rgba(0,0,0,1)] border-[2px] border-[#1f2937] overflow-hidden group cursor-pointer"
-            onClick={punchState === 'viewfinder' && !hasCameraError ? handlePunch : undefined}
-          >
-            {hasCameraError ? (
-               <label className="cursor-pointer text-gray-500 font-black text-center p-6 hover:text-white transition-colors w-full h-full flex flex-col items-center justify-center gap-3">
-                 <span className="tracking-widest text-sm">CAMERA UNAVAILABLE<br/>TAP TO UPLOAD</span>
-                 <input type="file" accept="image/*" className="hidden" onChange={handleFallbackUpload} />
-               </label>
-            ) : (
-              <>
-                {/* 
-                  Anti-Flicker Magic: 
-                  We keep the live video mounted during 'punching'. 
-                  We ONLY unmount it when 'done', leaving a pitch black crater inside the machine! 
-                */}
-                {punchState !== 'done' && (
-                  <video ref={videoRef} autoPlay playsInline muted className={`absolute inset-0 w-full h-full object-cover opacity-90 transition-transform ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`} />
-                )}
-
-                {/* Scalloped Teeth Overlay */}
-                <div className="absolute inset-0 z-20 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] pointer-events-none transition-transform group-active:scale-95 duration-75">
-                   <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0 w-full h-full">
-                     <path fill="#2a2a2a" fillRule="evenodd" d={`M -100,-100 L ${stampWidth + 100},-100 L ${stampWidth + 100},${stampHeight + 100} L -100,${stampHeight + 100} Z ${stampPath}`} />
-                     <path fill="none" stroke="#555" strokeWidth="2" d={stampPath} />
-                     <path fill="none" stroke="#000" strokeWidth="6" strokeOpacity="0.5" d={stampPath} />
-                   </svg>
-                </div>
-              </>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Cartoon Flip Camera Button (Outside the frame) */}
-        {punchState === 'viewfinder' && !hasCameraError && (
-          <motion.button 
-            whileHover={{ scale: 1.1, rotate: 15 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setFacingMode(prev => prev === 'environment' ? 'user' : 'environment')}
-            className="absolute -bottom-24 right-4 z-50 text-[#1A1A1A] bg-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-[#FED141] transition-colors"
-            title="Flip Camera"
-          >
-            <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
-               <path d="M 25 50 C 25 30 40 15 60 15 C 75 15 85 25 90 35" />
-               <path d="M 90 20 L 90 35 L 75 35" />
-               <path d="M 75 50 C 75 70 60 85 40 85 C 25 85 15 75 10 65" />
-               <path d="M 10 80 L 10 65 L 25 65" />
-            </svg>
-          </motion.button>
-        )}
-
-        {/* The Final Punched Stamp Output */}
-        {capturedImage && punchState !== 'viewfinder' && (
-          <motion.div
-            ref={stampRef}
-            initial={{ scale: 0.95, y: 15, opacity: 1 }} // Spawn EXACTLY where the machine pressed down
-            animate={
-              punchState === 'punching' ? { scale: 0.95, y: 15, opacity: 1 } : // Hold in the crater
-              { scale: 1.05, y: -25, rotate: -3, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.9))', opacity: 1 } // Pop out!
-            }
-            transition={punchState === 'done' ? { type: "spring", bounce: 0.5, delay: 0.05 } : { duration: 0 }}
-            className="absolute z-30 flex items-center justify-center"
-            style={{ width: stampWidth, height: stampHeight }}
-          >
-            <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
-              <path fill="#F6F5F2" d={stampPath} />
-            </svg>
-            <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
-              <img src={capturedImage} alt="Custom Stamp" className="w-[220px] h-[300px] object-cover" crossOrigin="anonymous" />
-            </div>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Retake & Save Controls (Cartoon Sketch Vibe) */}
-      <div className="mt-24 flex flex-row gap-4 w-full max-w-sm z-30 px-4">
-        {punchState === 'done' && (
-          <>
-            <motion.button 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
-              onClick={() => { setCapturedImage(null); setPunchState('viewfinder'); }}
-              className="flex-1 py-4 bg-[#F6F5F2] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-lg rounded-[255px_15px_225px_15px/15px_225px_15px_255px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+      {/* ---------------- CAMERA / MACHINE VIEW ---------------- */}
+      {activeTab === 'camera' && (
+        <div className="relative w-[340px] h-[420px] flex items-center justify-center mt-4">
+          
+          {/* Heavy Metallic Die-Punch Frame (Disappears instantly on 'done') */}
+          {punchState !== 'done' && (
+            <motion.div 
+              onPointerDown={punchState === 'viewfinder' && !hasCameraError ? handlePunch : undefined}
+              animate={ punchState === 'punching' ? { scale: 0.95, y: 15 } : { scale: 1, y: 0 } }
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className={`absolute inset-0 rounded-[48px] bg-gradient-to-br from-[#E5E7EB] via-[#9CA3AF] to-[#4B5563] shadow-[inset_0_4px_15px_rgba(255,255,255,0.7),0_30px_60px_rgba(0,0,0,0.9)] border-[4px] border-[#374151] flex items-center justify-center z-10 ${punchState === 'viewfinder' ? 'cursor-pointer' : ''}`}
             >
-              <svg width="24" height="24" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+              <div className="relative w-[260px] h-[340px] bg-[#0a0a0a] rounded shadow-[inset_0_15px_40px_rgba(0,0,0,1)] border-[2px] border-[#1f2937] overflow-hidden group">
+                {hasCameraError ? (
+                   <label className="cursor-pointer text-gray-500 font-black text-center p-6 hover:text-white transition-colors w-full h-full flex flex-col items-center justify-center gap-3">
+                     <span className="tracking-widest text-sm">CAMERA UNAVAILABLE<br/>TAP TO UPLOAD</span>
+                     <input type="file" accept="image/*" className="hidden" onChange={handleFallbackUpload} />
+                   </label>
+                ) : (
+                  <>
+                    <video ref={videoRef} autoPlay playsInline muted className={`absolute inset-0 w-full h-full object-cover opacity-90 transition-transform ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`} />
+                    
+                    {/* Anti-Flicker: Instantly overlay the captured image during the punch hold */}
+                    {hqImage && punchState === 'punching' && (
+                      <img src={hqImage} className="absolute inset-0 w-full h-full object-cover z-10" alt="frozen frame" />
+                    )}
+
+                    {/* Fixed Scalloped Teeth Overlay - Removed active CSS to prevent glitching */}
+                    <div className="absolute inset-0 z-20 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] pointer-events-none">
+                       <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0 w-full h-full">
+                         <path fill="#2a2a2a" fillRule="evenodd" d={`M -100,-100 L ${stampWidth + 100},-100 L ${stampWidth + 100},${stampHeight + 100} L -100,${stampHeight + 100} Z ${stampPath}`} />
+                         <path fill="none" stroke="#555" strokeWidth="2" d={stampPath} />
+                         <path fill="none" stroke="#000" strokeWidth="6" strokeOpacity="0.5" d={stampPath} />
+                       </svg>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Cartoon Flip Camera Button */}
+          {punchState === 'viewfinder' && !hasCameraError && (
+            <motion.button 
+              whileHover={{ scale: 1.1, rotate: 15 }} whileTap={{ scale: 0.9 }}
+              onClick={(e) => { e.stopPropagation(); setFacingMode(prev => prev === 'environment' ? 'user' : 'environment'); }}
+              className="absolute -bottom-24 right-4 z-50 text-[#1A1A1A] bg-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:bg-[#FED141] transition-colors"
+              title="Flip Camera"
+            >
+              <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
                  <path d="M 25 50 C 25 30 40 15 60 15 C 75 15 85 25 90 35" />
                  <path d="M 90 20 L 90 35 L 75 35" />
                  <path d="M 75 50 C 75 70 60 85 40 85 C 25 85 15 75 10 65" />
                  <path d="M 10 80 L 10 65 L 25 65" />
               </svg>
             </motion.button>
-            
-            <motion.button 
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} 
-              onClick={handleDownload} 
-              className="flex-[2] py-4 bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-xl rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-3 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+          )}
+
+          {/* The Final Punched Stamp Output */}
+          {hqImage && punchState === 'done' && (
+            <motion.div
+              ref={stampRef}
+              initial={{ scale: 0.95, y: 15, opacity: 1 }}
+              animate={{ scale: 1.05, y: -20, rotate: -2, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.9))', opacity: 1 }}
+              transition={{ type: "spring", bounce: 0.6, duration: 0.6 }}
+              className="absolute z-30 flex items-center justify-center"
+              style={{ width: stampWidth, height: stampHeight }}
             >
-              📥 SAVE
-            </motion.button>
-          </>
-        )}
-      </div>
+              <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
+                <path fill="#F6F5F2" d={stampPath} />
+              </svg>
+              <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
+                <img src={hqImage} alt="Custom Stamp" className="w-[220px] h-[300px] object-cover" crossOrigin="anonymous" />
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* ---------------- RETAKE / SAVE CONTROLS ---------------- */}
+      {punchState === 'done' && activeTab === 'camera' && (
+        <div className="mt-20 flex flex-row gap-4 w-full max-w-sm z-30 px-4">
+          <motion.button 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} 
+            onClick={() => { setHqImage(null); setArchiveImage(null); setPunchState('viewfinder'); }}
+            className="flex-1 py-4 bg-[#F6F5F2] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-lg rounded-[255px_15px_225px_15px/15px_225px_15px_255px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+          >
+            <svg width="24" height="24" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M 25 50 C 25 30 40 15 60 15 C 75 15 85 25 90 35" />
+               <path d="M 90 20 L 90 35 L 75 35" />
+               <path d="M 75 50 C 75 70 60 85 40 85 C 25 85 15 75 10 65" />
+               <path d="M 10 80 L 10 65 L 25 65" />
+            </svg>
+          </motion.button>
+          
+          <motion.button 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} 
+            onClick={handleDownload} 
+            className="flex-1 py-4 bg-[#1A1A1A] text-[#F6F5F2] border-[4px] border-[#1A1A1A] font-black uppercase text-sm rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_0px_#F6F5F2] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+          >
+            📥 EXPORT
+          </motion.button>
+
+          <motion.button 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} 
+            onClick={handleSaveToArchive} 
+            className="flex-[1.5] py-4 bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] font-black uppercase text-sm rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center gap-2 transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
+          >
+            📖 SAVE TO BOOK
+          </motion.button>
+        </div>
+      )}
+
+      {/* ---------------- SCRAPBOOK ARCHIVE VIEW ---------------- */}
+      {activeTab === 'archive' && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}
+          className="absolute inset-0 pt-24 pb-36 px-4 overflow-y-auto flex flex-col items-center z-20"
+        >
+          <div className="relative mb-12">
+            <h2 className="text-[#1A1A1A] font-black text-[2.5rem] uppercase tracking-widest text-center" style={{ fontFamily: "'Permanent Marker', cursive", transform: 'rotate(-2deg)' }}>
+              Field Notes
+            </h2>
+            <div 
+              className="absolute -bottom-6 left-1/2 bg-[#1A1A1A] text-[#F4F0EB] text-xs font-black uppercase tracking-widest px-4 py-1"
+              style={{ transform: 'translateX(-50%) rotate(2deg)' }}
+            >
+              {archive.length}/{MAX_ARCHIVE} Memories
+            </div>
+          </div>
+          
+          {archive.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64 border-[4px] border-dashed border-[#1A1A1A]/30 rounded-[255px_15px_225px_15px/15px_225px_15px_255px] w-full max-w-sm mt-8 transform rotate-1">
+               <p className="text-[#1A1A1A]/50 font-black text-center uppercase tracking-widest leading-relaxed">No stamps collected yet.<br/>Punch some memories.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-10 w-full max-w-2xl px-2">
+              {archive.map((entry, idx) => (
+                <div key={idx} className="flex flex-col items-center relative">
+                   {(idx === 0 || archive[idx-1].date !== entry.date) && (
+                     <span className="col-span-2 sm:col-span-3 w-full text-left text-[#1A1A1A] font-black text-sm uppercase tracking-widest mt-6 mb-4 border-b-4 border-[#1A1A1A]/10 pb-2">{entry.date}</span>
+                   )}
+                   <motion.div 
+                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} 
+                     className="relative aspect-[260/340] w-full flex items-center justify-center drop-shadow-[4px_6px_8px_rgba(0,0,0,0.15)] hover:scale-105 hover:z-50 transition-transform cursor-pointer"
+                     style={{ transform: `rotate(${Math.random() * 6 - 3}deg)` }}
+                   >
+                     {/* Masking Tape Overlay */}
+                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/70 backdrop-blur-sm shadow-sm z-40 border border-black/5" style={{ transform: `rotate(${Math.random() * 10 - 5}deg)` }}></div>
+                     
+                     <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
+                       <path fill="#F6F5F2" d={stampPath} />
+                     </svg>
+                     <div className="relative z-10 w-[84%] h-[88%] border-[2px] border-[#1A1A1A] overflow-hidden bg-white">
+                       <img src={entry.data} className="w-full h-full object-cover grayscale-[0.1] contrast-[1.1]" />
+                     </div>
+                   </motion.div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* ---------------- CENTERED BOTTOM NAVIGATION BAR ---------------- */}
+      {punchState !== 'punching' && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex bg-[#E5E7EB] border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] z-[9999]">
+           <button 
+             onClick={() => { setActiveTab('camera'); setPunchState('viewfinder'); setHqImage(null); }} 
+             className={`flex items-center justify-center gap-2 px-6 py-3 rounded-[255px_15px_225px_15px/15px_225px_15px_255px] transition-colors duration-200 ${activeTab === 'camera' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
+           >
+              {/* Custom Sketch Stamp Icon */}
+              <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                 <path d="M 20 80 L 80 80 M 30 80 L 30 50 C 30 20 50 20 50 20 C 70 20 70 50 70 80" />
+              </svg>
+              <span className="text-xs font-black uppercase tracking-widest">Stamp</span>
+           </button>
+           <button 
+             onClick={() => setActiveTab('archive')} 
+             className={`flex items-center justify-center gap-2 px-6 py-3 rounded-[15px_225px_15px_255px/255px_15px_225px_15px] transition-colors duration-200 ${activeTab === 'archive' ? 'bg-[#1A1A1A] text-[#F6F5F2]' : 'text-[#1A1A1A] hover:bg-[#D1D5DB]'}`}
+           >
+              {/* Custom Sketch Book Icon */}
+              <svg width="22" height="22" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                 <path d="M 20 20 L 80 20 L 80 80 L 20 80 Z M 40 20 L 40 80 M 60 40 L 70 40 M 60 60 L 70 60" />
+              </svg>
+              <span className="text-xs font-black uppercase tracking-widest">Book</span>
+           </button>
+        </div>
+      )}
+
     </div>
   );
 };
