@@ -32,6 +32,7 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
   const [hasCameraError, setHasCameraError] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [activeTab, setActiveTab] = useState<'camera' | 'archive'>('camera');
+  const [selectedStampIndex, setSelectedStampIndex] = useState<number | null>(null);
   
   const stampWidth = 260;
   const stampHeight = 340;
@@ -273,7 +274,7 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
         >
           <div className="relative mb-12">
             <h2 className="text-[#1A1A1A] font-black text-[2.5rem] uppercase tracking-widest text-center" style={{ fontFamily: "'Permanent Marker', cursive", transform: 'rotate(-2deg)' }}>
-              Field Notes
+              Collections
             </h2>
             <div 
               className="absolute -bottom-6 left-1/2 bg-[#1A1A1A] text-[#F4F0EB] text-xs font-black uppercase tracking-widest px-4 py-1"
@@ -296,6 +297,7 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
                    )}
                    <motion.div 
                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} 
+                     onClick={() => setSelectedStampIndex(idx)}
                      className="relative aspect-[260/340] w-full flex items-center justify-center drop-shadow-[4px_6px_8px_rgba(0,0,0,0.15)] hover:scale-105 hover:z-50 transition-transform cursor-pointer"
                      style={{ transform: `rotate(${Math.random() * 6 - 3}deg)` }}
                    >
@@ -345,6 +347,78 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
           </div>
         </div>
       )}
+
+      {/* ---------------- STAMP ZOOM MODAL ---------------- */}
+      <AnimatePresence>
+        {selectedStampIndex !== null && archive[selectedStampIndex] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[10000] flex flex-col items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={() => setSelectedStampIndex(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="flex flex-col items-center gap-6"
+            >
+              {/* Larger Stamp Display */}
+              <div className="relative" style={{ width: stampWidth * 1.2, height: stampHeight * 1.2 }}>
+                <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0 drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
+                  <path fill="#F6F5F2" d={stampPath} />
+                </svg>
+                <div className="absolute z-10 w-[84%] h-[88%] border-[3px] border-[#1A1A1A] overflow-hidden bg-white" style={{ top: '6%', left: '8%' }}>
+                  <img src={archive[selectedStampIndex].data} className="w-full h-full object-cover" />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => {
+                    const link = document.createElement('a'); 
+                    link.download = `supreme-collection-${Date.now()}.jpg`; 
+                    link.href = archive[selectedStampIndex].data; 
+                    link.click();
+                  }}
+                  className="w-[60px] h-[60px] bg-[#F6F5F2] hover:bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] rounded-2xl flex items-center justify-center shadow-[4px_4px_0px_#1A1A1A] transition-colors active:translate-x-1 active:translate-y-1 active:shadow-none"
+                  title="Download"
+                >
+                  {/* Cartoon Download Icon */}
+                  <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M 50 20 L 50 65" />
+                    <path d="M 30 45 L 50 65 L 70 45" />
+                    <path d="M 20 80 L 80 80" />
+                  </svg>
+                </button>
+                <button 
+                  onClick={() => {
+                    const newArchive = [...archive];
+                    newArchive.splice(selectedStampIndex, 1);
+                    setArchive(newArchive);
+                    localStorage.setItem('supreme_stamps_archive', JSON.stringify(newArchive));
+                    setSelectedStampIndex(null);
+                  }}
+                  className="w-[60px] h-[60px] bg-[#F6F5F2] hover:bg-[#BF0D3E] hover:text-[#F6F5F2] text-[#1A1A1A] border-[4px] border-[#1A1A1A] rounded-2xl flex items-center justify-center shadow-[4px_4px_0px_#1A1A1A] transition-colors active:translate-x-1 active:translate-y-1 active:shadow-none"
+                  title="Delete"
+                >
+                  {/* Cartoon Trash Icon */}
+                  <svg width="32" height="32" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M 30 30 L 70 30" />
+                    <path d="M 45 30 L 45 20 L 55 20 L 55 30" />
+                    <path d="M 35 30 L 40 80 L 60 80 L 65 30" />
+                    <path d="M 45 45 L 45 65" />
+                    <path d="M 55 45 L 55 65" />
+                  </svg>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
