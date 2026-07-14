@@ -20,6 +20,201 @@ const generateStampPath = (width: number, height: number) => {
 
 const MAX_ARCHIVE = 18; 
 
+// Simple seeded random function to keep scrapbook layouts consistent across renders
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed + 1.1) * 10000;
+  return x - Math.floor(x);
+};
+
+const renderDoodles = (idx: number) => {
+  const elements = [];
+  // Pass 1: Structural (Binder clips, Paper clips, Tape) - Top edge priority
+  const doodle1 = generateSingleDoodle(idx, 1);
+  if (doodle1) elements.push(doodle1);
+  // Pass 2: Contextual Text (Torn paper scraps, Location pins, Stacked text)
+  const doodle2 = generateSingleDoodle(idx, 2);
+  if (doodle2) elements.push(doodle2);
+  // Pass 3: Decorative SVGs (Thick stroke Stars, Smiley, Butterfly, Coffee, Hearts)
+  const doodle3 = generateSingleDoodle(idx, 3);
+  if (doodle3) elements.push(doodle3);
+  // Pass 4: Wildcard Connectors (Dotted trails, Zig-zags bridging the photos)
+  const doodle4 = generateSingleDoodle(idx, 4);
+  if (doodle4) elements.push(doodle4);
+  return elements;
+};
+
+const generateSingleDoodle = (idx: number, pass: number) => {
+  const seed = idx * 100 + pass;
+  const rand = seededRandom(seed);
+
+  // Advanced Z-Index strategy: Mix of extreme under-layering, mid-layering, and top-clipping
+  const zLayer = seededRandom(seed + 1);
+  let zClass = 'z-0'; // Default bottom
+  if (zLayer > 0.7) zClass = 'z-40'; // High overlap
+  else if (zLayer > 0.4) zClass = 'z-20'; // Mid overlap
+  
+  const rotation = seededRandom(seed + 2) * 35 - 17.5;
+  const fontPick = seededRandom(seed + 3) > 0.5 ? "'Gloria Hallelujah', cursive" : "'Permanent Marker', cursive";
+
+  // ---------------------------------------------------------
+  // PASS 1: STRUCTURAL BINDERS & TAPE (Top Edge Anchor)
+  // ---------------------------------------------------------
+  if (pass === 1) {
+    if (rand < 0.15) return null; // 15% empty for breathing room
+    const leftPos = '50%'; // Perfectly centered horizontally
+    
+    if (rand < 0.5) {
+      // Premium Black Binder Clip (Awwwards/Editorial Vibe)
+      return (
+        <div key={seed} className="absolute z-50 pointer-events-none drop-shadow-[0_6px_8px_rgba(0,0,0,0.35)]" style={{ top: '-10%', left: leftPos, transform: `translateX(-50%) rotate(${rotation * 0.15}deg)` }}>
+          <svg width="45" height="55" viewBox="0 0 60 80" fill="none" stroke="#1A1A1A" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M 20 40 L 10 10 C 8 5 25 5 30 15" strokeWidth="4" fill="none" />
+            <path d="M 40 40 L 50 10 C 52 5 35 5 30 15" strokeWidth="4" fill="none" />
+            <path d="M 15 35 L 45 35 L 48 70 L 12 70 Z" fill="#1A1A1A" strokeWidth="2" />
+            <path d="M 18 35 L 22 70 M 42 35 L 38 70" stroke="#333" strokeWidth="1.5" />
+          </svg>
+        </div>
+      );
+    } else if (rand < 0.75) {
+      // Elongated Paperclip
+      return (
+        <div key={seed} className="absolute z-50 pointer-events-none drop-shadow-md" style={{ top: '-6%', left: leftPos, transform: `translateX(-50%) rotate(${rotation}deg)` }}>
+          <svg width="32" height="65" viewBox="0 0 40 80" fill="none" stroke="#1A1A1A" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M 25 20 L 25 60 C 25 75, 5 75, 5 60 L 5 15 C 5 5, 35 5, 35 15 L 35 70 C 35 90, -5 90, -5 70 L -5 30" />
+          </svg>
+        </div>
+      );
+    } else {
+      // Raw Torn Tape Edge
+      return (
+        <div key={seed} className="absolute z-40 bg-[#F6F5F2]/80 backdrop-blur-md shadow-sm pointer-events-none border border-black/10 flex items-center justify-center overflow-hidden" style={{ width: '100px', height: '26px', top: '-4%', left: leftPos, transform: `translateX(-50%) rotate(${rotation}deg)` }}>
+          <div className="w-full h-full opacity-15" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 3px, #1A1A1A 3px, #1A1A1A 6px)' }}></div>
+        </div>
+      );
+    }
+  }
+
+  // ---------------------------------------------------------
+  // PASS 2: TYPOGRAPHY, SCRAPS, & LOCATION PINS
+  // ---------------------------------------------------------
+  if (pass === 2) {
+    if (rand < 0.2) return null;
+    const topPos = `${seededRandom(seed + 1) * 110 - 5}%`; 
+    const leftPos = `${seededRandom(seed + 2) * 120 - 10}%`; 
+    const textRand = seededRandom(seed + 4);
+    
+    if (textRand < 0.35) {
+      // Contextual Pin / Timestamps
+      const locations = ["📍 Wonosobo", "📍 Dieng", "10 Nov 2023", "📍 MNL", "company visit", "safety first"];
+      const text = locations[Math.floor(seededRandom(seed + 5) * locations.length)];
+      return (
+         <div key={seed} className={`absolute ${zClass} text-[#1A1A1A] font-bold text-[16px] whitespace-nowrap pointer-events-none drop-shadow-md`} style={{ top: topPos, left: leftPos, transform: `rotate(${rotation * 0.6}deg)`, fontFamily: fontPick, letterSpacing: '0.5px' }}>
+            {text}
+         </div>
+      );
+    } else if (textRand < 0.65) {
+      // Hand-cut Paper Scrap
+      const notes = ["hot tea is necessary", "perlu kesini lagi", "a day in my life", "w/@linuu", "sehari jadi"];
+      const text = notes[Math.floor(seededRandom(seed + 5) * notes.length)];
+      return (
+        <div key={seed} className={`absolute ${zClass} bg-[#F6F5F2] px-4 py-1.5 shadow-[3px_4px_8px_rgba(0,0,0,0.18)] pointer-events-none flex flex-col items-center border-[1px] border-[#1A1A1A]/10`} style={{ top: topPos, left: leftPos, transform: `rotate(${rotation}deg)` }}>
+          <span className="text-[#1A1A1A] text-[14px] whitespace-nowrap font-black tracking-wide" style={{ fontFamily: "'Gloria Hallelujah', cursive" }}>{text}</span>
+        </div>
+      );
+    } else {
+      // Stacked Vertical Typography (Premium Streetwear alignment)
+      return (
+        <div key={seed} className={`absolute ${zClass} text-[#1A1A1A] font-black text-[15px] flex flex-col leading-[0.9] pointer-events-none opacity-90`} style={{ top: topPos, left: leftPos, transform: `rotate(${rotation}deg)`, fontFamily: "'Permanent Marker', cursive" }}>
+          <span>how cool</span>
+          <span>how cool</span>
+          <span>how cool</span>
+        </div>
+      );
+    }
+  }
+
+  // ---------------------------------------------------------
+  // PASS 3: THICK STROKE PREMIUM SVGS
+  // ---------------------------------------------------------
+  if (pass === 3) {
+    if (rand < 0.25) return null;
+    const topPos = `${seededRandom(seed + 1) * 110 - 5}%`; 
+    const leftPos = `${seededRandom(seed + 2) * 120 - 10}%`; 
+    
+    const doodleTypes = [
+      // 0: Perfect Smiley 
+      <svg width="48" height="48" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><circle cx="50" cy="50" r="42" /><path d="M 35 40 L 35 48 M 65 40 L 65 48" strokeWidth="7" /><path d="M 30 65 Q 50 82 70 65" strokeWidth="5.5"/></svg>,
+      // 1: 3-Star Cluster
+      <svg width="65" height="65" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round"><path d="M 25 10 L 30 25 L 45 30 L 30 35 L 25 50 L 20 35 L 5 30 L 20 25 Z" /><path d="M 75 30 L 78 40 L 88 43 L 78 46 L 75 56 L 72 46 L 62 43 L 72 40 Z" strokeWidth="3.5"/><path d="M 50 65 L 52 72 L 59 74 L 52 76 L 50 83 L 48 76 L 41 74 L 48 72 Z" strokeWidth="3.5"/></svg>,
+      // 2: Outline Butterfly
+      <svg width="55" height="55" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M 50 20 L 50 80" strokeWidth="6.5" /><path d="M 50 35 C 10 10, 5 50, 50 50 Z" /><path d="M 50 35 C 90 10, 95 50, 50 50 Z" /><path d="M 50 50 C 20 50, 20 85, 50 75 Z" /><path d="M 50 50 C 80 50, 80 85, 50 75 Z" /><path d="M 50 20 Q 35 5 30 15 M 50 20 Q 65 5 70 15" strokeWidth="3.5"/></svg>,
+      // 3: PH Sun 
+      <svg width="50" height="50" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><circle cx="50" cy="50" r="16" /><path d="M 50 5 L 50 24 M 50 95 L 50 76 M 5 50 L 24 50 M 95 50 L 76 50 M 18 18 L 31 31 M 82 82 L 69 69 M 18 82 L 31 69 M 82 18 L 69 31" strokeWidth="5.5"/></svg>,
+      // 4: Minimalist Flower
+      <svg width="45" height="45" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="50" cy="50" r="11" /><path d="M 50 40 C 30 -10, 70 -10, 50 40 Z" /><path d="M 50 60 C 30 110, 70 110, 50 60 Z" /><path d="M 40 50 C -10 30, -10 70, 40 50 Z" /><path d="M 60 50 C 110 30, 110 70, 60 50 Z" /></svg>,
+      // 5: Coffee Cup
+      <svg width="48" height="48" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M 25 40 L 25 70 C 25 85, 65 85, 65 70 L 65 40 Z" strokeWidth="5.5"/><path d="M 15 80 C 15 90, 75 90, 75 80" /><path d="M 65 45 C 80 45, 80 65, 65 65" strokeWidth="5"/><path d="M 35 30 Q 40 15 35 5 M 45 30 Q 50 15 45 5 M 55 30 Q 60 15 55 5" strokeWidth="3.5"/></svg>,
+      // 6: Fluid Heart
+      <svg width="38" height="38" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"><path d="M 50 30 C 50 30 45 5 25 5 C -5 5 -5 45 50 95 C 105 45 105 5 75 5 C 55 5 50 30 50 30 Z" /></svg>
+    ];
+    
+    const svg = doodleTypes[Math.floor(seededRandom(seed + 6) * doodleTypes.length)];
+    return (
+      <div key={seed} className={`absolute ${zClass} pointer-events-none drop-shadow-sm opacity-90`} style={{ top: topPos, left: leftPos, transform: `rotate(${rotation * 1.5}deg)` }}>
+        {svg}
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------
+  // PASS 4: SPATIAL CONNECTORS (Spanning multiple items)
+  // ---------------------------------------------------------
+  if (pass === 4) {
+    if (rand < 0.45) return null; 
+    const topPos = `${seededRandom(seed + 1) * 80 + 10}%`; 
+    const leftPos = `${seededRandom(seed + 2) * 80 + 10}%`; 
+    const connectorRand = seededRandom(seed + 3);
+
+    if (connectorRand < 0.35) {
+      // Overlapping Smiley Face
+      return (
+        <div key={seed} className="absolute z-50 pointer-events-none drop-shadow-md" style={{ top: topPos, left: '-10%', transform: `rotate(${rotation * 1.5}deg)` }}>
+          <svg width="80" height="80" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+             <circle cx="50" cy="50" r="42" />
+             <path d="M 35 40 L 35 48 M 65 40 L 65 48" strokeWidth="7" />
+             <path d="M 30 65 Q 50 82 70 65" strokeWidth="5.5"/>
+          </svg>
+        </div>
+      );
+    } else if (connectorRand < 0.75) {
+      // Overlapping Butterfly
+      return (
+        <div key={seed} className={`absolute z-40 pointer-events-none opacity-90`} style={{ top: '-10%', left: leftPos, transform: `rotate(${rotation}deg)` }}>
+          <svg width="75" height="75" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+             <path d="M 50 20 L 50 80" strokeWidth="6.5" />
+             <path d="M 50 35 C 10 10, 5 50, 50 50 Z" />
+             <path d="M 50 35 C 90 10, 95 50, 50 50 Z" />
+             <path d="M 50 50 C 20 50, 20 85, 50 75 Z" />
+             <path d="M 50 50 C 80 50, 80 85, 50 75 Z" />
+             <path d="M 50 20 Q 35 5 30 15 M 50 20 Q 65 5 70 15" strokeWidth="3.5"/>
+          </svg>
+        </div>
+      );
+    } else {
+      // Directional Indicator Arrow
+      return (
+         <div key={seed} className={`absolute ${zClass} pointer-events-none drop-shadow-sm`} style={{ top: topPos, left: leftPos, transform: `rotate(${rotation * 2.5}deg)` }}>
+            <svg width="65" height="65" viewBox="0 0 100 100" fill="none" stroke="#1A1A1A" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M 20 80 Q 50 50 80 20 M 60 20 L 80 20 L 80 40" />
+            </svg>
+         </div>
+      );
+    }
+  }
+  
+  return null;
+};
+
 const StampMachine = ({ onClose }: { onClose: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -320,15 +515,19 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
                       </svg>
                     </div>
                   )}
-                  <div className="flex flex-col items-center relative">
+                  <div className="flex flex-col items-center relative z-10">
+                     {/* Random Scrapbook Doodles! */}
+                     {renderDoodles(idx)}
                      <motion.div 
                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} 
                        onClick={() => setSelectedStampIndex(idx)}
                        className="relative aspect-[260/340] w-full flex items-center justify-center drop-shadow-[4px_6px_8px_rgba(0,0,0,0.15)] hover:scale-105 hover:z-50 transition-transform cursor-pointer"
-                       style={{ transform: `rotate(${Math.random() * 6 - 3}deg)` }}
+                       style={{ transform: `rotate(${seededRandom(idx * 8) * 6 - 3}deg)` }}
                      >
-                       {/* Masking Tape Overlay */}
-                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/70 backdrop-blur-sm shadow-sm z-40 border border-black/5" style={{ transform: `rotate(${Math.random() * 10 - 5}deg)` }}></div>
+                       {/* Masking Tape Overlay - Only show if Pass 1 didn't generate a top binder/clip */}
+                       {seededRandom(idx * 100 + 1) < 0.15 && (
+                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/70 backdrop-blur-sm shadow-sm z-40 border border-black/5" style={{ transform: `rotate(${seededRandom(idx * 9) * 10 - 5}deg)` }}></div>
+                       )}
                        
                        <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
                          <path fill="#F6F5F2" d={stampPath} />
