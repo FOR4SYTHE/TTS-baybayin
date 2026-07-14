@@ -390,7 +390,7 @@ export default function App() {
       setArtBgIndex(Math.floor(Math.random() * 11) + 1);
       setIsArtMode(true);
       setIsGeneratingArt(false);
-    }, 1500); // 1.5 second anticipation
+    }, 3500); // 3.5 second anticipation
   };
 
   const handleCopyBaybayin = async () => {
@@ -636,13 +636,27 @@ export default function App() {
       </AnimatePresence>
 
       {/* Main App Container */}
-      <div
+      <main
         className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#93C5FD]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
-        style={appMode === 'translator'
-          ? { backgroundColor: '#EEF2FF', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
-          : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'240\' height=\'240\' viewBox=\'0 0 240 240\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\' opacity=\'0.06\'%3E%3Ccircle cx=\'120\' cy=\'120\' r=\'12\'/%3E%3Cpath d=\'M 120 100 L 120 92 M 120 140 L 120 148 M 100 120 L 92 120 M 140 120 L 148 120\' stroke-width=\'3\'/%3E%3Cpath d=\'M 106 106 L 98 98 M 134 134 L 142 142 M 106 134 L 98 142 M 134 106 L 142 98\' stroke-width=\'2\'/%3E%3Cpath d=\'M 110 70 L 120 80 L 130 70 M 110 60 L 120 70 L 130 60 M 110 50 L 120 60 L 130 50\'/%3E%3Cpath d=\'M 110 170 L 120 160 L 130 170 M 110 180 L 120 170 L 130 180 M 110 190 L 120 180 L 130 190\'/%3E%3Cpath d=\'M 40 100 L 50 110 L 40 120 L 30 110 Z\'/%3E%3Cpath d=\'M 40 130 L 50 140 L 40 150 L 30 140 Z\'/%3E%3Cpath d=\'M 25 80 L 35 90 L 45 80 L 55 90 M 25 90 L 35 100 L 45 90 L 55 100\'/%3E%3Cpath d=\'M 200 100 L 210 110 L 200 120 L 190 110 Z\'/%3E%3Cpath d=\'M 200 130 L 210 140 L 200 150 L 190 140 Z\'/%3E%3Cpath d=\'M 185 80 L 195 90 L 205 80 L 215 90 M 185 90 L 195 100 L 205 90 L 215 100\'/%3E%3Ccircle cx=\'120\' cy=\'30\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'120\' cy=\'210\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'40\' cy=\'60\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'200\' cy=\'190\' r=\'1.5\' fill=\'%232C2825\'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
-        }
       >
+        <motion.div 
+          className="fixed inset-0 -z-10 pointer-events-none"
+          animate={isGeneratingArt ? { 
+            filter: "invert(1) hue-rotate(180deg)",
+            backgroundPositionY: ["0px", "100px", "0px", "-100px", "0px"] 
+          } : { 
+            filter: "invert(0) hue-rotate(0deg)", 
+            backgroundPositionY: "0px" 
+          }}
+          transition={isGeneratingArt ? { 
+            backgroundPositionY: { repeat: Infinity, duration: 3.5, ease: "linear" },
+            filter: { duration: 0.4 } 
+          } : { duration: 0.4 }}
+          style={appMode === 'translator'
+            ? { backgroundColor: '#EEF2FF', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
+            : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'240\' height=\'240\' viewBox=\'0 0 240 240\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\' opacity=\'0.06\'%3E%3Ccircle cx=\'120\' cy=\'120\' r=\'12\'/%3E%3Cpath d=\'M 120 100 L 120 92 M 120 140 L 120 148 M 100 120 L 92 120 M 140 120 L 148 120\' stroke-width=\'3\'/%3E%3Cpath d=\'M 106 106 L 98 98 M 134 134 L 142 142 M 106 134 L 98 142 M 134 106 L 142 98\' stroke-width=\'2\'/%3E%3Cpath d=\'M 110 70 L 120 80 L 130 70 M 110 60 L 120 70 L 130 60 M 110 50 L 120 60 L 130 50\'/%3E%3Cpath d=\'M 110 170 L 120 160 L 130 170 M 110 180 L 120 170 L 130 180 M 110 190 L 120 180 L 130 190\'/%3E%3Cpath d=\'M 40 100 L 50 110 L 40 120 L 30 110 Z\'/%3E%3Cpath d=\'M 40 130 L 50 140 L 40 150 L 30 140 Z\'/%3E%3Cpath d=\'M 25 80 L 35 90 L 45 80 L 55 90 M 25 90 L 35 100 L 45 90 L 55 100\'/%3E%3Cpath d=\'M 200 100 L 210 110 L 200 120 L 190 110 Z\'/%3E%3Cpath d=\'M 200 130 L 210 140 L 200 150 L 190 140 Z\'/%3E%3Cpath d=\'M 185 80 L 195 90 L 205 80 L 215 90 M 185 90 L 195 100 L 205 90 L 215 100\'/%3E%3Ccircle cx=\'120\' cy=\'30\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'120\' cy=\'210\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'40\' cy=\'60\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'200\' cy=\'190\' r=\'1.5\' fill=\'%232C2825\'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
+          }
+        />
 
         {/* Top Controls */}
         <div className="w-full max-w-4xl flex justify-between items-center z-40 mb-2 relative">
@@ -1049,7 +1063,9 @@ export default function App() {
 
         {/* Baybayin Mode Layout */}
         {appMode === 'baybayin' && (
-          <div className="w-full max-w-md z-10 flex flex-col items-center pt-8 pb-12 animate-in fade-in duration-500 relative">
+          <div 
+            className={`w-full max-w-md z-10 flex flex-col items-center pt-8 pb-12 animate-in fade-in duration-500 relative ${isGeneratingArt ? 'text-[#F6F5F2]' : 'text-[#1A1A1A]'}`}
+          >
 
             {/* Background Petroglyphs */}
             <div className="absolute top-0 left-[-60px]"><TribalPetroglyph1 /></div>
@@ -1084,13 +1100,13 @@ export default function App() {
               {/* Mode Toggle */}
               <div className="flex mt-8 bg-transparent border-[4px] border-[#2C2825] p-1 rounded-[255px_15px_225px_15px/15px_225px_15px_255px]">
                 <button 
-                  onClick={() => { setBaybayinMode('encode'); setBaybayinOutput(''); setDecodedCache({}); }}
+                  onClick={() => { setBaybayinMode('encode'); setBaybayinInput(''); setBaybayinOutput(''); setDecodedCache({}); setIsArtMode(false); setIsGeneratingArt(false); }}
                   className={`px-4 py-2 font-tribal-text font-bold uppercase tracking-widest transition-colors rounded-xl ${baybayinMode === 'encode' ? 'bg-[#2C2825] text-[#F6F5F2]' : 'text-[#2C2825] hover:bg-[#2C2825]/10'}`}
                 >
                   CARVE (To Baybayin)
                 </button>
                 <button 
-                  onClick={() => { setBaybayinMode('decode'); setBaybayinOutput(''); setDecodedCache({}); }}
+                  onClick={() => { setBaybayinMode('decode'); setBaybayinInput(''); setBaybayinOutput(''); setDecodedCache({}); setIsArtMode(false); setIsGeneratingArt(false); }}
                   className={`px-4 py-2 font-tribal-text font-bold uppercase tracking-widest transition-colors rounded-xl ${baybayinMode === 'decode' ? 'bg-[#2C2825] text-[#F6F5F2]' : 'text-[#2C2825] hover:bg-[#2C2825]/10'}`}
                 >
                   DECODE (From Baybayin)
@@ -1153,14 +1169,26 @@ export default function App() {
                 >
                   
                   {/* The Tiny Floating Trigger Button (Hidden during Art Mode or Loading) */}
-                  {!isArtMode && !isGeneratingArt && (
-                    <button 
+                  {!isArtMode && !isGeneratingArt && baybayinMode === 'encode' && (
+                    <motion.button 
                       onClick={handleMorphToArt}
-                      className="absolute -right-3 -top-3 z-50 bg-[#FED141] border-[3px] border-[#1A1A1A] w-10 h-10 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-[2px_2px_0px_0px_#1A1A1A]"
-                      title="Transform to Art Stamp"
+                      className="absolute -right-3 -top-3 z-50 bg-[#F6F5F2] border-[3px] border-[#1A1A1A] w-10 h-10 rounded-sm flex items-center justify-center hover:bg-[#1A1A1A] hover:text-[#F6F5F2] transition-colors shadow-[2px_2px_0px_0px_#1A1A1A] text-[#1A1A1A]"
+                      title="Imprint Art Background"
+                      animate={{ rotate: [0, -15, 15, -15, 15, 0], scale: [1, 1.1, 1.1, 1] }}
+                      transition={{ duration: 0.6, delay: 1, repeat: 2, repeatDelay: 3 }}
                     >
-                      🎨
-                    </button>
+                      <motion.span 
+                        initial={{ opacity: 0, y: 0 }} 
+                        animate={{ opacity: [0, 1, 1, 0], y: [0, -35, -35, -35] }} 
+                        transition={{ duration: 3.5, delay: 0.5, ease: "easeOut" }} 
+                        className="absolute left-1/2 -translate-x-1/2 text-xs font-black text-[#BF0D3E] whitespace-nowrap pointer-events-none drop-shadow-md"
+                      >
+                        TRY ME!
+                      </motion.span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                         <path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9L12 2Z"/>
+                      </svg>
+                    </motion.button>
                   )}
                   
                   {/* Loading State Overlay */}
@@ -1231,13 +1259,15 @@ export default function App() {
                     {isBaybayinCopied ? <Check className="w-6 h-6 stroke-[3]" /> : <Copy className="w-6 h-6 stroke-[3]" />}
                     {isBaybayinCopied ? 'COPIED!' : 'COPY CHARACTERS'}
                   </button>
-                  <button
-                    onClick={handleDownloadImage}
-                    className="flex items-center gap-3 bg-transparent hover:bg-[#2C2825] hover:text-[#F6F5F2] text-[#2C2825] px-6 py-4 border-4 border-[#2C2825] text-xl font-tribal-text font-bold uppercase transition-colors duration-150 tracking-wider w-full justify-center"
-                  >
-                    <Download className="w-6 h-6 stroke-[3]" />
-                    SAVE AS IMAGE
-                  </button>
+                  {baybayinMode === 'encode' && (
+                    <button
+                      onClick={handleDownloadImage}
+                      className="flex items-center gap-3 bg-transparent hover:bg-[#2C2825] hover:text-[#F6F5F2] text-[#2C2825] px-6 py-4 border-4 border-[#2C2825] text-xl font-tribal-text font-bold uppercase transition-colors duration-150 tracking-wider w-full justify-center"
+                    >
+                      <Download className="w-6 h-6 stroke-[3]" />
+                      SAVE AS IMAGE
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -1260,7 +1290,7 @@ export default function App() {
           {isLensOpen && <SupremeLens onClose={() => setIsLensOpen(false)} />}
         </AnimatePresence>
 
-      </div>
+      </main>
     </>
   );
 }
