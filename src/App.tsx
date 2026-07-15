@@ -310,7 +310,14 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
 
   const handleDownload = () => {
     if (!stampRef.current) return;
-    toPng(stampRef.current, { cacheBust: true, pixelRatio: 4, skipFonts: true }) // Premium 4x Export
+    toPng(stampRef.current, { 
+      cacheBust: true, 
+      pixelRatio: 4, 
+      skipFonts: true,
+      width: stampWidth,
+      height: stampHeight,
+      style: { transform: 'scale(1) rotate(0deg) translateY(0px)' } 
+    }) 
       .then((dataUrl) => {
         const link = document.createElement('a'); link.download = `supreme-stamp-${Date.now()}.png`; link.href = dataUrl; link.click();
       });
@@ -409,18 +416,19 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
           {/* The Final Punched Stamp Output */}
           {hqImage && punchState === 'done' && (
             <motion.div
-              ref={stampRef}
               initial={{ scale: 0.95, y: 15, opacity: 1 }}
               animate={{ scale: 1.05, y: -20, rotate: -2, filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.9))', opacity: 1 }}
               transition={{ type: "spring", bounce: 0.6, duration: 0.6 }}
               className="absolute z-30 flex items-center justify-center"
-              style={{ width: stampWidth, height: stampHeight }}
             >
-              <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
-                <path fill="#F6F5F2" d={stampPath} />
-              </svg>
-              <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
-                <img src={hqImage} alt="Custom Stamp" className="w-[220px] h-[300px] object-cover" crossOrigin="anonymous" />
+              {/* ISOLATED EXPORT WRAPPER: ref goes here to avoid transform clipping */}
+              <div ref={stampRef} className="relative flex items-center justify-center bg-transparent" style={{ width: stampWidth, height: stampHeight }}>
+                <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
+                  <path fill="#F6F5F2" d={stampPath} />
+                </svg>
+                <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
+                  <img src={hqImage} alt="Custom Stamp" className="w-[220px] h-[300px] object-cover" crossOrigin="anonymous" />
+                </div>
               </div>
             </motion.div>
           )}
