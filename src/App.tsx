@@ -1033,18 +1033,21 @@ export default function App() {
 
   const baybayinRef = useRef<HTMLDivElement>(null);
 
-  const handleDownloadImage = async () => {
+  const handleDownloadImage = () => {
     if (!baybayinRef.current) return;
-    try {
-      const canvas = await html2canvas(baybayinRef.current, { backgroundColor: null });
-      const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = 'baybayin-script.png';
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error('Failed to download image', err);
-    }
+    toPng(baybayinRef.current, { 
+      cacheBust: true, 
+      pixelRatio: 4, 
+      // skipFonts removed to allow Baybayin font embedding
+      style: { transform: 'scale(1) rotate(0deg) translateY(0px)' } 
+    })
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.download = `sinaunang-baybayin-${Date.now()}.png`;
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch((err) => console.error('Failed to export image', err));
   };
 
   const handleMorphToArt = () => {
@@ -1819,42 +1822,54 @@ export default function App() {
                 <motion.div
                   ref={baybayinRef}
                   animate={isGeneratingArt ? { x: [-2, 2, -2, 2, 0], transition: { repeat: Infinity, duration: 0.2 } } : {}}
-                  className={`relative flex flex-col items-center justify-center transition-all duration-500 w-full min-h-[200px] sm:min-h-[250px] ${isArtMode
-                      ? 'shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
-                      : 'bg-[#F6F5F2] border-[8px] border-[#2C2825]'
-                    }`}
-                  style={isArtMode ? {
-                    backgroundColor: 'transparent',
-                    backgroundImage: `radial-gradient(circle at 8px 8px, transparent 8px, #F6F5F2 8.5px)`,
-                    backgroundSize: '24px 24px',
-                    backgroundPosition: '-12px -12px',
-                    padding: '24px' // Thick border for the stamp
-                  } : { padding: '2.5rem' }}
+                  className={`relative flex flex-col items-center justify-center transition-all duration-500 w-full min-h-[200px] sm:min-h-[250px] ${ 
+                    isArtMode 
+                      ? 'drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)] p-[24px]' 
+                      : 'bg-[#F6F5F2] border-[8px] border-[#2C2825] p-[2.5rem]'
+                  }`}
                 >
-
+                  {/* ISOLATED MASK LAYER: Only cuts the background, leaving image and text perfectly solid */}
+                  {isArtMode && (
+                    <div 
+                      className="absolute inset-0 z-0 bg-[#F6F5F2]"
+                      style={{
+                        WebkitMaskImage: 'linear-gradient(black, black), radial-gradient(circle at 10px 10px, transparent 5px, black 5.5px)',
+                        maskImage: 'linear-gradient(black, black), radial-gradient(circle at 10px 10px, transparent 5px, black 5.5px)',
+                        WebkitMaskSize: 'calc(100% - 20px) calc(100% - 20px), 20px 20px',
+                        maskSize: 'calc(100% - 20px) calc(100% - 20px), 20px 20px',
+                        WebkitMaskPosition: 'center, -10px -10px',
+                        maskPosition: 'center, -10px -10px',
+                        WebkitMaskRepeat: 'no-repeat, round',
+                        maskRepeat: 'no-repeat, round',
+                        WebkitMaskComposite: 'source-over',
+                        maskComposite: 'add',
+                      }}
+                    />
+                  )}
+                  
                   {/* The Tiny Floating Trigger Button (Hidden during Art Mode or Loading) */}
                   {!isArtMode && !isGeneratingArt && baybayinMode === 'encode' && (
-                    <motion.button
+                    <motion.button 
                       onClick={handleMorphToArt}
                       className="absolute -right-3 -top-3 z-50 bg-[#F6F5F2] border-[3px] border-[#1A1A1A] w-10 h-10 rounded-sm flex items-center justify-center hover:bg-[#1A1A1A] hover:text-[#F6F5F2] transition-colors shadow-[2px_2px_0px_0px_#1A1A1A] text-[#1A1A1A]"
                       title="Imprint Art Background"
                       animate={{ rotate: [0, -15, 15, -15, 15, 0], scale: [1, 1.1, 1.1, 1] }}
                       transition={{ duration: 0.6, delay: 1, repeat: 2, repeatDelay: 3 }}
                     >
-                      <motion.span
-                        initial={{ opacity: 0, y: 0 }}
-                        animate={{ opacity: [0, 1, 1, 0], y: [0, -35, -35, -35] }}
-                        transition={{ duration: 3.5, delay: 0.5, ease: "easeOut" }}
+                      <motion.span 
+                        initial={{ opacity: 0, y: 0 }} 
+                        animate={{ opacity: [0, 1, 1, 0], y: [0, -35, -35, -35] }} 
+                        transition={{ duration: 3.5, delay: 0.5, ease: "easeOut" }} 
                         className="absolute left-1/2 -translate-x-1/2 text-xs font-black text-[#BF0D3E] whitespace-nowrap pointer-events-none drop-shadow-md"
                       >
                         TRY ME!
                       </motion.span>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9L12 2Z" />
+                         <path d="M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9L12 2Z"/>
                       </svg>
                     </motion.button>
                   )}
-
+                  
                   {/* Loading State Overlay */}
                   {isGeneratingArt && (
                     <div className="absolute inset-0 z-40 bg-[#F6F5F2]/80 backdrop-blur-sm flex items-center justify-center font-black uppercase text-[#1A1A1A] animate-pulse">
@@ -1862,9 +1877,9 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* Art Mode Inner Wrapper (Image + Overlay) */}
+                  {/* Art Mode Inner Wrapper (Z-10: Sits safely ON TOP of the mask) */}
                   {isArtMode && (
-                    <div className="absolute inset-[24px] border-[3px] border-[#1A1A1A] overflow-hidden z-0 bg-[#1A1A1A]">
+                    <div className="absolute inset-[24px] border-[2px] border-[#1A1A1A] overflow-hidden z-10 bg-white shadow-inner">
                       <img src={`/art/${artBgIndex}.webp`} alt="Art Background" className="absolute inset-0 w-full h-full object-cover opacity-90" crossOrigin="anonymous" />
                       <div className="absolute inset-0 bg-black/40"></div>
                     </div>
