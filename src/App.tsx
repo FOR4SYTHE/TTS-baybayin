@@ -1466,7 +1466,7 @@ export default function App() {
             {/* Header */}
             <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-6 select-none">
               <div className="relative inline-block transform -rotate-3 text-center">
-                <div className="absolute -top-14 -left-4 sm:-top-20 sm:-left-8 z-0 pointer-events-none">
+                <div className="absolute -top-14 -left-12 sm:-top-20 sm:-left-16 z-0 pointer-events-none">
                   <Sampaguita />
                 </div>
                 <h1
