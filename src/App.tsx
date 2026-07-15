@@ -219,6 +219,7 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stampRef = useRef<HTMLDivElement>(null);
+  const zoomedStampRef = useRef<HTMLDivElement>(null);
 
   const [hqImage, setHqImage] = useState<string | null>(null);
   const [archiveImage, setArchiveImage] = useState<string | null>(null);
@@ -608,12 +609,16 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
               className="flex flex-col items-center gap-6"
             >
               {/* Larger Stamp Display */}
-              <div className="relative" style={{ width: stampWidth * 1.2, height: stampHeight * 1.2 }}>
-                <svg width="100%" height="100%" viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0 drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
-                  <path fill="#F6F5F2" d={stampPath} />
-                </svg>
-                <div className="absolute z-10 w-[84%] h-[88%] border-[3px] border-[#1A1A1A] overflow-hidden bg-white" style={{ top: '6%', left: '8%' }}>
-                  <img src={archive[selectedStampIndex].data} className="w-full h-full object-cover" />
+              <div className="relative flex items-center justify-center" style={{ width: stampWidth * 1.2, height: stampHeight * 1.2 }}>
+                <div className="drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]" style={{ transform: 'scale(1.2)' }}>
+                  <div ref={zoomedStampRef} className="relative flex items-center justify-center bg-transparent" style={{ width: stampWidth, height: stampHeight }}>
+                    <svg width={stampWidth} height={stampHeight} viewBox={`0 0 ${stampWidth} ${stampHeight}`} className="absolute inset-0">
+                      <path fill="#F6F5F2" d={stampPath} />
+                    </svg>
+                    <div className="relative z-10 w-[220px] h-[300px] border-[2px] border-[#1A1A1A] overflow-hidden bg-white shadow-inner">
+                      <img src={archive[selectedStampIndex].data} className="w-full h-full object-cover" crossOrigin="anonymous" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -621,10 +626,20 @@ const StampMachine = ({ onClose }: { onClose: () => void }) => {
               <div className="flex gap-4">
                 <button
                   onClick={() => {
-                    const link = document.createElement('a');
-                    link.download = `supreme-collection-${Date.now()}.jpg`;
-                    link.href = archive[selectedStampIndex].data;
-                    link.click();
+                    if (!zoomedStampRef.current) return;
+                    toPng(zoomedStampRef.current, {
+                      cacheBust: true,
+                      pixelRatio: 4,
+                      skipFonts: true,
+                      width: stampWidth,
+                      height: stampHeight,
+                      style: { transform: 'scale(1) rotate(0deg) translateY(0px)' }
+                    }).then((dataUrl) => {
+                      const link = document.createElement('a');
+                      link.download = `supreme-collection-${Date.now()}.png`;
+                      link.href = dataUrl;
+                      link.click();
+                    });
                   }}
                   className="w-[60px] h-[60px] bg-[#F6F5F2] hover:bg-[#FED141] text-[#1A1A1A] border-[4px] border-[#1A1A1A] rounded-2xl flex items-center justify-center shadow-[4px_4px_0px_#1A1A1A] transition-colors active:translate-x-1 active:translate-y-1 active:shadow-none"
                   title="Download"
