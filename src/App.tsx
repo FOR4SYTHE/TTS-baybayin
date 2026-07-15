@@ -1262,42 +1262,7 @@ export default function App() {
   return (
     <>
       <h1 className="sr-only">Baybayin Translate — Elite Tagalog & Filipino Image Translator</h1>
-      <script 
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "Baybayin Translate | Elite Filipino & Tagalog Translator",
-            "alternateName": [
-              "Tagalog Translator",
-              "Filipino Translator",
-              "Baybayin Image Scanner"
-            ],
-            "description": "The ultimate precolonial script tool. Translate Tagalog to English, English to Tagalog, and scan ancient scripts using our real-time Baybayin image scanner.",
-            "url": "https://baybayin.jonathanquidlat.com/",
-            "applicationCategory": "EducationalApplication",
-            "operatingSystem": "All",
-            "browserRequirements": "Requires JavaScript. Requires camera permissions for Supreme Lens image scanning feature.",
-            "author": {
-              "@type": "Person",
-              "name": "Jonathan Quidlat"
-            },
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
-            },
-            "featureList": [
-              "Real-time English to Tagalog translator",
-              "Interactive Tagalog to English digital dictionary",
-              "Precolonial Baybayin script generator and art mechanics",
-              "Supreme Lens camera scanner for translating Filipino to English from images",
-              "Scrapbook archive to save scanned translations locally"
-            ]
-          })
-        }}
-      />
+
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&family=Knewave&family=Neucha&display=swap');
