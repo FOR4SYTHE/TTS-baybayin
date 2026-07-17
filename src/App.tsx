@@ -736,30 +736,28 @@ const Butterfly = () => (
   </motion.svg>
 );
 
-const CartoonCamera = () => (
+const TribalSunCamera = () => (
   <motion.svg width="90" height="90" viewBox="0 0 100 100"
-    whileHover={{ scale: 1.05, rotate: 3 }}
-    whileTap={{ scale: 0.95, rotate: -5 }}
+    whileHover={{ scale: 1.05, rotate: 5 }}
+    whileTap={{ scale: 0.95, rotate: -10 }}
     className="overflow-visible"
   >
-    {/* Red Shutter Button */}
-    <path d="M 22 42 L 34 38 L 32 33 L 20 37 Z" fill="#EF4444" stroke="#1A1A1A" strokeWidth="4" strokeLinejoin="round" />
+    {/* Premium Flat Sun Rays */}
+    {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
+      <g key={angle} transform={`rotate(${angle} 50 50)`} fill="#FCD116">
+        {/* Main Central Beam (Fountain Pen Tip) */}
+        <polygon points="47,25 45,11 50,2 55,11 53,25" />
+        
+        {/* Left Side Beam (Cut from the pen) */}
+        <polygon points="45.5,25 44,14 41.5,18 42,25" />
+        
+        {/* Right Side Beam (Cut from the pen) */}
+        <polygon points="54.5,25 56,14 58.5,18 58,25" />
+      </g>
+    ))}
 
-    {/* Camera Body */}
-    <path d="M 16 46 C 16 42, 28 38, 38 34 C 44 28, 52 28, 58 34 C 68 38, 84 42, 84 46 C 88 60, 86 74, 80 78 C 70 84, 30 84, 20 78 C 12 74, 12 60, 16 46 Z" fill="#2C2825" stroke="#1A1A1A" strokeWidth="5" strokeLinejoin="round" />
-
-    {/* Yellow Flash */}
-    <rect x="68" y="48" width="6" height="4" rx="2" fill="#EAB308" />
-
-    {/* Lens Outer Grey Ring */}
-    <circle cx="48" cy="58" r="20" fill="#6B7280" stroke="#1A1A1A" strokeWidth="4" />
-
-    {/* Lens Inner Blue Glass */}
-    <circle cx="48" cy="58" r="14" fill="#38BDF8" stroke="#1A1A1A" strokeWidth="3" />
-
-    {/* Glass Glare / Scribbles */}
-    <path d="M 40 52 C 45 49, 52 52, 54 54" fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
-    <path d="M 38 58 C 42 56, 48 59, 48 59" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
+    {/* Center Sun Body (r=22 leaves a 3-unit gap to the ray bases at r=25) */}
+    <circle cx="50" cy="50" r="22" fill="#FCD116" />
   </motion.svg>
 );
 
@@ -2025,10 +2023,10 @@ export default function App() {
         <div className="absolute bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none">
           <button
             onClick={() => setIsLensOpen(true)}
-            className="pointer-events-auto cursor-pointer drop-shadow-[4px_4px_0px_#1A1A1A] hover:drop-shadow-[6px_6px_0px_#1A1A1A] active:drop-shadow-[0px_0px_0px_#1A1A1A] transition-all duration-150 outline-none bg-transparent border-none p-0"
+            className="pointer-events-auto cursor-pointer transition-transform duration-150 outline-none bg-transparent border-none p-0"
             title="Supreme Lens"
           >
-            <CartoonCamera />
+            <TribalSunCamera />
           </button>
         </div>
 
