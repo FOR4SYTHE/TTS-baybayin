@@ -736,6 +736,14 @@ const Butterfly = () => (
   </motion.svg>
 );
 
+const JeepneyWing = ({ className, flipped = false }: { className?: string, flipped?: boolean }) => (
+  <svg width="50" height="100" viewBox="0 0 60 120" className={className} style={flipped ? { transform: 'scaleX(-1)' } : undefined}>
+    <path d="M 5 60 Q 30 5 55 20 Q 40 40 50 60 Q 35 75 45 95 Q 20 110 5 60 Z" fill="#FCD116" stroke="#1A1A1A" strokeWidth="5" strokeLinejoin="round" />
+    <path d="M 15 60 Q 30 40 45 45" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" />
+    <path d="M 15 65 Q 30 80 40 85" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" />
+  </svg>
+);
+
 const TribalSunCamera = () => (
   <motion.svg width="200" height="100" viewBox="0 0 100 50"
     whileTap={{ scale: 0.95 }}
@@ -1757,7 +1765,7 @@ export default function App() {
                         handleTranslate();
                       }
                     }}
-                    className={`flex-1 bg-transparent outline-none placeholder:text-[#0032A0]/30 w-full text-[#1A1A1A] resize-none transition-all duration-300 ${inputMode === 'conversation' ? 'min-h-[120px] text-lg font-sans font-bold leading-relaxed' : 'min-h-[3rem] text-2xl font-box overflow-hidden'}`}
+                    className={`flex-1 bg-transparent outline-none placeholder:text-[#0032A0]/30 w-full text-[#1A1A1A] resize-none transition-all duration-300 font-box ${inputMode === 'conversation' ? 'min-h-[120px] text-2xl leading-relaxed' : 'min-h-[3rem] text-2xl overflow-hidden'}`}
                     placeholder={inputMode === 'conversation' ? 'Type a full sentence or paragraph here...' : `e.g. ${currentPlaceholder}`}
                   />
                   {inputMode === 'conversation' && <span className="absolute bottom-2 right-20 text-xs font-black text-[#0032A0]/40">{englishWord.length}/500</span>}
@@ -1771,14 +1779,15 @@ export default function App() {
                   </button>
                 </div>
               </div>
-
-              <motion.div className="absolute -bottom-14 -right-4 z-20 pointer-events-none" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
-                <Sparkle />
-              </motion.div>
             </div>
 
             {/* ── TRANSLATE! BUTTON — RECTO style: navy + white + red accent ── */}
             <div className="relative self-center z-10 w-full mb-10 mt-6">
+              
+              <motion.div className="absolute -top-5 -right-3 z-30 pointer-events-none drop-shadow-[2px_2px_0px_#1A1A1A]" animate={{ y: [0, -8, 0], rotate: [0, 5, 0], scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}>
+                <Sparkle />
+              </motion.div>
+
               <motion.button
                 whileHover={isLoading ? {} : { scale: 1.02, y: -2 }}
                 whileTap={isLoading ? {} : { scale: 0.97, x: 5, y: 5 }}
@@ -1816,8 +1825,11 @@ export default function App() {
               <div className="w-full z-10 relative mb-10 animate-in fade-in slide-in-from-bottom-6 duration-300" style={{ transform: 'rotate(-0.8deg)' }}>
 
                 <div className="relative">
-                  <motion.div className="absolute -left-12 top-10 -z-10" animate={{ rotate: [0, -8, 0], x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 3.5 }}>
-                    <Butterfly />
+                  <motion.div className="absolute -left-6 top-1/2 -translate-y-1/2 -z-10" animate={{ rotate: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 4 }}>
+                    <JeepneyWing />
+                  </motion.div>
+                  <motion.div className="absolute -right-6 top-1/2 -translate-y-1/2 -z-10" animate={{ rotate: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 4, delay: 0.5 }}>
+                    <JeepneyWing flipped />
                   </motion.div>
 
                   <motion.div
@@ -1959,7 +1971,7 @@ export default function App() {
                         <Loader2 className="w-8 h-8 animate-spin stroke-[3] text-[#FCD116]" />
                       ) : null}
                       <span
-                        className="font-cubao text-[#1A1A1A] text-[2rem] tracking-[0.06em]"
+                        className="font-cubao text-white text-[2rem] tracking-[0.06em]"
                       >
                         EXAMPLE SENTENCE
                       </span>
