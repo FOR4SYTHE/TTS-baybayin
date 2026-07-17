@@ -1869,7 +1869,7 @@ export default function App() {
                       ) : (
                         <>
                           <div className={`w-full ${inputMode === 'conversation' ? 'max-h-[250px] overflow-y-auto pr-4 mb-6' : 'mb-8'}`}>
-                            <span className={`${inputMode === 'conversation' ? 'text-lg md:text-xl font-sans font-bold normal-case text-left block' : 'text-3xl md:text-4xl font-box uppercase text-center'} text-[#1A1A1A] break-words w-full`}>
+                            <span className={`${inputMode === 'conversation' ? 'text-2xl font-box leading-relaxed text-left block' : 'text-3xl md:text-4xl font-box uppercase text-center'} text-[#1A1A1A] break-words w-full`}>
                               {translation}
                             </span>
                           </div>
@@ -1878,9 +1878,9 @@ export default function App() {
                               <button
                                 onClick={() => handleSpeak(audioUrl)}
                                 disabled={!audioUrl}
-                                className="jeep-btn flex items-center gap-3 bg-[#2BA8A8] text-[#D4961A] px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#219898] disabled:opacity-50 disabled:cursor-wait min-h-[52px] font-cubao text-[1.2rem]"
+                                className="jeep-btn flex items-center gap-3 bg-[#2BA8A8] text-[#1A1A1A] px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#219898] disabled:opacity-50 disabled:cursor-wait min-h-[52px] font-cubao text-[1.2rem]"
                               >
-                                <Volume2 className="w-6 h-6 stroke-[2]" />
+                                <Volume2 className="w-6 h-6 stroke-[3]" />
                                 SPEAK
                               </button>
                             )}
@@ -1984,20 +1984,20 @@ export default function App() {
                   <div className="w-full z-10 relative mb-8 animate-in zoom-in-95 duration-300" style={{ transform: 'rotate(0.7deg)' }}>
                     <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
-                      {/* Header strip — RECTO deep navy + white */}
-                      <div className="jeep-strip bg-[#1A2464] text-white jeep-rivet relative overflow-hidden">
-                        <div className="absolute inset-x-0 top-0 h-[4px] bg-[#BF0D3E]" />
+                      {/* Header strip — Black with yellow accent */}
+                      <div className="jeep-strip bg-[#1A1A1A] text-white jeep-rivet relative overflow-hidden">
+                        <div className="absolute inset-x-0 top-0 h-[6px] bg-[#FCD116]" />
                         <span className="ml-5 font-cubao text-[1.25rem]">CONTEXT</span>
-                        <span className="ml-auto mr-5 font-cubao text-white/80 text-[0.8rem]">EXAMPLE</span>
+                        <span className="ml-auto mr-5 font-cubao text-[#FCD116] text-[0.8rem]">EXAMPLE</span>
                       </div>
 
                       {/* Body — pure white bg */}
                       <div className="bg-[#FFFFFF] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
-                        <p className="text-2xl font-box mb-5 break-words text-[#1A2464] text-center w-full leading-tight uppercase">
+                        <p className="text-2xl font-box mb-5 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
                           {example.tagalogSentence}
                         </p>
                         <p
-                          className="text-2xl font-quiapo mb-8 text-[#1A2464] text-center w-full px-5 py-3 border-[3px] border-[#1A2464] rounded-xl shadow-[3px_3px_0px_0px_#1A2464] bg-white tracking-wide"
+                          className="text-2xl font-quiapo mb-8 text-[#1A1A1A] text-center w-full px-5 py-3 border-[3px] border-[#1A1A1A] rounded-xl shadow-[3px_3px_0px_0px_#1A1A1A] bg-white tracking-wide"
                           style={{ transform: 'rotate(-1deg)' }}
                         >
                           "{example.englishTranslation}"
@@ -2006,7 +2006,7 @@ export default function App() {
                           <button
                             onClick={() => handleSpeak(exampleAudioUrl)}
                             disabled={!exampleAudioUrl}
-                            className="jeep-btn flex items-center gap-3 bg-[#1A2464] text-white px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#131A4A] disabled:opacity-50 disabled:cursor-wait min-h-[52px] font-cubao text-[1.2rem]"
+                            className="jeep-btn flex items-center gap-3 bg-[#1A1A1A] text-[#FCD116] px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-wait min-h-[52px] font-cubao text-[1.2rem]"
                           >
                             <Volume2 className="w-6 h-6 stroke-[3]" />
                             SPEAK
