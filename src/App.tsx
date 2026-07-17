@@ -746,13 +746,13 @@ const TribalSunCamera = () => (
     {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
       <g key={angle} transform={`rotate(${angle} 50 50)`} fill="#FCD116">
         {/* Main Central Beam (Fountain Pen Tip) */}
-        <polygon points="47,25 45,11 50,2 55,11 53,25" />
+        <polygon points="47,29 45,10 50,0 55,10 53,29" />
         
-        {/* Left Side Beam (Cut from the pen) */}
-        <polygon points="45.5,25 44,14 41.5,18 42,25" />
+        {/* Left Side Beam (Slanted outward burst) */}
+        <polygon points="46,29 42,10 40,14 43,29" />
         
-        {/* Right Side Beam (Cut from the pen) */}
-        <polygon points="54.5,25 56,14 58.5,18 58,25" />
+        {/* Right Side Beam (Slanted outward burst) */}
+        <polygon points="54,29 58,10 60,14 57,29" />
       </g>
     ))}
 
