@@ -742,22 +742,57 @@ const TribalSunCamera = () => (
     whileTap={{ scale: 0.95, rotate: -10 }}
     className="overflow-visible"
   >
-    {/* Premium Flat Sun Rays */}
+    {/* Tribal Sun Rays */}
     {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
-      <g key={angle} transform={`rotate(${angle} 50 50)`} fill="#FCD116">
-        {/* Main Central Beam (Fountain Pen Tip) */}
-        <polygon points="47,29 45,10 50,0 55,10 53,29" />
+      <g key={angle} transform={`rotate(${angle} 50 50)`}>
+        {/* White Silhouette with Black Stroke */}
+        <g fill="#FFFFFF" stroke="#1A1A1A" strokeWidth="1.25" strokeLinejoin="round">
+          {/* Main Central Beam */}
+          <polygon points="47,29 45,10 50,0 55,10 53,29" />
+          {/* Left Side Beam */}
+          <polygon points="46,29 42,10 40,14 43,29" />
+          {/* Right Side Beam */}
+          <polygon points="54,29 58,10 60,14 57,29" />
+        </g>
         
-        {/* Left Side Beam (Slanted outward burst) */}
-        <polygon points="46,29 42,10 40,14 43,29" />
-        
-        {/* Right Side Beam (Slanted outward burst) */}
-        <polygon points="54,29 58,10 60,14 57,29" />
+        {/* Black Tribal Prints inside Rays */}
+        <g fill="#1A1A1A" stroke="none">
+          {/* Central Ray Chevrons & Diamond */}
+          <polygon points="50,4 47.5,9 47.5,12 50,7 52.5,12 52.5,9" />
+          <polygon points="50,11 47.5,16 47.5,19 50,14 52.5,19 52.5,16" />
+          <polygon points="50,21 47.5,25 50,29 52.5,25" />
+          
+          {/* Side Rays Solid Top Triangles */}
+          <polygon points="42,10 40,14 41.5,18" />
+          <polygon points="58,10 60,14 58.5,18" />
+        </g>
       </g>
     ))}
 
-    {/* Center Sun Body (r=22 leaves a 3-unit gap to the ray bases at r=25) */}
-    <circle cx="50" cy="50" r="22" fill="#FCD116" />
+    {/* Center Sun Body (Tribal Ring) */}
+    {/* Base white circle to cover ray bases seamlessly */}
+    <circle cx="50" cy="50" r="22" fill="#FFFFFF" />
+    
+    {/* Outer and Inner Borders */}
+    <circle cx="50" cy="50" r="22" fill="none" stroke="#1A1A1A" strokeWidth="1.5" />
+    <circle cx="50" cy="50" r="16" fill="none" stroke="#1A1A1A" strokeWidth="1.5" />
+    
+    {/* Zigzag Tribal Pattern */}
+    {[...Array(24)].map((_, i) => {
+      const a1 = (i * 15) * Math.PI / 180;
+      const a2 = ((i + 0.5) * 15) * Math.PI / 180;
+      const a3 = ((i + 1) * 15) * Math.PI / 180;
+      return (
+        <polyline key={`zig-${i}`}
+          points={`
+            ${50 + 16 * Math.cos(a1)},${50 + 16 * Math.sin(a1)}
+            ${50 + 22 * Math.cos(a2)},${50 + 22 * Math.sin(a2)}
+            ${50 + 16 * Math.cos(a3)},${50 + 16 * Math.sin(a3)}
+          `}
+          fill="none" stroke="#1A1A1A" strokeWidth="1.25" strokeLinejoin="round"
+        />
+      )
+    })}
   </motion.svg>
 );
 
