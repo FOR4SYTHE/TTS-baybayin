@@ -9,8 +9,32 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Martires';
+  src: url('/Martires.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bantayog';
+  src: url('/Bantayog.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TCMilo';
+  src: url('/TCMilo.ttf') format('truetype'), url('/TCMilo.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @theme {
   --font-sans: "Comic Sans MS", "Comic Sans", "Mali", ui-sans-serif, system-ui, sans-serif;
+  --font-martires: "Dela Gothic One", sans-serif;
+  --font-bantayog: "Oswald", sans-serif;
+  --font-tcmilo: "TCMilo", "Oswald", sans-serif;
 }
 
 @layer utilities {

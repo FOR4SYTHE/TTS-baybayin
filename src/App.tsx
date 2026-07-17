@@ -1297,7 +1297,7 @@ export default function App() {
 
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&family=Knewave&family=Neucha&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&family=Knewave&family=Neucha&family=Dela+Gothic+One&family=Oswald:wght@700&family=DynaPuff:wght@600;700&family=Chewy&family=Fredoka:wght@600;700&display=swap');
           .font-title { font-family: 'Permanent Marker', cursive; }
           .font-box { font-family: 'Gloria Hallelujah', cursive; }
           .font-tribal-title { font-family: 'Knewave', cursive; }
@@ -1556,24 +1556,54 @@ export default function App() {
         {/* Translator Mode Layout */}
         {appMode === 'translator' && (
           <div className="w-full max-w-md z-10 flex flex-col items-center pt-4 pb-12 animate-in fade-in duration-500">
-            {/* Header */}
-            <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-6 select-none">
-              <div className="relative inline-block transform -rotate-3 text-center">
-                <div className="absolute -top-14 -left-12 sm:-top-20 sm:-left-16 z-0 pointer-events-none">
-                  <Sampaguita />
-                </div>
-                <h1
-                  className="text-[2.9rem] sm:text-[4rem] md:text-[5.5rem] font-title leading-[1.05] tracking-normal sm:tracking-wide relative z-10"
-                  style={{
-                    filter: 'drop-shadow(6px 6px 0px #1A1A1A)',
-                    WebkitTextStroke: '3px #1A1A1A'
-                  }}
-                >
-                  <span className="text-[#0032A0]">TAGALOG</span><br />
-                  <span className="text-[#BF0D3E]">TRANSLATOR</span><br />
-                  <span className="text-[#FED141]">SUPREME</span>
-                </h1>
+            {/* Header: 3-Tier KTS-Style Architecture */}
+            <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-4 select-none z-20">
+              
+              {/* TIER 1: SVG Curved "TAGALOG" Text (Martires Font) */}
+              <div className="relative w-[320px] md:w-[380px] h-[100px] -mb-6 z-20">
+                <svg viewBox="0 0 400 120" className="w-full h-full overflow-visible">
+                  {/* The invisible path that dictates the curve */}
+                  <path id="tagalog-curve" fill="transparent" d="M 20,100 Q 200,10 380,100" />
+                  <g style={{ filter: "drop-shadow(4px 4px 3px rgba(0,0,0,0.3))" }}>
+                    {/* Outline Layer (Drawn first, underneath) */}
+                    <text width="400" className="text-6xl md:text-7xl uppercase tracking-wide" stroke="#FFFFFF" strokeWidth="16" strokeLinejoin="round" strokeLinecap="round" fill="none" style={{ fontFamily: "'Dela Gothic One', sans-serif" }}>
+                      <textPath href="#tagalog-curve" startOffset="50%" textAnchor="middle">
+                        TAGALOG
+                      </textPath>
+                    </text>
+                    
+                    {/* Fill Layer (Drawn second, on top) */}
+                    <text width="400" className="text-6xl md:text-7xl uppercase tracking-wide fill-[#0032A0]" style={{ fontFamily: "'Dela Gothic One', sans-serif" }}>
+                      <textPath href="#tagalog-curve" startOffset="50%" textAnchor="middle">
+                        TAGALOG
+                      </textPath>
+                    </text>
+                  </g>
+                </svg>
               </div>
+
+              {/* TIER 2: Central Focal Image (Tcharacters.webp) */}
+              <motion.img
+                src="/Tcharacters.webp"
+                alt="Tagalog Characters"
+                className="w-[280px] md:w-[340px] relative z-10"
+                style={{ filter: "drop-shadow(4px 4px 3px rgba(0,0,0,0.3))" }}
+                animate={{ y: [-3, 3, -3], rotate: [-1, 1, -1] }}
+                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              />
+
+              {/* TIER 3: Subtitle (DynaPuff Font - Akakios Style) */}
+              <h2
+                className="text-[1.4rem] md:text-[1.7rem] uppercase mt-2 z-20"
+                style={{
+                  fontFamily: "'DynaPuff', sans-serif",
+                  filter: 'drop-shadow(2px 2px 1.5px rgba(0,0,0,0.15))',
+                  fontWeight: 700,
+                  letterSpacing: '0.05em'
+                }}
+              >
+                <span className="text-[#BF0D3E]">—</span> <span className="text-white">Translator</span> <span className="text-white">Supreme</span> <span className="text-[#FED141]">—</span>
+              </h2>
             </div>
 
             {/* Input Box */}
