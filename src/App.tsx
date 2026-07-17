@@ -1297,11 +1297,13 @@ export default function App() {
 
       <style>
         {`
-          @import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&family=Knewave&family=Neucha&family=Dela+Gothic+One&family=Oswald:wght@700&family=DynaPuff:wght@600;700&family=Chewy&family=Fredoka:wght@600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Permanent+Marker&family=Knewave&family=Neucha&family=Dela+Gothic+One&family=Oswald:wght@700&family=DynaPuff:wght@600;700&family=Chewy&family=Fredoka:wght@600;700&family=Anton&family=Barlow+Condensed:ital,wght@0,900;1,900&display=swap');
           .font-title { font-family: 'Permanent Marker', cursive; }
           .font-box { font-family: 'Gloria Hallelujah', cursive; }
           .font-tribal-title { font-family: 'Knewave', cursive; }
           .font-tribal-text { font-family: 'Neucha', cursive; }
+          .font-cubao { font-family: 'CubaoFree', 'Anton', sans-serif; letter-spacing: 0.04em; }
+          .font-quiapo { font-family: 'QuiapoFree', cursive; letter-spacing: 0.04em; }
           html {
             overflow-y: scroll;
             scrollbar-gutter: stable;
@@ -1712,27 +1714,27 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Placard card */}
-              <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#0032A0]">
+              {/* Placard card — MAKATI style: amber/gold bg, dark navy text */}
+              <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
-                {/* Header strip — cobalt blue destination band */}
-                <div className="jeep-strip bg-[#0032A0] text-[#FCD116] jeep-rivet">
+                {/* Header strip — MAKATI amber with navy text */}
+                <div className="jeep-strip bg-[#D4961A] text-[#1A2464] jeep-rivet">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={direction}
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 8 }}
-                      className="ml-5"
+                      className="ml-5 font-cubao text-[1.25rem]"
                     >
-                      {direction === 'en-tl' ? '🇬🇧 ENGLISH WORD' : '🇵🇭 TAGALOG WORD'}
+                      {direction === 'en-tl' ? 'ENGLISH WORD' : 'TAGALOG WORD'}
                     </motion.span>
                   </AnimatePresence>
-                  <span className="ml-auto mr-5 text-[#FCD116]/50 text-[10px]">INPUT</span>
+                  <span className="ml-auto mr-5 font-cubao text-[#1A2464]/80 text-[0.8rem]">INPUT</span>
                 </div>
 
-                {/* Body */}
-                <div className="bg-[#F0F4FF] p-5 flex items-center relative min-h-[100px]">
+                {/* Body — pure white bg */}
+                <div className="bg-[#FFFFFF] p-5 flex items-center relative min-h-[100px]">
                   <textarea
                     id="english-input"
                     value={englishWord}
@@ -1775,28 +1777,29 @@ export default function App() {
               </motion.div>
             </div>
 
-            {/* ── TRANSLATE! BUTTON — Philippine Red Night Sign ── */}
+            {/* ── TRANSLATE! BUTTON — RECTO style: navy + white + red accent ── */}
             <div className="relative self-center z-10 w-full mb-10 mt-6">
               <motion.button
                 whileHover={isLoading ? {} : { scale: 1.02, y: -2 }}
                 whileTap={isLoading ? {} : { scale: 0.97, x: 5, y: 5 }}
                 animate={{
                   backgroundColor: isLoading
-                    ? ['#BF0D3E', '#FCD116', '#0032A0', '#00A550', '#BF0D3E']
-                    : '#BF0D3E'
+                    ? ['#1A2464', '#D4961A', '#2BA8A8', '#1A1A1A', '#1A2464']
+                    : '#1A2464'
                 }}
                 transition={{ backgroundColor: isLoading ? { repeat: Infinity, duration: 0.6, ease: 'linear' } : { duration: 0.15 } }}
                 onClick={handleTranslate}
                 disabled={isLoading || !englishWord.trim()}
-                className="w-full text-white text-3xl font-black py-5 border-[5px] border-[#1A1A1A] shadow-[7px_7px_0px_0px_#1A1A1A] rounded-[14px] disabled:opacity-70 disabled:cursor-not-allowed min-h-[68px] uppercase tracking-[0.15em] flex items-center justify-center relative overflow-hidden"
-                style={{ fontFamily: "'Oswald', sans-serif" }}
+                className="w-full text-white py-5 border-[5px] border-[#1A1A1A] shadow-[7px_7px_0px_0px_#1A1A1A] rounded-[16px] disabled:opacity-70 disabled:cursor-not-allowed min-h-[72px] flex items-center justify-center relative overflow-hidden"
               >
+                {/* Red RECTO accent bar at top */}
+                <div className="absolute inset-x-0 top-0 h-[6px] bg-[#BF0D3E] pointer-events-none" />
                 {/* Inner gloss stripe */}
-                <div className="absolute inset-x-0 top-0 h-[40%] bg-white/10 pointer-events-none" />
+                <div className="absolute inset-x-0 top-[6px] h-[35%] bg-white/8 pointer-events-none" />
                 {isLoading ? (
                   <Loader2 className="w-10 h-10 animate-spin stroke-[3]" />
                 ) : (
-                  <span style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.4)' }}>TRANSLATE!</span>
+                  <span className="font-cubao text-[2.25rem] tracking-[0.06em]" style={{ textShadow: '3px 3px 0px rgba(0,0,0,0.5)' }}>TRANSLATE!</span>
                 )}
               </motion.button>
 
@@ -1825,31 +1828,31 @@ export default function App() {
                       scale: { type: 'spring', bounce: 0.65, duration: 0.6 },
                       opacity: { duration: 0.2 }
                     } : { duration: 0.2 }}
-                    className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#00A550]"
+                    className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]"
                   >
-                    {/* Header strip — green BACLARAN band */}
-                    <div className="jeep-strip bg-[#00A550] text-white jeep-rivet">
+                    {/* Header strip — QUIAPO teal with gold text */}
+                    <div className="jeep-strip bg-[#2BA8A8] text-[#D4961A] jeep-rivet">
                       <AnimatePresence mode="wait">
                         <motion.span
                           key={direction}
                           initial={{ opacity: 0, x: -8 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: 8 }}
-                          className="ml-5"
+                          className="ml-5 font-cubao text-[1.25rem]"
                         >
-                          {direction === 'en-tl' ? '🇵🇭 TAGALOG TRANSLATION' : '🇬🇧 ENGLISH TRANSLATION'}
+                          {direction === 'en-tl' ? 'TAGALOG TRANSLATION' : 'ENGLISH TRANSLATION'}
                         </motion.span>
                       </AnimatePresence>
-                      <span className="ml-auto mr-5 text-white/50 text-[10px]">OUTPUT</span>
+                      <span className="ml-auto mr-5 font-cubao text-[#D4961A]/80 text-[0.8rem]">OUTPUT</span>
                     </div>
 
-                    {/* Body */}
-                    <div className="bg-[#F0FFF5] p-8 flex flex-col items-center justify-center min-h-[180px] relative">
+                    {/* Body — pure white bg */}
+                    <div className="bg-[#FFFFFF] p-8 flex flex-col items-center justify-center min-h-[180px] relative">
                       {translation && !isLoading && <PhParticles triggerKey={translation} />}
                       {isLoading ? (
                         <div className="flex flex-col items-center justify-center w-full animate-pulse gap-3">
-                          <div className="h-10 bg-[#00A550]/20 rounded-xl w-3/4"></div>
-                          <div className="h-10 bg-[#00A550]/15 rounded-xl w-1/2"></div>
+                          <div className="h-10 bg-[#2BA8A8]/20 rounded-xl w-3/4"></div>
+                          <div className="h-10 bg-[#2BA8A8]/15 rounded-xl w-1/2"></div>
                         </div>
                       ) : (
                         <>
@@ -1863,9 +1866,9 @@ export default function App() {
                               <button
                                 onClick={() => handleSpeak(audioUrl)}
                                 disabled={!audioUrl}
-                                className="jeep-btn flex items-center gap-3 bg-[#00A550] text-white px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#008B42] disabled:opacity-50 disabled:cursor-wait min-h-[52px] text-lg"
+                                className="jeep-btn flex items-center gap-3 bg-[#2BA8A8] text-[#D4961A] px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#219898] disabled:opacity-50 disabled:cursor-wait min-h-[52px] font-cubao text-[1.2rem]"
                               >
-                                <Volume2 className="w-6 h-6 stroke-[3]" />
+                                <Volume2 className="w-6 h-6 stroke-[2]" />
                                 SPEAK
                               </button>
                             )}
@@ -1888,25 +1891,27 @@ export default function App() {
             {/* ── FUN FACT CARD — Golden MANILA PHILIPPINES placard ── */}
             {inputMode === 'word' && (funFact || isLoadingFunFact) && !isLoading && (
               <div className="w-full z-10 relative mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ transform: 'rotate(1deg)' }}>
-                <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#FCD116]">
+                {/* EDSA style: black card, gold border, red accent */}
+                <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
-                  {/* Header strip — deep red MANILA band */}
-                  <div className="jeep-strip bg-[#BF0D3E] text-[#FCD116] jeep-rivet">
-                    <Lightbulb className="w-4 h-4 ml-5" />
-                    <span>DID YOU KNOW?</span>
-                    <span className="ml-auto mr-5 text-[#FCD116]/40 text-[10px]">FUN FACT</span>
+                  {/* Header strip — EDSA black with gold text, red accent bar at top */}
+                  <div className="jeep-strip bg-[#1A1A1A] text-[#D4961A] jeep-rivet relative overflow-hidden">
+                    <div className="absolute inset-x-0 top-0 h-[4px] bg-[#BF0D3E]" />
+                    <Lightbulb className="w-4 h-4 ml-5 text-[#D4961A]" />
+                    <span className="font-cubao text-[1.25rem]">DID YOU KNOW?</span>
+                    <span className="ml-auto mr-5 font-cubao text-[#D4961A]/80 text-[0.8rem]">FUN FACT</span>
                   </div>
 
-                  {/* Body */}
-                  <div className="bg-[#FFFBEA] p-6">
+                  {/* Body — pure white bg */}
+                  <div className="bg-[#FFFFFF] p-6">
                     {isLoadingFunFact ? (
                       <div className="animate-pulse space-y-2.5">
-                        <div className="h-3.5 bg-[#BF0D3E]/15 rounded-full w-full"></div>
-                        <div className="h-3.5 bg-[#BF0D3E]/12 rounded-full w-5/6"></div>
-                        <div className="h-3.5 bg-[#BF0D3E]/10 rounded-full w-3/4"></div>
+                        <div className="h-3.5 bg-[#D4961A]/20 rounded-full w-full"></div>
+                        <div className="h-3.5 bg-[#D4961A]/15 rounded-full w-5/6"></div>
+                        <div className="h-3.5 bg-[#D4961A]/10 rounded-full w-3/4"></div>
                       </div>
                     ) : (
-                      <p className="text-xl font-box text-[#1A1A1A] leading-snug">
+                      <p className="text-2xl font-quiapo text-[#1A1A1A] leading-snug tracking-wide">
                         {funFact}
                       </p>
                     )}
@@ -1921,10 +1926,10 @@ export default function App() {
 
                 {!example && (
                   exampleCooldown ? (
-                    /* Cooldown — PASIG PALENGKE black sign */
+                    /* Cooldown — PASIG PALENGKE: black + gold */
                     <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A] mb-8">
-                      <div className="jeep-strip bg-[#1A1A1A] text-[#FCD116] jeep-rivet">
-                        <span className="ml-5">⏳ ON COOLDOWN</span>
+                      <div className="jeep-strip bg-[#1A1A1A] text-[#D4961A] jeep-rivet">
+                        <span className="ml-5 font-cubao text-[1.2rem]">⏳ ON COOLDOWN</span>
                       </div>
                       <div className="bg-[#F5F5F5] p-6 flex flex-col items-center gap-2 text-center">
                         <span className="text-5xl font-black text-[#1A1A1A]">{exampleCooldown}s</span>
@@ -1954,8 +1959,8 @@ export default function App() {
                         <Loader2 className="w-8 h-8 animate-spin stroke-[3] text-[#FCD116]" />
                       ) : null}
                       <span
-                        className="text-[#FCD116] text-2xl font-black uppercase tracking-[0.15em]"
-                        style={{ fontFamily: "'Oswald', sans-serif", textShadow: '1px 1px 0px rgba(0,0,0,0.5)' }}
+                        className="font-cubao text-[#D4961A] text-[2rem] tracking-[0.06em]"
+                        style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.6)' }}
                       >
                         EXAMPLE SENTENCE
                       </span>
@@ -1964,23 +1969,24 @@ export default function App() {
                 )}
 
                 {example && (
-                  /* Example output — DIVISORIA teal placard */
+                  /* Example output — RECTO-style: navy + white text */
                   <div className="w-full z-10 relative mb-8 animate-in zoom-in-95 duration-300" style={{ transform: 'rotate(0.7deg)' }}>
-                    <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#0097A7]">
+                    <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
-                      {/* Header strip — teal DIVISORIA band */}
-                      <div className="jeep-strip bg-[#0097A7] text-white jeep-rivet">
-                        <span className="ml-5">📖 CONTEXT</span>
-                        <span className="ml-auto mr-5 text-white/50 text-[10px]">EXAMPLE</span>
+                      {/* Header strip — RECTO deep navy + white */}
+                      <div className="jeep-strip bg-[#1A2464] text-white jeep-rivet relative overflow-hidden">
+                        <div className="absolute inset-x-0 top-0 h-[4px] bg-[#BF0D3E]" />
+                        <span className="ml-5 font-cubao text-[1.25rem]">CONTEXT</span>
+                        <span className="ml-auto mr-5 font-cubao text-white/80 text-[0.8rem]">EXAMPLE</span>
                       </div>
 
-                      {/* Body */}
-                      <div className="bg-[#E0F7FA] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
-                        <p className="text-2xl font-box mb-5 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
+                      {/* Body — pure white bg */}
+                      <div className="bg-[#FFFFFF] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
+                        <p className="text-2xl font-box mb-5 break-words text-[#1A2464] text-center w-full leading-tight uppercase">
                           {example.tagalogSentence}
                         </p>
                         <p
-                          className="text-lg font-box mb-8 text-[#1A1A1A] text-center w-full px-4 py-2 border-[3px] border-[#0097A7] rounded-xl shadow-[3px_3px_0px_0px_#0097A7] bg-white"
+                          className="text-2xl font-quiapo mb-8 text-[#1A2464] text-center w-full px-5 py-3 border-[3px] border-[#1A2464] rounded-xl shadow-[3px_3px_0px_0px_#1A2464] bg-white tracking-wide"
                           style={{ transform: 'rotate(-1deg)' }}
                         >
                           "{example.englishTranslation}"
@@ -1989,7 +1995,7 @@ export default function App() {
                           <button
                             onClick={() => handleSpeak(exampleAudioUrl)}
                             disabled={!exampleAudioUrl}
-                            className="jeep-btn flex items-center gap-3 bg-[#0097A7] text-white px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#00838F] disabled:opacity-50 disabled:cursor-wait min-h-[52px] text-lg"
+                            className="jeep-btn flex items-center gap-3 bg-[#1A2464] text-white px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#131A4A] disabled:opacity-50 disabled:cursor-wait min-h-[52px] font-cubao text-[1.2rem]"
                           >
                             <Volume2 className="w-6 h-6 stroke-[3]" />
                             SPEAK
