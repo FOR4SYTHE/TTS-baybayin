@@ -1570,23 +1570,49 @@ export default function App() {
                     {/* The String */}
                     <path d="M 30,70 Q 200,165 370,70" fill="none" stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round" />
                     
-                    {/* The Flags */}
+                    {/* The Flags & Parol Centerpiece */}
                     {[
-                      { cx: 81, cy: 94, rot: 21.4, fill: "#0032A0", dur: 2.2, del: 0.1, swing: [-1, 2, -2, 1, -1] },
-                      { cx: 115, cy: 106, rot: 15.6, fill: "#BF0D3E", dur: 2.5, del: 0.4, swing: [-2, 1, -1, 2, -2] },
-                      { cx: 157.5, cy: 114.5, rot: 8.0, fill: "#00A550", dur: 2.1, del: 0.2, swing: [-1, 2, -1, 1, -1] },
-                      { cx: 200, cy: 117.5, rot: 0, fill: "#FED141", dur: 2.8, del: 0.5, swing: [-2, 1, -2, 1, -2] },
-                      { cx: 242.5, cy: 114.5, rot: -8.0, fill: "#FFFFFF", dur: 2.3, del: 0.0, swing: [-1, 1, 0, 2, -1] },
-                      { cx: 285, cy: 106, rot: -15.6, fill: "#0032A0", dur: 2.6, del: 0.3, swing: [-2, 1, -1, 2, -2] },
-                      { cx: 319, cy: 94, rot: -21.4, fill: "#BF0D3E", dur: 2.4, del: 0.6, swing: [-1, 2, -2, 1, -1] }
-                    ].map((flag, i) => (
-                      <g key={i} transform={`translate(${flag.cx}, ${flag.cy}) rotate(${flag.rot})`}>
+                      { cx: 81, cy: 94, rot: 21.4, fill: "#0032A0", dur: 2.2, del: 0.1, swing: [-1, 2, -2, 1, -1], type: 'flag' },
+                      { cx: 115, cy: 106, rot: 15.6, fill: "#BF0D3E", dur: 2.5, del: 0.4, swing: [-2, 1, -1, 2, -2], type: 'flag' },
+                      { cx: 157.5, cy: 114.5, rot: 8.0, fill: "#00A550", dur: 2.1, del: 0.2, swing: [-1, 2, -1, 1, -1], type: 'flag' },
+                      { cx: 200, cy: 117.5, rot: 0, fill: "", dur: 3.5, del: 0.0, swing: [-1.5, 2, -1, 1.5, -1.5], type: 'parol' },
+                      { cx: 242.5, cy: 114.5, rot: -8.0, fill: "#FED141", dur: 2.3, del: 0.0, swing: [-1, 1, 0, 2, -1], type: 'flag' },
+                      { cx: 285, cy: 106, rot: -15.6, fill: "#FFFFFF", dur: 2.6, del: 0.3, swing: [-2, 1, -1, 2, -2], type: 'flag' },
+                      { cx: 319, cy: 94, rot: -21.4, fill: "#0032A0", dur: 2.4, del: 0.6, swing: [-1, 2, -2, 1, -1], type: 'flag' }
+                    ].map((item, i) => (
+                      <g key={i} transform={`translate(${item.cx}, ${item.cy}) rotate(${item.rot})`}>
                         <motion.g
                           transformOrigin="0px -1.5px"
-                          animate={{ rotate: flag.swing }}
-                          transition={{ repeat: Infinity, duration: flag.dur, ease: "easeInOut", delay: flag.del }}
+                          animate={{ rotate: item.swing }}
+                          transition={{ repeat: Infinity, duration: item.dur, ease: "easeInOut", delay: item.del }}
                         >
-                          <polygon points="-11,0 11,0 0,33" fill={flag.fill} stroke="#1A1A1A" strokeWidth="2.5" strokeLinejoin="round" />
+                          {item.type === 'flag' ? (
+                            <polygon points="-11,0 11,0 0,33" fill={item.fill} stroke="#1A1A1A" strokeWidth="2.5" strokeLinejoin="round" />
+                          ) : (
+                            <g className="parol-star">
+                              {/* Outer Yellow Star */}
+                              <polygon points="0,0 6,17 24,17 9,28 15,45 0,35 -15,45 -9,28 -24,17 -6,17" fill="#FED141" stroke="#1A1A1A" strokeWidth="2.5" strokeLinejoin="round" />
+                              
+                              {/* 5 Tip Tassels */}
+                              {[
+                                { x: 0, y: 0, r: 0 },
+                                { x: 24, y: 17, r: 72 },
+                                { x: 15, y: 45, r: 144 },
+                                { x: -15, y: 45, r: 216 },
+                                { x: -24, y: 17, r: 288 }
+                              ].map((tip, idx) => (
+                                <g key={idx} transform={`translate(${tip.x}, ${tip.y}) rotate(${tip.r})`}>
+                                  <path d="M 0,0 L -3,-5 L -1,-6 L 0,-5 L 1,-6 L 3,-5 Z" fill="#FED141" stroke="#1A1A1A" strokeWidth="1.5" strokeLinejoin="round" />
+                                </g>
+                              ))}
+
+                              {/* White Inner Circle */}
+                              <circle cx="0" cy="25" r="11" fill="#FFFFFF" stroke="#1A1A1A" strokeWidth="2" />
+                              
+                              {/* Green Inner Star */}
+                              <polygon points="0,17 2,22.5 7.5,22.5 3,26 4.5,31.5 0,28.5 -4.5,31.5 -3,26 -7.5,22.5 -2,22.5" fill="#00A550" stroke="#1A1A1A" strokeWidth="1.5" strokeLinejoin="round" />
+                            </g>
+                          )}
                         </motion.g>
                       </g>
                     ))}
