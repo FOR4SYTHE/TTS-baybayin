@@ -1715,9 +1715,9 @@ export default function App() {
                   title="Swap Translation Direction"
                 >
                   {direction === 'en-tl' ? (
-                    <><UKFlag className="-rotate-3" /> EN <ArrowLeftRight className="w-4 h-4 stroke-[3]" /> <PHFlag className="rotate-3" /> TL</>
+                    <><UKFlag className="-rotate-3" /> <span className="font-quiapo text-[1.15rem] tracking-wide mt-1">EN</span> <ArrowLeftRight className="w-4 h-4 stroke-[3]" /> <PHFlag className="rotate-3" /> <span className="font-quiapo text-[1.15rem] tracking-wide mt-1">TL</span></>
                   ) : (
-                    <><PHFlag className="-rotate-3" /> TL <ArrowLeftRight className="w-4 h-4 stroke-[3]" /> <UKFlag className="rotate-3" /> EN</>
+                    <><PHFlag className="-rotate-3" /> <span className="font-quiapo text-[1.15rem] tracking-wide mt-1">TL</span> <ArrowLeftRight className="w-4 h-4 stroke-[3]" /> <UKFlag className="rotate-3" /> <span className="font-quiapo text-[1.15rem] tracking-wide mt-1">EN</span></>
                   )}
                 </button>
               </div>
