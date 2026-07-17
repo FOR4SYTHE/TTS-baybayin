@@ -737,10 +737,9 @@ const Butterfly = () => (
 );
 
 const TribalSunCamera = () => (
-  <motion.svg width="90" height="90" viewBox="0 0 100 100"
-    whileHover={{ scale: 1.05, rotate: 5 }}
-    whileTap={{ scale: 0.95, rotate: -10 }}
-    className="overflow-visible"
+  <motion.svg width="200" height="100" viewBox="0 0 100 50"
+    whileTap={{ scale: 0.95 }}
+    className="overflow-hidden block"
   >
     {/* Tribal Sun Rays */}
     {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => (
@@ -1303,6 +1302,10 @@ export default function App() {
           .font-box { font-family: 'Gloria Hallelujah', cursive; }
           .font-tribal-title { font-family: 'Knewave', cursive; }
           .font-tribal-text { font-family: 'Neucha', cursive; }
+          html {
+            overflow-y: scroll;
+            scrollbar-gutter: stable;
+          }
         `}
       </style>
 
@@ -2055,7 +2058,7 @@ export default function App() {
         )}
 
         {/* Floating Action Button - Fixed bottom center (Standalone Cartoon Lens) */}
-        <div className="absolute bottom-6 left-0 w-full flex justify-center z-40 pointer-events-none">
+        <div className="absolute bottom-0 left-0 w-full flex justify-center z-40 pointer-events-none">
           <button
             onClick={() => setIsLensOpen(true)}
             className="pointer-events-auto cursor-pointer transition-transform duration-150 outline-none bg-transparent border-none p-0"
