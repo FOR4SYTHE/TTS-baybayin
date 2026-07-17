@@ -1564,6 +1564,34 @@ export default function App() {
                 <svg viewBox="0 0 400 120" className="w-full h-full overflow-visible">
                   {/* The invisible path that dictates the curve */}
                   <path id="tagalog-curve" fill="transparent" d="M 20,100 Q 200,10 380,100" />
+                  
+                  {/* Fiesta Banderitas (Hanging from T to G) */}
+                  <g style={{ filter: "drop-shadow(2px 3px 0px rgba(0,0,0,0.25))" }}>
+                    {/* The String */}
+                    <path d="M 30,70 Q 200,165 370,70" fill="none" stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round" />
+                    
+                    {/* The Flags */}
+                    {[
+                      { cx: 81, cy: 94, rot: 21.4, fill: "#0032A0", dur: 2.2, del: 0.1, swing: [-1, 2, -2, 1, -1] },
+                      { cx: 115, cy: 106, rot: 15.6, fill: "#BF0D3E", dur: 2.5, del: 0.4, swing: [-2, 1, -1, 2, -2] },
+                      { cx: 157.5, cy: 114.5, rot: 8.0, fill: "#00A550", dur: 2.1, del: 0.2, swing: [-1, 2, -1, 1, -1] },
+                      { cx: 200, cy: 117.5, rot: 0, fill: "#FED141", dur: 2.8, del: 0.5, swing: [-2, 1, -2, 1, -2] },
+                      { cx: 242.5, cy: 114.5, rot: -8.0, fill: "#FFFFFF", dur: 2.3, del: 0.0, swing: [-1, 1, 0, 2, -1] },
+                      { cx: 285, cy: 106, rot: -15.6, fill: "#0032A0", dur: 2.6, del: 0.3, swing: [-2, 1, -1, 2, -2] },
+                      { cx: 319, cy: 94, rot: -21.4, fill: "#BF0D3E", dur: 2.4, del: 0.6, swing: [-1, 2, -2, 1, -1] }
+                    ].map((flag, i) => (
+                      <g key={i} transform={`translate(${flag.cx}, ${flag.cy}) rotate(${flag.rot})`}>
+                        <motion.g
+                          transformOrigin="0px -1.5px"
+                          animate={{ rotate: flag.swing }}
+                          transition={{ repeat: Infinity, duration: flag.dur, ease: "easeInOut", delay: flag.del }}
+                        >
+                          <polygon points="-11,0 11,0 0,33" fill={flag.fill} stroke="#1A1A1A" strokeWidth="2.5" strokeLinejoin="round" />
+                        </motion.g>
+                      </g>
+                    ))}
+                  </g>
+
                   <g style={{ filter: "drop-shadow(4px 4px 3px rgba(0,0,0,0.3))" }}>
                     {/* Outline Layer (Drawn first, underneath) */}
                     <text width="400" className="text-6xl md:text-7xl uppercase tracking-wide" stroke="#FFFFFF" strokeWidth="16" strokeLinejoin="round" strokeLinecap="round" fill="none" style={{ fontFamily: "'Dela Gothic One', sans-serif" }}>
@@ -1598,6 +1626,8 @@ export default function App() {
                 style={{
                   fontFamily: "'DynaPuff', sans-serif",
                   filter: 'drop-shadow(2px 2px 1.5px rgba(0,0,0,0.15))',
+                  WebkitTextStroke: '2px #1A1A1A',
+                  paintOrder: 'stroke fill',
                   fontWeight: 700,
                   letterSpacing: '0.05em'
                 }}
