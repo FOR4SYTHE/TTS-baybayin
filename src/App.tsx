@@ -1662,29 +1662,46 @@ export default function App() {
               </h2>
             </div>
 
-            {/* Input Box */}
-            <div className="w-full space-y-3 z-10 relative mb-8">
-              <div className="flex bg-[#F6F5F2] border-[4px] border-[#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] p-1 mb-4 shadow-[4px_4px_0px_0px_#1A1A1A] self-start z-10 w-full sm:w-auto">
-                <button onClick={() => handleInputModeChange('word')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'word' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Word</button>
-                <button onClick={() => handleInputModeChange('conversation')} className={`flex-1 px-4 py-2 text-sm font-black uppercase rounded-lg transition-colors ${inputMode === 'conversation' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-gray-200'}`}>Conversation</button>
+            {/* ── MODE TOGGLE — Jeepney Route Plate ── */}
+            <div className="w-full z-10 relative mb-6">
+              {/* Plate frame — black anodised jeepney trim */}
+              <div
+                className="flex bg-[#1A1A1A] border-[4px] border-[#1A1A1A] rounded-[12px] p-1 shadow-[5px_5px_0px_0px_#000] overflow-hidden"
+                style={{ transform: 'rotate(-0.5deg)' }}
+              >
+                <button
+                  onClick={() => handleInputModeChange('word')}
+                  className={`flex-1 px-4 py-2.5 text-sm font-black uppercase rounded-[8px] tracking-widest transition-all duration-150 ${
+                    inputMode === 'word'
+                      ? 'bg-[#FCD116] text-[#1A1A1A] shadow-[inset_0_-3px_0px_rgba(0,0,0,0.3)]'
+                      : 'text-[#FCD116]/60 hover:text-[#FCD116]'
+                  }`}
+                  style={{ fontFamily: "'Oswald', sans-serif", letterSpacing: '0.15em' }}
+                >
+                  ★ WORD
+                </button>
+                <button
+                  onClick={() => handleInputModeChange('conversation')}
+                  className={`flex-1 px-4 py-2.5 text-sm font-black uppercase rounded-[8px] tracking-widest transition-all duration-150 ${
+                    inputMode === 'conversation'
+                      ? 'bg-[#FCD116] text-[#1A1A1A] shadow-[inset_0_-3px_0px_rgba(0,0,0,0.3)]'
+                      : 'text-[#FCD116]/60 hover:text-[#FCD116]'
+                  }`}
+                  style={{ fontFamily: "'Oswald', sans-serif", letterSpacing: '0.15em' }}
+                >
+                  ★ CONVERSATION
+                </button>
               </div>
-              <div className="flex items-center justify-between px-2 mb-2">
-                <AnimatePresence mode="wait">
-                  <motion.label
-                    key={direction}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    htmlFor="english-input"
-                    className="text-xl font-black text-white tracking-widest uppercase"
-                    style={{ textShadow: '3px 3px 0px #1A1A1A', WebkitTextStroke: '1.5px #1A1A1A' }}
-                  >
-                    {direction === 'en-tl' ? 'English Word' : 'Tagalog Word'}
-                  </motion.label>
-                </AnimatePresence>
+            </div>
+
+            {/* ── INPUT BOX — Cobalt Blue RECTO/CUBAO style ── */}
+            <div className="w-full z-10 relative mb-6" style={{ transform: 'rotate(0.6deg)' }}>
+
+              {/* Direction swap row */}
+              <div className="flex items-center justify-end mb-2 px-1">
                 <button
                   onClick={handleSwap}
-                  className="flex items-center justify-center gap-2 bg-[#FFE5B4] border-[3px] border-[#1A1A1A] rounded-[10px_20px_10px_20px/20px_10px_20px_10px] px-3 py-2 text-sm font-black uppercase hover:bg-[#FFDAB9] active:translate-y-[2px] active:translate-x-[2px] shadow-[3px_3px_0px_0px_#1A1A1A] active:shadow-none transition-all"
+                  className="jeep-btn flex items-center justify-center gap-2 bg-[#FFE5B4] px-3 py-2 text-sm shadow-[3px_3px_0px_0px_#1A1A1A] hover:bg-[#FFDAB9]"
                   title="Swap Translation Direction"
                 >
                   {direction === 'en-tl' ? (
@@ -1694,90 +1711,106 @@ export default function App() {
                   )}
                 </button>
               </div>
-              <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 flex items-center relative min-h-[100px]">
-                <textarea
-                  id="english-input"
-                  value={englishWord}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (inputMode === 'conversation' && val.length > 500) return;
-                    setEnglishWord(val);
-                    setErrorMsg(null);
-                    if (val.trim() === '') {
-                      setTranslation('');
-                      setExample(null);
-                      setFunFact(null);
-                      setAudioUrl(null);
-                      setExampleAudioUrl(null);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleTranslate();
-                    }
-                  }}
-                  className={`flex-1 bg-transparent outline-none placeholder:text-gray-300 w-full text-[#1A1A1A] resize-none transition-all duration-300 ${inputMode === 'conversation' ? 'min-h-[120px] text-lg font-sans font-bold leading-relaxed' : 'min-h-[3rem] text-2xl font-box overflow-hidden'}`}
-                  placeholder={inputMode === 'conversation' ? 'Type a full sentence or paragraph here...' : `e.g. ${currentPlaceholder}`}
-                />
-                {inputMode === 'conversation' && <span className="absolute bottom-2 right-24 text-xs font-black text-gray-400">{englishWord.length}/500</span>}
-                <button
-                  onClick={handleMicClick}
-                  className={`w-14 h-14 ml-3 rounded-[15px_225px_15px_255px/255px_15px_225px_15px] border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex flex-shrink-0 items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none ${isRecording ? 'bg-[#ffcdd2]' : 'bg-[#e8f5e9] hover:bg-[#c8e6c9]'}`}
-                  title="Speak to translate"
-                >
-                  <Mic className="w-7 h-7 stroke-[4] text-[#1A1A1A]" />
-                </button>
+
+              {/* Placard card */}
+              <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#0032A0]">
+
+                {/* Header strip — cobalt blue destination band */}
+                <div className="jeep-strip bg-[#0032A0] text-[#FCD116] jeep-rivet">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={direction}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 8 }}
+                      className="ml-5"
+                    >
+                      {direction === 'en-tl' ? '🇬🇧 ENGLISH WORD' : '🇵🇭 TAGALOG WORD'}
+                    </motion.span>
+                  </AnimatePresence>
+                  <span className="ml-auto mr-5 text-[#FCD116]/50 text-[10px]">INPUT</span>
+                </div>
+
+                {/* Body */}
+                <div className="bg-[#F0F4FF] p-5 flex items-center relative min-h-[100px]">
+                  <textarea
+                    id="english-input"
+                    value={englishWord}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (inputMode === 'conversation' && val.length > 500) return;
+                      setEnglishWord(val);
+                      setErrorMsg(null);
+                      if (val.trim() === '') {
+                        setTranslation('');
+                        setExample(null);
+                        setFunFact(null);
+                        setAudioUrl(null);
+                        setExampleAudioUrl(null);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleTranslate();
+                      }
+                    }}
+                    className={`flex-1 bg-transparent outline-none placeholder:text-[#0032A0]/30 w-full text-[#1A1A1A] resize-none transition-all duration-300 ${inputMode === 'conversation' ? 'min-h-[120px] text-lg font-sans font-bold leading-relaxed' : 'min-h-[3rem] text-2xl font-box overflow-hidden'}`}
+                    placeholder={inputMode === 'conversation' ? 'Type a full sentence or paragraph here...' : `e.g. ${currentPlaceholder}`}
+                  />
+                  {inputMode === 'conversation' && <span className="absolute bottom-2 right-20 text-xs font-black text-[#0032A0]/40">{englishWord.length}/500</span>}
+                  {/* Mic — red circle jeepney button */}
+                  <button
+                    onClick={handleMicClick}
+                    className={`jeep-btn w-14 h-14 ml-3 rounded-full flex flex-shrink-0 items-center justify-center shadow-[4px_4px_0px_0px_#1A1A1A] ${isRecording ? 'bg-[#BF0D3E] border-[#BF0D3E]' : 'bg-[#BF0D3E] border-[#1A1A1A] hover:bg-[#A00C34]'}`}
+                    title="Speak to translate"
+                  >
+                    <Mic className="w-7 h-7 stroke-[3] text-white" />
+                  </button>
+                </div>
               </div>
 
-              <motion.div className="absolute -bottom-16 -right-4 z-20 pointer-events-none" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
+              <motion.div className="absolute -bottom-14 -right-4 z-20 pointer-events-none" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>
                 <Sparkle />
               </motion.div>
             </div>
 
-            {/* Translate Button */}
-            <div className="relative self-center z-10 w-full mb-12 mt-4">
+            {/* ── TRANSLATE! BUTTON — Philippine Red Night Sign ── */}
+            <div className="relative self-center z-10 w-full mb-10 mt-6">
               <motion.button
-                whileHover={isLoading ? {} : { scale: 1.02 }}
-                whileTap={isLoading ? {} : { scale: 0.96, x: 4, y: 4, boxShadow: "0px 0px 0px 0px #1A1A1A" }}
-                animate={{ backgroundColor: isLoading ? ["#F6F5F2", "#FED141", "#BF0D3E", "#0032A0", "#F6F5F2"] : "#F6F5F2" }}
-                transition={{ backgroundColor: isLoading ? { repeat: Infinity, duration: 0.6, ease: "linear" } : { duration: 0.1 } }}
+                whileHover={isLoading ? {} : { scale: 1.02, y: -2 }}
+                whileTap={isLoading ? {} : { scale: 0.97, x: 5, y: 5 }}
+                animate={{
+                  backgroundColor: isLoading
+                    ? ['#BF0D3E', '#FCD116', '#0032A0', '#00A550', '#BF0D3E']
+                    : '#BF0D3E'
+                }}
+                transition={{ backgroundColor: isLoading ? { repeat: Infinity, duration: 0.6, ease: 'linear' } : { duration: 0.15 } }}
                 onClick={handleTranslate}
                 disabled={isLoading || !englishWord.trim()}
-                className="w-full text-[#1A1A1A] text-3xl font-black py-5 border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[100px_25px_100px_25px/25px_100px_25px_100px] disabled:opacity-70 disabled:cursor-not-allowed min-h-[64px] uppercase tracking-wider flex items-center justify-center"
+                className="w-full text-white text-3xl font-black py-5 border-[5px] border-[#1A1A1A] shadow-[7px_7px_0px_0px_#1A1A1A] rounded-[14px] disabled:opacity-70 disabled:cursor-not-allowed min-h-[68px] uppercase tracking-[0.15em] flex items-center justify-center relative overflow-hidden"
+                style={{ fontFamily: "'Oswald', sans-serif" }}
               >
+                {/* Inner gloss stripe */}
+                <div className="absolute inset-x-0 top-0 h-[40%] bg-white/10 pointer-events-none" />
                 {isLoading ? (
-                  <Loader2 className="w-10 h-10 animate-spin stroke-[4]" />
+                  <Loader2 className="w-10 h-10 animate-spin stroke-[3]" />
                 ) : (
-                  'Translate!'
+                  <span style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.4)' }}>TRANSLATE!</span>
                 )}
               </motion.button>
 
               {errorMsg && (
-                <div className="mt-6 p-4 bg-red-100 border-[4px] border-[#1A1A1A] rounded-xl text-[#1A1A1A] font-black flex items-start gap-3 shadow-[4px_4px_0px_0px_#1A1A1A]">
+                <div className="mt-4 p-4 bg-red-100 border-[4px] border-[#1A1A1A] rounded-xl text-[#1A1A1A] font-black flex items-start gap-3 shadow-[4px_4px_0px_0px_#1A1A1A]">
                   <X className="w-6 h-6 shrink-0 mt-0.5 text-red-500" />
                   <span className="flex-1 uppercase">{errorMsg}</span>
                 </div>
               )}
             </div>
 
-            {/* Output Box */}
+            {/* ── OUTPUT BOX — Green BACLARAN LRT placard ── */}
             {(translation || isLoading) && (
-              <div className="w-full space-y-3 z-10 relative mb-12 animate-in fade-in slide-in-from-bottom-6 duration-300">
-                <div className="flex items-center justify-between px-2 mb-2">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={direction}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="text-xl font-black text-white tracking-widest uppercase"
-                      style={{ textShadow: '3px 3px 0px #1A1A1A', WebkitTextStroke: '1.5px #1A1A1A' }}
-                    >
-                      {direction === 'en-tl' ? 'Tagalog Translation' : 'English Translation'}
-                    </motion.span>
-                  </AnimatePresence>
-                </div>
+              <div className="w-full z-10 relative mb-10 animate-in fade-in slide-in-from-bottom-6 duration-300" style={{ transform: 'rotate(-0.8deg)' }}>
 
                 <div className="relative">
                   <motion.div className="absolute -left-12 top-10 -z-10" animate={{ rotate: [0, -8, 0], x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 3.5 }}>
@@ -1786,142 +1819,196 @@ export default function App() {
 
                   <motion.div
                     key={translation ? `result-${translation.substring(0, 10)}` : 'empty'}
-                    initial={translation && !isLoading ? { scale: 0.8, rotate: -3, backgroundColor: "#FED141", opacity: 0 } : { opacity: 1, backgroundColor: "#F6F5F2" }}
-                    animate={{ scale: 1, rotate: 0, backgroundColor: "#F6F5F2", opacity: 1 }}
+                    initial={translation && !isLoading ? { scale: 0.85, rotate: -2, opacity: 0 } : { opacity: 1 }}
+                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
                     transition={translation && !isLoading ? {
-                      scale: { type: "spring", bounce: 0.7, duration: 0.6 },
-                      backgroundColor: { duration: 0.5, ease: "easeOut", delay: 0.1 },
+                      scale: { type: 'spring', bounce: 0.65, duration: 0.6 },
                       opacity: { duration: 0.2 }
                     } : { duration: 0.2 }}
-                    className="relative border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[125px_25px_125px_25px/25px_125px_25px_125px] p-8 flex flex-col items-center justify-center min-h-[180px]"
+                    className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#00A550]"
                   >
-                    {translation && !isLoading && <PhParticles triggerKey={translation} />}
-                    {isLoading ? (
-                      <div className="flex flex-col items-center justify-center w-full animate-pulse">
-                        <div className="h-12 bg-gray-300 border-[4px] border-[#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] w-3/4 mb-6 opacity-50"></div>
-                        <div className="h-12 bg-gray-300 border-[4px] border-[#15px_225px_15px_255px/255px_15px_225px_15px] w-32 opacity-50"></div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className={`w-full ${inputMode === 'conversation' ? 'max-h-[250px] overflow-y-auto pr-4 mb-6' : 'mb-8'}`}>
-                          <span className={`${inputMode === 'conversation' ? 'text-lg md:text-xl font-sans font-bold normal-case text-left block' : 'text-3xl md:text-4xl font-box uppercase text-center'} text-[#1A1A1A] break-words w-full`}>
-                            {translation}
-                          </span>
+                    {/* Header strip — green BACLARAN band */}
+                    <div className="jeep-strip bg-[#00A550] text-white jeep-rivet">
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={direction}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 8 }}
+                          className="ml-5"
+                        >
+                          {direction === 'en-tl' ? '🇵🇭 TAGALOG TRANSLATION' : '🇬🇧 ENGLISH TRANSLATION'}
+                        </motion.span>
+                      </AnimatePresence>
+                      <span className="ml-auto mr-5 text-white/50 text-[10px]">OUTPUT</span>
+                    </div>
+
+                    {/* Body */}
+                    <div className="bg-[#F0FFF5] p-8 flex flex-col items-center justify-center min-h-[180px] relative">
+                      {translation && !isLoading && <PhParticles triggerKey={translation} />}
+                      {isLoading ? (
+                        <div className="flex flex-col items-center justify-center w-full animate-pulse gap-3">
+                          <div className="h-10 bg-[#00A550]/20 rounded-xl w-3/4"></div>
+                          <div className="h-10 bg-[#00A550]/15 rounded-xl w-1/2"></div>
                         </div>
-                        <div className="flex items-center gap-4 flex-wrap justify-center">
-                          {inputMode === 'word' && (
+                      ) : (
+                        <>
+                          <div className={`w-full ${inputMode === 'conversation' ? 'max-h-[250px] overflow-y-auto pr-4 mb-6' : 'mb-8'}`}>
+                            <span className={`${inputMode === 'conversation' ? 'text-lg md:text-xl font-sans font-bold normal-case text-left block' : 'text-3xl md:text-4xl font-box uppercase text-center'} text-[#1A1A1A] break-words w-full`}>
+                              {translation}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 flex-wrap justify-center">
+                            {inputMode === 'word' && (
+                              <button
+                                onClick={() => handleSpeak(audioUrl)}
+                                disabled={!audioUrl}
+                                className="jeep-btn flex items-center gap-3 bg-[#00A550] text-white px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#008B42] disabled:opacity-50 disabled:cursor-wait min-h-[52px] text-lg"
+                              >
+                                <Volume2 className="w-6 h-6 stroke-[3]" />
+                                SPEAK
+                              </button>
+                            )}
                             <button
-                              onClick={() => handleSpeak(audioUrl)}
-                              disabled={!audioUrl}
-                              className="flex items-center gap-3 bg-white hover:bg-gray-50 text-[#1A1A1A] px-6 py-3 border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] text-lg font-black uppercase transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-wait min-h-[56px]"
+                              onClick={handleCopy}
+                              className="jeep-btn flex items-center justify-center w-14 h-14 bg-white text-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-gray-50"
+                              title="Copy to clipboard"
                             >
-                              <Volume2 className="w-6 h-6 stroke-[4]" />
-                              SPEAK
+                              {isCopied ? <Check className="w-6 h-6 stroke-[4] text-green-500" /> : <Copy className="w-6 h-6 stroke-[4]" />}
                             </button>
-                          )}
-                          <button
-                            onClick={handleCopy}
-                            className="flex items-center justify-center w-14 h-14 bg-white hover:bg-gray-50 text-[#1A1A1A] border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
-                            title="Copy to clipboard"
-                          >
-                            {isCopied ? <Check className="w-6 h-6 stroke-[4] text-green-500" /> : <Copy className="w-6 h-6 stroke-[4]" />}
-                          </button>
-                        </div>
-                      </>
-                    )}
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </motion.div>
                 </div>
               </div>
             )}
 
-            {/* Fun Fact Card */}
+            {/* ── FUN FACT CARD — Golden MANILA PHILIPPINES placard ── */}
             {inputMode === 'word' && (funFact || isLoadingFunFact) && !isLoading && (
-              <div className="w-full z-10 relative mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-[#FFE5B4] border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] p-6 pt-8 relative transform -rotate-1">
-                  <span className="absolute -top-4 left-6 bg-[#1A1A1A] text-[#FFE5B4] text-sm font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-[2px_2px_0px_0px_#FFE5B4] flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4 stroke-[3]" /> DID YOU KNOW?
-                  </span>
-                  {isLoadingFunFact ? (
-                    <div className="animate-pulse space-y-2 mt-2">
-                      <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-full"></div>
-                      <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-5/6"></div>
-                      <div className="h-3.5 bg-[#1A1A1A]/20 rounded-full w-3/4"></div>
-                    </div>
-                  ) : (
-                    <p className="text-xl font-box text-[#1A1A1A] leading-snug">
-                      {funFact}
-                    </p>
-                  )}
+              <div className="w-full z-10 relative mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ transform: 'rotate(1deg)' }}>
+                <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#FCD116]">
+
+                  {/* Header strip — deep red MANILA band */}
+                  <div className="jeep-strip bg-[#BF0D3E] text-[#FCD116] jeep-rivet">
+                    <Lightbulb className="w-4 h-4 ml-5" />
+                    <span>DID YOU KNOW?</span>
+                    <span className="ml-auto mr-5 text-[#FCD116]/40 text-[10px]">FUN FACT</span>
+                  </div>
+
+                  {/* Body */}
+                  <div className="bg-[#FFFBEA] p-6">
+                    {isLoadingFunFact ? (
+                      <div className="animate-pulse space-y-2.5">
+                        <div className="h-3.5 bg-[#BF0D3E]/15 rounded-full w-full"></div>
+                        <div className="h-3.5 bg-[#BF0D3E]/12 rounded-full w-5/6"></div>
+                        <div className="h-3.5 bg-[#BF0D3E]/10 rounded-full w-3/4"></div>
+                      </div>
+                    ) : (
+                      <p className="text-xl font-box text-[#1A1A1A] leading-snug">
+                        {funFact}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Example Section */}
+            {/* ── EXAMPLE SECTION ── */}
             {inputMode === 'word' && translation && !isLoading && (
               <div className="w-full relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-300">
 
-                {/* Cooldown UI or normal button */}
                 {!example && (
                   exampleCooldown ? (
-                    <div className="w-full bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px_125px_25px_125px/125px_25px_125px_25px] p-6 mb-8 flex flex-col items-center gap-2 text-center">
-                      <span className="text-5xl font-black text-[#1A1A1A]">⏳ {exampleCooldown}s</span>
-                      <p className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight leading-tight">
-                        Sentence examples on cooldown!
-                      </p>
-                      <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">
-                        You can keep translating words in the meantime ✌️
-                      </p>
+                    /* Cooldown — PASIG PALENGKE black sign */
+                    <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A] mb-8">
+                      <div className="jeep-strip bg-[#1A1A1A] text-[#FCD116] jeep-rivet">
+                        <span className="ml-5">⏳ ON COOLDOWN</span>
+                      </div>
+                      <div className="bg-[#F5F5F5] p-6 flex flex-col items-center gap-2 text-center">
+                        <span className="text-5xl font-black text-[#1A1A1A]">{exampleCooldown}s</span>
+                        <p className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight leading-tight">
+                          Sentence examples on cooldown!
+                        </p>
+                        <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">
+                          You can keep translating words in the meantime ✌️
+                        </p>
+                      </div>
                     </div>
                   ) : (
+                    /* Example button — Black NOVALICHES BAYAN night sign */
                     <button
                       onClick={handleShowExample}
                       disabled={isLoadingExample}
-                      className="w-full bg-white hover:bg-gray-50 text-[#1A1A1A] text-xl font-black py-5 px-6 border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[25px_125px_25px_125px/125px_25px_125px_25px] transition-all duration-150 active:translate-x-[8px] active:translate-y-[8px] active:shadow-none disabled:opacity-70 flex items-center justify-center mb-8 min-h-[64px] uppercase"
+                      className="w-full mb-8 relative overflow-hidden rounded-[14px] border-[5px] border-[#1A1A1A] shadow-[7px_7px_0px_0px_#1A1A1A] bg-[#1A1A1A] hover:bg-[#2a2a2a] min-h-[68px] flex items-center justify-center gap-3 transition-all duration-150 active:translate-x-[7px] active:translate-y-[7px] active:shadow-none disabled:opacity-70"
+                      style={{ transform: 'rotate(-0.5deg)' }}
                     >
+                      {/* Gloss stripe */}
+                      <div className="absolute inset-x-0 top-0 h-[35%] bg-white/5 pointer-events-none" />
+                      {/* Left yellow accent bar */}
+                      <div className="absolute left-0 inset-y-0 w-2 bg-[#FCD116]" />
+                      {/* Right yellow accent bar */}
+                      <div className="absolute right-0 inset-y-0 w-2 bg-[#FCD116]" />
                       {isLoadingExample ? (
-                        <Loader2 className="w-8 h-8 mr-3 animate-spin stroke-[4]" />
+                        <Loader2 className="w-8 h-8 animate-spin stroke-[3] text-[#FCD116]" />
                       ) : null}
-                      Example Sentence
+                      <span
+                        className="text-[#FCD116] text-2xl font-black uppercase tracking-[0.15em]"
+                        style={{ fontFamily: "'Oswald', sans-serif", textShadow: '1px 1px 0px rgba(0,0,0,0.5)' }}
+                      >
+                        EXAMPLE SENTENCE
+                      </span>
                     </button>
                   )
                 )}
 
                 {example && (
-                  <div className="w-full space-y-3 z-10 relative mb-8 animate-in zoom-in-95 duration-300">
-                    <div className="flex items-center justify-between px-2">
-                      <span className="text-xl font-black text-white tracking-widest uppercase" style={{ textShadow: '3px 3px 0px #1A1A1A', WebkitTextStroke: '1.5px #1A1A1A' }}>
-                        Context
-                      </span>
-                    </div>
-                    <div className="bg-white border-[6px] border-[#1A1A1A] shadow-[8px_8px_0px_0px_#1A1A1A] rounded-[50px] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
-                      <p className="text-2xl font-box mb-6 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
-                        {example.tagalogSentence}
-                      </p>
-                      <p className="text-xl font-box mb-8 text-[#1A1A1A] text-center w-full bg-gray-50 px-4 py-2 border-[4px] border-[#1A1A1A] rounded-xl transform -rotate-2 shadow-[4px_4px_0px_0px_#1A1A1A]">
-                        "{example.englishTranslation}"
-                      </p>
-                      <div className="flex items-center gap-4 flex-wrap justify-center">
-                        <button
-                          onClick={() => handleSpeak(exampleAudioUrl)}
-                          disabled={!exampleAudioUrl}
-                          className="flex items-center gap-3 bg-white hover:bg-gray-50 text-[#1A1A1A] px-6 py-3 border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] text-lg font-black uppercase transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-wait min-h-[56px]"
+                  /* Example output — DIVISORIA teal placard */
+                  <div className="w-full z-10 relative mb-8 animate-in zoom-in-95 duration-300" style={{ transform: 'rotate(0.7deg)' }}>
+                    <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#0097A7]">
+
+                      {/* Header strip — teal DIVISORIA band */}
+                      <div className="jeep-strip bg-[#0097A7] text-white jeep-rivet">
+                        <span className="ml-5">📖 CONTEXT</span>
+                        <span className="ml-auto mr-5 text-white/50 text-[10px]">EXAMPLE</span>
+                      </div>
+
+                      {/* Body */}
+                      <div className="bg-[#E0F7FA] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
+                        <p className="text-2xl font-box mb-5 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
+                          {example.tagalogSentence}
+                        </p>
+                        <p
+                          className="text-lg font-box mb-8 text-[#1A1A1A] text-center w-full px-4 py-2 border-[3px] border-[#0097A7] rounded-xl shadow-[3px_3px_0px_0px_#0097A7] bg-white"
+                          style={{ transform: 'rotate(-1deg)' }}
                         >
-                          <Volume2 className="w-6 h-6 stroke-[4]" />
-                          SPEAK
-                        </button>
-                        <button
-                          onClick={handleCopyExample}
-                          className="flex items-center justify-center w-14 h-14 bg-white hover:bg-gray-50 text-[#1A1A1A] border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none"
-                          title="Copy to clipboard"
-                        >
-                          {isExampleCopied ? <Check className="w-6 h-6 stroke-[4] text-green-500" /> : <Copy className="w-6 h-6 stroke-[4]" />}
-                        </button>
+                          "{example.englishTranslation}"
+                        </p>
+                        <div className="flex items-center gap-4 flex-wrap justify-center">
+                          <button
+                            onClick={() => handleSpeak(exampleAudioUrl)}
+                            disabled={!exampleAudioUrl}
+                            className="jeep-btn flex items-center gap-3 bg-[#0097A7] text-white px-6 py-3 shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-[#00838F] disabled:opacity-50 disabled:cursor-wait min-h-[52px] text-lg"
+                          >
+                            <Volume2 className="w-6 h-6 stroke-[3]" />
+                            SPEAK
+                          </button>
+                          <button
+                            onClick={handleCopyExample}
+                            className="jeep-btn flex items-center justify-center w-14 h-14 bg-white text-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] hover:bg-gray-50"
+                            title="Copy to clipboard"
+                          >
+                            {isExampleCopied ? <Check className="w-6 h-6 stroke-[4] text-green-500" /> : <Copy className="w-6 h-6 stroke-[4]" />}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
             )}
+
           </div>
         )}
 

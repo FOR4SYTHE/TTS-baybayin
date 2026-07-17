@@ -70,5 +70,60 @@
     box-shadow: 0px 0px 0px 0px #1A1A1A;
     transform: translateY(4px) translateX(4px);
   }
+
+  /* ============================================================
+     JEEPNEY PLACARD DESIGN SYSTEM
+     Inspired by Philippine jeepney route signboards
+     ============================================================ */
+
+  /* Base placard card — thick border, no organic curves */
+  .jeep-card {
+    border: 5px solid #1A1A1A;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Inner header strip — mimics the destination label band */
+  .jeep-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-family: 'Oswald', 'Dela Gothic One', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* Jeepney action button */
+  .jeep-btn {
+    border: 4px solid #1A1A1A;
+    border-radius: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.12s ease;
+  }
+
+  .jeep-btn:active {
+    transform: translateX(4px) translateY(4px);
+    box-shadow: none !important;
+  }
+
+  /* Riveted corner decorations for the jeepney card */
+  .jeep-rivet::before,
+  .jeep-rivet::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1A1A1A;
+    top: 8px;
+  }
+  .jeep-rivet::before { left: 10px; }
+  .jeep-rivet::after  { right: 10px; }
 }
 
