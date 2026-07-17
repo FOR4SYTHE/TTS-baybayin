@@ -1324,23 +1324,60 @@ export default function App() {
       <main
         className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#93C5FD]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
       >
-        <motion.div
-          className="fixed inset-0 -z-10 pointer-events-none"
-          animate={isGeneratingArt ? {
-            filter: "invert(1) hue-rotate(180deg)",
-            backgroundPositionY: ["0px", "100px", "0px", "-100px", "0px"]
-          } : {
-            filter: "invert(0) hue-rotate(0deg)",
-            backgroundPositionY: "0px"
+        {/* =========================================================================
+            LAYERED BARONG EMBROIDERY BACKGROUND (Scale-Adaptive Premium Craft)
+            ========================================================================= */}
+        {appMode === 'translator' ? (
+          <motion.div
+            className="fixed inset-0 -z-20 pointer-events-none bg-[#EBE2D3]"
+            animate={isGeneratingArt ? {
+              filter: "invert(1) hue-rotate(180deg)",
+              backgroundPositionY: ["0px", "50px", "0px", "-50px", "0px"]
+            } : {
+              filter: "invert(0) hue-rotate(0deg)",
+              backgroundPositionY: "0px"
+            }}
+            transition={isGeneratingArt ? {
+              backgroundPositionY: { repeat: Infinity, duration: 3.5, ease: "linear" },
+              filter: { duration: 0.4 }
+            } : { duration: 0.4 }}
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg stroke='%23B8A892' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 50 15 L 50 85 M 15 50 L 85 50' stroke-dasharray='1 4' stroke-width='2'/%3E%3Cpolygon points='50,5 95,50 50,95 5,50'/%3E%3Cpolygon points='50,15 85,50 50,85 15,50' stroke-dasharray='4 3'/%3E%3Cpolygon points='50,25 75,50 50,75 25,50'/%3E%3Cpath d='M 50 35 L 55 45 L 65 50 L 55 55 L 50 65 L 45 55 L 35 50 L 45 45 Z' fill='%23B8A892' fill-opacity='0.15'/%3E%3Cpolygon points='0,25 25,0 0,-25 -25,0'/%3E%3Cpolygon points='100,25 125,0 100,-25 75,0'/%3E%3Cpolygon points='0,125 25,100 0,75 -25,100'/%3E%3Cpolygon points='100,125 125,100 100,75 75,100'/%3E%3Cpolygon points='0,15 15,0 0,-15 -15,0' stroke-dasharray='2 3'/%3E%3Cpolygon points='100,15 115,0 100,-15 85,0' stroke-dasharray='2 3'/%3E%3Cpolygon points='0,115 15,100 0,85 -15,100' stroke-dasharray='2 3'/%3E%3Cpolygon points='100,115 115,100 100,85 85,100' stroke-dasharray='2 3'/%3E%3Cpath d='M 25 0 L 37.5 12.5 L 50 0 L 62.5 12.5 L 75 0'/%3E%3Cpath d='M 25 100 L 37.5 87.5 L 50 100 L 62.5 87.5 L 75 100'/%3E%3Cpath d='M 0 25 L 12.5 37.5 L 0 50 L 12.5 62.5 L 0 75'/%3E%3Cpath d='M 100 25 L 87.5 37.5 L 100 50 L 87.5 62.5 L 100 75'/%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '55px 55px',
+              backgroundRepeat: 'repeat',
+              transform: 'translateZ(0)',
+              willChange: 'transform'
+            }}
+          />
+        ) : (
+          /* Precolonial Baybayin Mode Background (Isolated State) */
+          <motion.div
+            className="fixed inset-0 -z-10 pointer-events-none bg-[#F6F5F2]"
+            animate={isGeneratingArt ? {
+              filter: "invert(1) hue-rotate(180deg)",
+              backgroundPositionY: ["0px", "100px", "0px", "-100px", "0px"]
+            } : {
+              filter: "invert(0) hue-rotate(0deg)",
+              backgroundPositionY: "0px"
+            }}
+            transition={isGeneratingArt ? {
+              backgroundPositionY: { repeat: Infinity, duration: 3.5, ease: "linear" },
+              filter: { duration: 0.4 }
+            } : { duration: 0.4 }}
+            style={{
+              backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'240\' height=\'240\' viewBox=\'0 0 240 240\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\' opacity=\'0.06\'%3E%3Ccircle cx=\'120\' cy=\'120\' r=\'12\'/%3E%3Cpath d=\'M 120 100 L 120 92 M 120 140 L 120 148 M 100 120 L 92 120 M 140 120 L 148 120\' stroke-width=\'3\'/%3E%3Cpath d=\'M 106 106 L 98 98 M 134 134 L 142 142 M 106 134 L 98 142 M 134 106 L 142 98\' stroke-width=\'2\'/%3E%3Cpath d=\'M 110 70 L 120 80 L 130 70 M 110 60 L 120 70 L 130 60 M 110 50 L 120 60 L 130 50\'/%3E%3Cpath d=\'M 110 170 L 120 160 L 130 170 M 110 180 L 120 170 L 130 180 M 110 190 L 120 180 L 130 190\'/%3E%3Cpath d=\'M 40 100 L 50 110 L 40 120 L 30 110 Z\'/%3E%3Cpath d=\'M 40 130 L 50 140 L 40 150 L 30 140 Z\'/%3E%3Cpath d=\'M 25 80 L 35 90 L 45 80 L 55 90 M 25 90 L 35 100 L 45 90 L 55 100\'/%3E%3Cpath d=\'M 200 100 L 210 110 L 200 120 L 190 110 Z\'/%3E%3Cpath d=\'M 200 130 L 210 140 L 200 150 L 190 140 Z\'/%3E%3Cpath d=\'M 185 80 L 195 90 L 205 80 L 215 90 M 185 90 L 195 100 L 205 90 L 215 100\'/%3E%3Ccircle cx=\'120\' cy=\'30\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'120\' cy=\'210\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'40\' cy=\'60\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'200\' cy=\'190\' r=\'1.5\' fill=\'%232C2825\'/%3E%3C/g%3E%3C/svg%3E")',
+              transform: 'translateZ(0)'
+            }}
+          />
+        )}
+
+        {/* Layer 3: Hardware-Accelerated Film Grain Noise Overlay (Unified Texture) */}
+        <div
+          className="fixed inset-0 -z-10 pointer-events-none opacity-[0.05]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            transform: 'translateZ(0)'
           }}
-          transition={isGeneratingArt ? {
-            backgroundPositionY: { repeat: Infinity, duration: 3.5, ease: "linear" },
-            filter: { duration: 0.4 }
-          } : { duration: 0.4 }}
-          style={appMode === 'translator'
-            ? { backgroundColor: '#EEF2FF', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }
-            : { backgroundColor: '#F6F5F2', backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'240\' height=\'240\' viewBox=\'0 0 240 240\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\' opacity=\'0.06\'%3E%3Ccircle cx=\'120\' cy=\'120\' r=\'12\'/%3E%3Cpath d=\'M 120 100 L 120 92 M 120 140 L 120 148 M 100 120 L 92 120 M 140 120 L 148 120\' stroke-width=\'3\'/%3E%3Cpath d=\'M 106 106 L 98 98 M 134 134 L 142 142 M 106 134 L 98 142 M 134 106 L 142 98\' stroke-width=\'2\'/%3E%3Cpath d=\'M 110 70 L 120 80 L 130 70 M 110 60 L 120 70 L 130 60 M 110 50 L 120 60 L 130 50\'/%3E%3Cpath d=\'M 110 170 L 120 160 L 130 170 M 110 180 L 120 170 L 130 180 M 110 190 L 120 180 L 130 190\'/%3E%3Cpath d=\'M 40 100 L 50 110 L 40 120 L 30 110 Z\'/%3E%3Cpath d=\'M 40 130 L 50 140 L 40 150 L 30 140 Z\'/%3E%3Cpath d=\'M 25 80 L 35 90 L 45 80 L 55 90 M 25 90 L 35 100 L 45 90 L 55 100\'/%3E%3Cpath d=\'M 200 100 L 210 110 L 200 120 L 190 110 Z\'/%3E%3Cpath d=\'M 200 130 L 210 140 L 200 150 L 190 140 Z\'/%3E%3Cpath d=\'M 185 80 L 195 90 L 205 80 L 215 90 M 185 90 L 195 100 L 205 90 L 215 100\'/%3E%3Ccircle cx=\'120\' cy=\'30\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'120\' cy=\'210\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'40\' cy=\'60\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'200\' cy=\'190\' r=\'1.5\' fill=\'%232C2825\'/%3E%3C/g%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'0.05\'/%3E%3C/svg%3E")' }
-          }
         />
 
         {/* Top Controls */}
