@@ -1830,8 +1830,8 @@ export default function App() {
                     } : { duration: 0.2 }}
                     className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]"
                   >
-                    {/* Header strip — QUIAPO teal with gold text */}
-                    <div className="jeep-strip bg-[#2BA8A8] text-[#D4961A] jeep-rivet">
+                    {/* Header strip — QUIAPO teal with black text for better contrast */}
+                    <div className="jeep-strip bg-[#2BA8A8] text-[#1A1A1A] jeep-rivet">
                       <AnimatePresence mode="wait">
                         <motion.span
                           key={direction}
@@ -1843,7 +1843,7 @@ export default function App() {
                           {direction === 'en-tl' ? 'TAGALOG TRANSLATION' : 'ENGLISH TRANSLATION'}
                         </motion.span>
                       </AnimatePresence>
-                      <span className="ml-auto mr-5 font-cubao text-[#D4961A]/80 text-[0.8rem]">OUTPUT</span>
+                      <span className="ml-auto mr-5 font-cubao text-[#1A1A1A]/70 text-[0.8rem]">OUTPUT</span>
                     </div>
 
                     {/* Body — pure white bg */}
@@ -1895,11 +1895,11 @@ export default function App() {
                 <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
                   {/* Header strip — EDSA black with gold text, red accent bar at top */}
-                  <div className="jeep-strip bg-[#1A1A1A] text-[#D4961A] jeep-rivet relative overflow-hidden">
+                  <div className="jeep-strip bg-[#FCD116] text-[#1A1A1A] jeep-rivet relative overflow-hidden">
                     <div className="absolute inset-x-0 top-0 h-[4px] bg-[#BF0D3E]" />
-                    <Lightbulb className="w-4 h-4 ml-5 text-[#D4961A]" />
+                    <Lightbulb className="w-4 h-4 ml-5 text-[#1A1A1A]" />
                     <span className="font-cubao text-[1.25rem]">DID YOU KNOW?</span>
-                    <span className="ml-auto mr-5 font-cubao text-[#D4961A]/80 text-[0.8rem]">FUN FACT</span>
+                    <span className="ml-auto mr-5 font-cubao text-[#1A1A1A]/70 text-[0.8rem]">FUN FACT</span>
                   </div>
 
                   {/* Body — pure white bg */}
@@ -1928,7 +1928,7 @@ export default function App() {
                   exampleCooldown ? (
                     /* Cooldown — PASIG PALENGKE: black + gold */
                     <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A] mb-8">
-                      <div className="jeep-strip bg-[#1A1A1A] text-[#D4961A] jeep-rivet">
+                      <div className="jeep-strip bg-[#FCD116] text-[#1A1A1A] jeep-rivet">
                         <span className="ml-5 font-cubao text-[1.2rem]">⏳ ON COOLDOWN</span>
                       </div>
                       <div className="bg-[#F5F5F5] p-6 flex flex-col items-center gap-2 text-center">
@@ -1959,8 +1959,7 @@ export default function App() {
                         <Loader2 className="w-8 h-8 animate-spin stroke-[3] text-[#FCD116]" />
                       ) : null}
                       <span
-                        className="font-cubao text-[#D4961A] text-[2rem] tracking-[0.06em]"
-                        style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.6)' }}
+                        className="font-cubao text-[#1A1A1A] text-[2rem] tracking-[0.06em]"
                       >
                         EXAMPLE SENTENCE
                       </span>
