@@ -1382,52 +1382,67 @@ export default function App() {
 
         {/* Top Controls */}
         <div className="w-full max-w-4xl flex justify-between items-center z-40 mb-2 relative">
+          {/* Mode Switch Star */}
           <button
             onClick={() => handleModeSwitch(appMode === 'translator' ? 'baybayin' : 'translator')}
-            className={`flex items-center justify-center w-12 h-12 transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none rounded-[255px_15px_225px_15px/15px_225px_15px_255px] ${appMode === 'translator'
-              ? 'bg-[#1A1A1A] border-[4px] border-[#1A1A1A] text-[#FED141] shadow-[4px_4px_0px_0px_#0032A0] hover:bg-gray-800'
-              : 'bg-[#F6F5F2] border-[4px] border-[#2C2825] text-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] hover:bg-[#EAE6DF]'
-              }`}
+            className="relative flex items-center justify-center w-14 h-14 group focus:outline-none"
             title={appMode === 'translator' ? 'Reveal the past...' : 'Return to translator'}
           >
-            {appMode === 'translator' ? (
-              <svg width="26" height="26" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M 50 15 Q 60 35 85 50 Q 60 65 50 85 Q 40 65 15 50 Q 40 35 50 15 Z" />
-                <circle cx="50" cy="50" r="8" fill="currentColor" />
-                <path d="M 30 30 Q 35 35 40 40" />
-                <path d="M 70 30 Q 65 35 60 40" />
-                <path d="M 30 70 Q 35 65 40 60" />
-                <path d="M 70 70 Q 65 65 60 60" />
+            {/* Shadow */}
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+              <g fill={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} strokeWidth="6" strokeLinejoin="round">
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(1.5, 1.5)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(3, 3)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(4.5, 4.5)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(6, 6)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(7.5, 7.5)" />
+              </g>
+            </svg>
+            {/* Main Star */}
+            <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 group-active:translate-x-[4px] group-active:translate-y-[4px] ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                <polygon 
+                  points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" 
+                  stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} 
+                  strokeWidth="6" 
+                  strokeLinejoin="round" 
+                  className={`transition-colors duration-150 fill-[#FCD116] group-hover:fill-[#EAB308]`}
+                />
               </svg>
-            ) : (
-              <svg width="26" height="26" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M 50 45 Q 60 10 70 20 Q 60 35 55 50" />
-                <path d="M 55 50 Q 90 30 85 45 Q 65 55 50 55" />
-                <path d="M 50 55 Q 80 85 65 90 Q 45 65 45 50" />
-                <path d="M 45 50 Q 15 80 10 65 Q 35 45 50 45" />
-                <path d="M 50 45 Q 15 15 30 10 Q 45 35 55 50" />
-                <circle cx="50" cy="50" r="12" fill="currentColor" />
-              </svg>
-            )}
+
+            </div>
           </button>
 
-          {appMode === 'translator' ? (
-            <button
-              onClick={() => setShowHistory(true)}
-              className="w-12 h-12 bg-white border-[4px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-gray-50"
-              title="History"
-            >
-              <History className="w-5 h-5 stroke-[4] text-[#1A1A1A]" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowBaybayinHistory(true)}
-              className="w-12 h-12 bg-[#F6F5F2] border-[4px] border-[#2C2825] shadow-[4px_4px_0px_0px_#2C2825] rounded-[255px_15px_225px_15px/15px_225px_15px_255px] flex items-center justify-center transition-all duration-150 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none hover:bg-[#EAE6DF]"
-              title="Baybayin History"
-            >
-              <History className="w-6 h-6 stroke-[3] text-[#2C2825]" />
-            </button>
-          )}
+          {/* History Star */}
+          <button
+            onClick={() => appMode === 'translator' ? setShowHistory(true) : setShowBaybayinHistory(true)}
+            className="relative flex items-center justify-center w-14 h-14 group focus:outline-none"
+            title={appMode === 'translator' ? 'History' : 'Baybayin History'}
+          >
+            {/* Shadow */}
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+              <g fill={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} strokeWidth="6" strokeLinejoin="round">
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(1.5, 1.5)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(3, 3)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(4.5, 4.5)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(6, 6)" />
+                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(7.5, 7.5)" />
+              </g>
+            </svg>
+            {/* Main Star */}
+            <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 group-active:translate-x-[4px] group-active:translate-y-[4px] ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                <polygon 
+                  points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" 
+                  stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} 
+                  strokeWidth="6" 
+                  strokeLinejoin="round" 
+                  className={`transition-colors duration-150 fill-[#FCD116] group-hover:fill-[#EAB308]`}
+                />
+              </svg>
+
+            </div>
+          </button>
         </div>
 
         {/* History Modal (Translator) */}
