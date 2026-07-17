@@ -1306,6 +1306,11 @@ export default function App() {
             overflow-y: scroll;
             scrollbar-gutter: stable;
           }
+          button:focus, button:active, button:focus-visible, svg:focus, svg:active {
+            outline: none !important;
+            outline-style: none !important;
+            box-shadow: none !important;
+          }
         `}
       </style>
 
@@ -1419,9 +1424,10 @@ export default function App() {
         {/* Top Controls */}
         <div className="w-full max-w-4xl flex justify-between items-center z-40 mb-2 relative">
           {/* Mode Switch Star */}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => handleModeSwitch(appMode === 'translator' ? 'baybayin' : 'translator')}
-            className="relative flex items-center justify-center w-14 h-14 group focus:outline-none"
+            className="relative flex items-center justify-center w-14 h-14 group focus:outline-none focus-visible:outline-none [-webkit-tap-highlight-color:transparent]"
             title={appMode === 'translator' ? 'Reveal the past...' : 'Return to translator'}
           >
             {/* Shadow */}
@@ -1435,7 +1441,7 @@ export default function App() {
               </g>
             </svg>
             {/* Main Star */}
-            <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 group-active:translate-x-[4px] group-active:translate-y-[4px] ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
+            <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
                 <polygon 
                   points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" 
@@ -1445,14 +1451,14 @@ export default function App() {
                   className={`transition-colors duration-150 fill-[#FCD116] group-hover:fill-[#EAB308]`}
                 />
               </svg>
-
             </div>
-          </button>
+          </motion.button>
 
           {/* History Star */}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => appMode === 'translator' ? setShowHistory(true) : setShowBaybayinHistory(true)}
-            className="relative flex items-center justify-center w-14 h-14 group focus:outline-none"
+            className="relative flex items-center justify-center w-14 h-14 group focus:outline-none focus-visible:outline-none [-webkit-tap-highlight-color:transparent]"
             title={appMode === 'translator' ? 'History' : 'Baybayin History'}
           >
             {/* Shadow */}
@@ -1466,7 +1472,7 @@ export default function App() {
               </g>
             </svg>
             {/* Main Star */}
-            <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 group-active:translate-x-[4px] group-active:translate-y-[4px] ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
+            <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
                 <polygon 
                   points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" 
@@ -1476,9 +1482,8 @@ export default function App() {
                   className={`transition-colors duration-150 fill-[#FCD116] group-hover:fill-[#EAB308]`}
                 />
               </svg>
-
             </div>
-          </button>
+          </motion.button>
         </div>
 
         {/* History Modal (Translator) */}
@@ -2061,7 +2066,7 @@ export default function App() {
         <div className="absolute bottom-0 left-0 w-full flex justify-center z-40 pointer-events-none">
           <button
             onClick={() => setIsLensOpen(true)}
-            className="pointer-events-auto cursor-pointer transition-transform duration-150 outline-none bg-transparent border-none p-0"
+            className="pointer-events-auto cursor-pointer transition-transform duration-150 outline-none focus:outline-none focus-visible:outline-none [-webkit-tap-highlight-color:transparent] bg-transparent border-none p-0"
             title="Supreme Lens"
           >
             <TribalSunCamera />
