@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Deep Drop Shadow (Pure Black for Seamless Merge) -->
+  <circle cx="316" cy="316" r="196" fill="#000000" />
+
+  <!-- Clipping Path for the Base Circle -->
+  <defs>
+    <clipPath id="circle-clip">
+      <circle cx="256" cy="256" r="180" />
+    </clipPath>
+  </defs>
+
+  <!-- Philippine Blue (Top Half) -->
+  <rect x="0" y="0" width="512" height="256" fill="#0032A0" clip-path="url(#circle-clip)" />
+  
+  <!-- Philippine Red (Bottom Half) -->
+  <rect x="0" y="256" width="512" height="256" fill="#BF0D3E" clip-path="url(#circle-clip)" />
+
+  <!-- Thick Black Outer Border (Pure Black) -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#000000" stroke-width="32" />
+
+  <!-- Chunky Center Star (Yellow Fill, White Border) -->
+  <!-- The white stroke separates the yellow from the red/blue and completes the flag colors -->
+  <polygon
+    points="256,146 291,207 361,222 313,275 321,345 256,316 191,345 199,275 151,222 221,207"
+    fill="#FED141"
+    stroke="#FFFFFF"
+    stroke-width="24"
+    stroke-linejoin="round"
+  />
+</svg>
