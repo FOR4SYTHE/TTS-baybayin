@@ -919,6 +919,116 @@ const PhParticles = ({ triggerKey }: { triggerKey: string }) => (
   </div>
 );
 
+const BAYBAYIN_BG_SVG = encodeURIComponent(`
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Basic Diamond -->
+    <g id="bg-diamond">
+      <polygon points="0,-12 12,0 0,12 -12,0" />
+      <circle cx="0" cy="0" r="2.5" fill="#2C2825" stroke="none" />
+    </g>
+    <!-- Upward Chevrons -->
+    <g id="bg-up-chev">
+      <path d="M 0 -20 L 0 20 M -12 -5 L 0 -15 L 12 -5 M -12 10 L 0 0 L 12 10" />
+      <circle cx="0" cy="-25" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="0" cy="25" r="1.5" fill="#2C2825" stroke="none" />
+    </g>
+    <!-- Downward Chevrons -->
+    <g id="bg-down-chev">
+      <path d="M 0 -20 L 0 20 M -12 -10 L 0 0 L 12 -10 M -12 5 L 0 15 L 12 5" />
+      <circle cx="0" cy="-25" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="0" cy="25" r="1.5" fill="#2C2825" stroke="none" />
+    </g>
+    <!-- Tribal Sun -->
+    <g id="bg-sun">
+      <circle cx="0" cy="0" r="8" />
+      <circle cx="0" cy="0" r="3" fill="#2C2825" stroke="none" />
+      <path d="M 0 -12 L 0 -18 M 0 12 L 0 18 M -12 0 L -18 0 M 12 0 L 18 0 M -8 -8 L -12 -12 M 8 8 L 12 12 M -8 8 L -12 12 M 8 -8 L 12 -12" />
+      <circle cx="0" cy="-22" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="0" cy="22" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="-22" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="22" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+    </g>
+    <!-- Rotated Tic-Tac-Toe -->
+    <g id="bg-tic-tac">
+      <path d="M 12 -16 L -16 12 M 16 -12 L -12 16 M -12 -16 L 16 12 M -16 -12 L 12 16" />
+      <polygon points="0,-8 8,0 0,8 -8,0" />
+      <circle cx="0" cy="0" r="2" fill="#2C2825" stroke="none" />
+      <circle cx="0" cy="-16" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="0" cy="16" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="-16" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="16" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+    </g>
+    <!-- Hourglass -->
+    <g id="bg-hourglass">
+      <path d="M -10 -15 L 10 -15 L 0 0 Z M -10 15 L 10 15 L 0 0 Z" />
+      <circle cx="0" cy="-20" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="0" cy="20" r="1.5" fill="#2C2825" stroke="none" />
+    </g>
+    <!-- Stacked Nested Diamonds -->
+    <g id="bg-stacked-dia">
+      <polygon points="0,-20 8,-12 0,-4 -8,-12" />
+      <polygon points="0,-16 4,-12 0,-8 -4,-12" />
+      <polygon points="0,-8 8,0 0,8 -8,0" />
+      <polygon points="0,-4 4,0 0,4 -4,0" />
+      <polygon points="0,4 8,12 0,20 -8,12" />
+      <polygon points="0,8 4,12 0,16 -4,12" />
+    </g>
+    <!-- Zigzag Brackets -->
+    <g id="bg-zigzag">
+      <path d="M -15 -20 L -10 -10 L -15 0 L -10 10 L -15 20" />
+      <path d="M 15 -20 L 10 -10 L 15 0 L 10 10 L 15 20" />
+      <polygon points="0,-6 6,0 0,6 -6,0" />
+      <circle cx="0" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="-20" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+      <circle cx="20" cy="0" r="1.5" fill="#2C2825" stroke="none" />
+    </g>
+  </defs>
+
+  <g stroke="#2C2825" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.12">
+    <!-- Col 1 -->
+    <use href="#bg-diamond" x="50" y="25" />
+    <use href="#bg-up-chev" x="50" y="75" />
+    <use href="#bg-sun" x="50" y="125" />
+    <use href="#bg-down-chev" x="50" y="175" />
+    <use href="#bg-diamond" x="50" y="225" />
+    <use href="#bg-up-chev" x="50" y="275" />
+    <use href="#bg-sun" x="50" y="325" />
+    <use href="#bg-down-chev" x="50" y="375" />
+
+    <!-- Col 2 -->
+    <use href="#bg-stacked-dia" x="150" y="25" />
+    <use href="#bg-hourglass" x="150" y="75" />
+    <use href="#bg-tic-tac" x="150" y="125" />
+    <use href="#bg-hourglass" x="150" y="175" />
+    <use href="#bg-stacked-dia" x="150" y="225" />
+    <use href="#bg-hourglass" x="150" y="275" />
+    <use href="#bg-tic-tac" x="150" y="325" />
+    <use href="#bg-hourglass" x="150" y="375" />
+
+    <!-- Col 3 -->
+    <use href="#bg-down-chev" x="250" y="25" />
+    <use href="#bg-diamond" x="250" y="75" />
+    <use href="#bg-up-chev" x="250" y="125" />
+    <use href="#bg-sun" x="250" y="175" />
+    <use href="#bg-down-chev" x="250" y="225" />
+    <use href="#bg-diamond" x="250" y="275" />
+    <use href="#bg-up-chev" x="250" y="325" />
+    <use href="#bg-sun" x="250" y="375" />
+
+    <!-- Col 4 -->
+    <use href="#bg-zigzag" x="350" y="25" />
+    <use href="#bg-tic-tac" x="350" y="75" />
+    <use href="#bg-hourglass" x="350" y="125" />
+    <use href="#bg-tic-tac" x="350" y="175" />
+    <use href="#bg-zigzag" x="350" y="225" />
+    <use href="#bg-tic-tac" x="350" y="275" />
+    <use href="#bg-hourglass" x="350" y="325" />
+    <use href="#bg-tic-tac" x="350" y="375" />
+  </g>
+</svg>
+`);
+
 export default function App() {
   // App Mode State
   const [appMode, setAppMode] = useState<'translator' | 'baybayin'>('translator');
@@ -1483,7 +1593,9 @@ export default function App() {
               filter: { duration: 0.4 }
             } : { duration: 0.4 }}
             style={{
-              backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'240\' height=\'240\' viewBox=\'0 0 240 240\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg stroke=\'%232C2825\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\' stroke-linejoin=\'round\' opacity=\'0.06\'%3E%3Ccircle cx=\'120\' cy=\'120\' r=\'12\'/%3E%3Cpath d=\'M 120 100 L 120 92 M 120 140 L 120 148 M 100 120 L 92 120 M 140 120 L 148 120\' stroke-width=\'3\'/%3E%3Cpath d=\'M 106 106 L 98 98 M 134 134 L 142 142 M 106 134 L 98 142 M 134 106 L 142 98\' stroke-width=\'2\'/%3E%3Cpath d=\'M 110 70 L 120 80 L 130 70 M 110 60 L 120 70 L 130 60 M 110 50 L 120 60 L 130 50\'/%3E%3Cpath d=\'M 110 170 L 120 160 L 130 170 M 110 180 L 120 170 L 130 180 M 110 190 L 120 180 L 130 190\'/%3E%3Cpath d=\'M 40 100 L 50 110 L 40 120 L 30 110 Z\'/%3E%3Cpath d=\'M 40 130 L 50 140 L 40 150 L 30 140 Z\'/%3E%3Cpath d=\'M 25 80 L 35 90 L 45 80 L 55 90 M 25 90 L 35 100 L 45 90 L 55 100\'/%3E%3Cpath d=\'M 200 100 L 210 110 L 200 120 L 190 110 Z\'/%3E%3Cpath d=\'M 200 130 L 210 140 L 200 150 L 190 140 Z\'/%3E%3Cpath d=\'M 185 80 L 195 90 L 205 80 L 215 90 M 185 90 L 195 100 L 205 90 L 215 100\'/%3E%3Ccircle cx=\'120\' cy=\'30\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'120\' cy=\'210\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'40\' cy=\'60\' r=\'1.5\' fill=\'%232C2825\'/%3E%3Ccircle cx=\'200\' cy=\'190\' r=\'1.5\' fill=\'%232C2825\'/%3E%3C/g%3E%3C/svg%3E")',
+              backgroundImage: `url("data:image/svg+xml,${BAYBAYIN_BG_SVG}")`,
+              backgroundSize: '400px 400px',
+              backgroundRepeat: 'repeat',
               transform: 'translateZ(0)'
             }}
           />
