@@ -1332,7 +1332,10 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className={`fixed inset-0 z-50 flex flex-col items-center justify-center ${nextMode === 'baybayin' ? 'bg-[#12100E]' : 'bg-[#EEF2FF]'}`}
+            className={`fixed inset-0 z-50 flex flex-col items-center justify-center ${nextMode === 'baybayin' ? 'bg-[#12100E]' : 'bg-[#D6CEB5]'}`}
+            style={nextMode !== 'baybayin' ? {
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.12'/%3E%3C/svg%3E")`
+            } : undefined}
           >
             {nextMode === 'baybayin' ? (
               <div className="flex flex-col items-center text-white">
@@ -1355,9 +1358,28 @@ export default function App() {
                 <motion.div
                   animate={{ y: [0, -20, 0], scale: [1, 1.05, 1], rotate: [-2, 2, -2] }}
                   transition={{ duration: 0.6, repeat: Infinity }}
-                  className="mb-8 bg-white border-[6px] border-[#1A1A1A] p-6 rounded-[20px] shadow-[8px_8px_0px_0px_#1A1A1A]"
+                  className="mb-8 relative flex items-center justify-center w-32 h-32"
                 >
-                  <Sparkle />
+                  {/* Shadow */}
+                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                    <g fill="#1A1A1A" stroke="#1A1A1A" strokeWidth="6" strokeLinejoin="round">
+                      <use href="#standard-star" transform="translate(1.5, 1.5)" />
+                      <use href="#standard-star" transform="translate(3, 3)" />
+                      <use href="#standard-star" transform="translate(4.5, 4.5)" />
+                      <use href="#standard-star" transform="translate(6, 6)" />
+                      <use href="#standard-star" transform="translate(7.5, 7.5)" />
+                    </g>
+                  </svg>
+                  {/* Main Star */}
+                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full text-[#1A1A1A]">
+                    <use 
+                      href="#standard-star" 
+                      stroke="#1A1A1A" 
+                      strokeWidth="6" 
+                      strokeLinejoin="round" 
+                      className="fill-[#FCD116]"
+                    />
+                  </svg>
                 </motion.div>
                 <motion.p
                   initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -1375,6 +1397,51 @@ export default function App() {
       <main
         className={`min-h-[100dvh] font-sans p-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] flex flex-col items-center justify-start overflow-x-hidden relative ${appMode === 'translator' ? 'text-[#1A1A1A] selection:bg-[#93C5FD]' : 'text-[#2C2825] selection:bg-[#D4C3A3]'}`}
       >
+        {/* Global SVG Defs */}
+        <svg width="0" height="0" className="absolute">
+          <defs>
+            <polygon id="standard-star" points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" />
+            <g id="tribal-mark">
+              <circle cx="50" cy="50" r="14" />
+              <circle cx="50" cy="26" r="3" />
+              <circle cx="67" cy="33" r="3" />
+              <circle cx="74" cy="50" r="3" />
+              <circle cx="67" cy="67" r="3" />
+              <circle cx="50" cy="74" r="3" />
+              <circle cx="33" cy="67" r="3" />
+              <circle cx="26" cy="50" r="3" />
+              <circle cx="33" cy="33" r="3" />
+              <path d="M 50 2 L 56 16 L 44 16 Z M 84 16 L 78.2 30.2 L 69.8 21.8 Z M 98 50 L 84 56 L 84 44 Z M 84 84 L 69.8 78.2 L 78.2 69.8 Z M 50 98 L 44 84 L 56 84 Z M 16 84 L 21.8 69.8 L 30.2 78.2 Z M 2 50 L 16 44 L 16 56 Z M 16 16 L 30.2 21.8 L 21.8 30.2 Z" />
+            </g>
+            <g id="tribal-history" strokeLinecap="round">
+              {/* Outer Crossed Lines (Rotated Tic-Tac-Toe) */}
+              <path d="M 65 10 L 10 65" fill="none" />
+              <path d="M 35 10 L 90 65" fill="none" />
+              <path d="M 10 35 L 65 90" fill="none" />
+              <path d="M 90 35 L 35 90" fill="none" />
+              
+              {/* Inner Diamond */}
+              <polygon points="50,37 63,50 50,63 37,50" fill="none" strokeLinejoin="round" />
+              
+              {/* Dots */}
+              <circle cx="50" cy="50" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="50" cy="12" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="88" cy="50" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="50" cy="88" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="12" cy="50" r="4.5" fill="currentColor" stroke="none" />
+            </g>
+            <g id="tribal-arrow" strokeLinecap="round">
+              <path d="M 13 50 L 55 50" fill="none" />
+              <path d="M 28 35 L 13 50 L 28 65" fill="none" />
+              <path d="M 38 35 L 23 50 L 38 65" fill="none" />
+              <path d="M 48 35 L 33 50 L 48 65" fill="none" />
+              <polygon points="63,42 71,50 63,58 55,50" fill="none" />
+              <circle cx="83" cy="50" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="63" cy="30" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="63" cy="70" r="4.5" fill="currentColor" stroke="none" />
+            </g>
+          </defs>
+        </svg>
         {/* =========================================================================
             LAYERED BARONG EMBROIDERY BACKGROUND (Scale-Adaptive Premium Craft)
             ========================================================================= */}
@@ -1441,24 +1508,26 @@ export default function App() {
             title={appMode === 'translator' ? 'Reveal the past...' : 'Return to translator'}
           >
             {/* Shadow */}
-            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-              <g fill={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} strokeWidth="6" strokeLinejoin="round">
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(1.5, 1.5)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(3, 3)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(4.5, 4.5)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(6, 6)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(7.5, 7.5)" />
-              </g>
-            </svg>
+            {appMode === 'translator' && (
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                <g fill="#1A1A1A" stroke="#1A1A1A" strokeWidth="6" strokeLinejoin="round">
+                  <use href="#standard-star" transform="translate(1.5, 1.5)" />
+                  <use href="#standard-star" transform="translate(3, 3)" />
+                  <use href="#standard-star" transform="translate(4.5, 4.5)" />
+                  <use href="#standard-star" transform="translate(6, 6)" />
+                  <use href="#standard-star" transform="translate(7.5, 7.5)" />
+                </g>
+              </svg>
+            )}
             {/* Main Star */}
             <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-                <polygon 
-                  points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" 
+                <use 
+                  href={appMode === 'translator' ? "#standard-star" : "#tribal-arrow"} 
                   stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} 
-                  strokeWidth="6" 
+                  strokeWidth={appMode === 'translator' ? "6" : "4.5"} 
                   strokeLinejoin="round" 
-                  className={`transition-colors duration-150 fill-[#FCD116] group-hover:fill-[#EAB308]`}
+                  className={`transition-colors duration-150 ${appMode === 'translator' ? 'fill-[#FCD116] group-hover:fill-[#EAB308]' : 'fill-[#F6F5F2] group-hover:fill-white'}`}
                 />
               </svg>
             </div>
@@ -1472,24 +1541,26 @@ export default function App() {
             title={appMode === 'translator' ? 'History' : 'Baybayin History'}
           >
             {/* Shadow */}
-            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-              <g fill={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} strokeWidth="6" strokeLinejoin="round">
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(1.5, 1.5)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(3, 3)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(4.5, 4.5)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(6, 6)" />
-                <polygon points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" transform="translate(7.5, 7.5)" />
-              </g>
-            </svg>
+            {appMode === 'translator' && (
+              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                <g fill="#1A1A1A" stroke="#1A1A1A" strokeWidth="6" strokeLinejoin="round">
+                  <use href="#standard-star" transform="translate(1.5, 1.5)" />
+                  <use href="#standard-star" transform="translate(3, 3)" />
+                  <use href="#standard-star" transform="translate(4.5, 4.5)" />
+                  <use href="#standard-star" transform="translate(6, 6)" />
+                  <use href="#standard-star" transform="translate(7.5, 7.5)" />
+                </g>
+              </svg>
+            )}
             {/* Main Star */}
             <div className={`absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-150 ${appMode === 'translator' ? 'text-[#1A1A1A]' : 'text-[#2C2825]'}`}>
               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-                <polygon 
-                  points="50,8 62,34 90,37 69,56 75,84 50,70 25,84 31,56 10,37 38,34" 
+                <use 
+                  href={appMode === 'translator' ? "#standard-star" : "#tribal-history"} 
                   stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} 
-                  strokeWidth="6" 
+                  strokeWidth={appMode === 'translator' ? "6" : "4.5"} 
                   strokeLinejoin="round" 
-                  className={`transition-colors duration-150 fill-[#FCD116] group-hover:fill-[#EAB308]`}
+                  className={`transition-colors duration-150 ${appMode === 'translator' ? 'fill-[#FCD116] group-hover:fill-[#EAB308]' : 'fill-[#F6F5F2] group-hover:fill-white'}`}
                 />
               </svg>
             </div>
