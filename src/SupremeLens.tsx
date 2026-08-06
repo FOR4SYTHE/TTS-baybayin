@@ -44,9 +44,10 @@ const CartoonSparkle = () => (
 interface SupremeLensProps {
   onClose: () => void;
   onCapturedChange?: (captured: boolean) => void;
+  onOpenGallery?: () => void;
 }
 
-export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensProps) {
+export default function SupremeLens({ onClose, onCapturedChange, onOpenGallery }: SupremeLensProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -65,13 +66,43 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
   const [mode, setMode] = useState<'EN' | 'TL' | 'BAY'>('EN');
   const [showInfo, setShowInfo] = useState(false);
 
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2>(0);
+  const [spotlightRect, setSpotlightRect] = useState({ top: 0, left: 0, width: 0, height: 0, borderRadius: '24px' });
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scanlineRef = useRef<HTMLDivElement>(null);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     onCapturedChange?.(!!capturedImage);
   }, [capturedImage, onCapturedChange]);
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('supreme_lens_intro_seen');
+    if (!hasSeenOnboarding) {
+      setOnboardingStep(1); // Trigger the tour for first-timers
+    }
+  }, []);
+
+  useEffect(() => {
+    if (onboardingStep === 2 && infoButtonRef.current) {
+      const measure = () => {
+        const rect = infoButtonRef.current!.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(infoButtonRef.current!);
+        setSpotlightRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          borderRadius: computedStyle.borderRadius || '24px'
+        });
+      };
+      measure();
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
+    }
+  }, [onboardingStep]);
 
   useEffect(() => {
     let currentStream: MediaStream | null = null;
@@ -298,7 +329,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
 
         {/* Left Side: Info & Flash */}
         <div className="flex gap-3">
-          <button onClick={() => setShowInfo(true)} className="w-12 h-12 bg-[#F6F5F2] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] border-[4px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all flex items-center justify-center text-[#1A1A1A]">
+          <button ref={infoButtonRef} onClick={() => setShowInfo(true)} className="w-12 h-12 bg-[#F6F5F2] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] border-[4px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all flex items-center justify-center text-[#1A1A1A]">
             <Info strokeWidth={4} size={22} />
           </button>
 
@@ -455,12 +486,27 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
       {/* CARTOON BOTTOM DASHBOARD */}
       <div className="w-full px-6 pb-10 pt-4 flex justify-between items-center relative z-30">
 
-        {/* Left: Retake Button */}
+        {/* Left: Retake Button or Gallery */}
         <div className="w-20">
-          {capturedImage && (
+          {capturedImage ? (
             <button onClick={() => { setCapturedImage(null); setResultText(''); setDisplayedText(''); setScanData(null); }} className="w-16 h-16 bg-[#F6F5F2] rounded-full border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none flex items-center justify-center text-[#1A1A1A] transition-all">
               <RefreshCcw strokeWidth={4} size={24} />
             </button>
+          ) : (
+            onOpenGallery && (
+              <button 
+                onClick={onOpenGallery}
+                className="relative w-[68px] h-[68px] bg-[#E5E7EB] text-[#1A1A1A] rounded-xl border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center overflow-hidden hover:bg-[#D1D5DB] transition-all active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+                title="Open Stamp Gallery"
+              >
+                <div className="absolute inset-1 border-[2px] border-dashed border-[#9CA3AF] rounded-md pointer-events-none"></div>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="z-10 text-[#4B5563]">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+              </button>
+            )
           )}
         </div>
 
@@ -540,6 +586,72 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
                 <li className="flex items-center gap-4"><Camera strokeWidth={4} className="text-[#38BDF8]" /> Snap to translate!</li>
               </ul>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ONBOARDING TOUR */}
+      <AnimatePresence>
+        {onboardingStep === 1 && (
+          <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 z-[100] flex flex-col items-center justify-center p-6 backdrop-blur-sm">
+            <div className="bg-[#F6F5F2] border-[6px] border-[#1A1A1A] p-8 rounded-[25px_125px_25px_125px/125px_25px_125px_25px] shadow-[12px_12px_0px_#1A1A1A] relative max-w-sm w-full text-center">
+              <h2 className="text-3xl font-title uppercase mb-4 text-[#1A1A1A]">WELCOME TO<br/>SUPREME LENS</h2>
+              <p className="font-box text-lg text-[#1A1A1A] mb-8">
+                Your camera is now supercharged with instant translation and Baybayin decoding.
+              </p>
+              <button 
+                onClick={() => setOnboardingStep(2)}
+                className="w-full py-4 bg-[#3B82F6] text-white font-cubao text-2xl tracking-widest border-[4px] border-[#1A1A1A] rounded-[15px_225px_15px_255px/255px_15px_225px_15px] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all"
+              >
+                NEXT
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {onboardingStep === 2 && spotlightRect.width > 0 && (
+          <motion.div 
+            key="step2"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[100] pointer-events-auto overflow-hidden"
+          >
+            {/* The Hole (Box Shadow Technique) */}
+            <div 
+              className="absolute pointer-events-none transition-all duration-300"
+              style={{
+                top: spotlightRect.top,
+                left: spotlightRect.left,
+                width: spotlightRect.width,
+                height: spotlightRect.height,
+                borderRadius: spotlightRect.borderRadius,
+                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7)'
+              }}
+            />
+            {/* The Tooltip */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute bg-[#F6F5F2] border-[4px] border-[#1A1A1A] p-4 rounded-xl shadow-[6px_6px_0px_#1A1A1A] max-w-[200px]"
+              style={{
+                top: spotlightRect.top + spotlightRect.height + 16,
+                left: Math.max(16, spotlightRect.left - 8)
+              }}
+            >
+              <div className="absolute -top-3 left-6 w-0 h-0 border-l-[10px] border-l-transparent border-b-[12px] border-b-[#1A1A1A] border-r-[10px] border-r-transparent" />
+              <div className="absolute -top-[6px] left-6 w-0 h-0 border-l-[10px] border-l-transparent border-b-[12px] border-b-[#F6F5F2] border-r-[10px] border-r-transparent" />
+              <p className="font-box text-sm text-[#1A1A1A] mb-3 leading-tight">
+                Tap here anytime for the full Lens Guide.
+              </p>
+              <button 
+                onClick={() => {
+                  localStorage.setItem('supreme_lens_intro_seen', 'true');
+                  setOnboardingStep(0);
+                }}
+                className="px-4 py-2 bg-[#3B82F6] text-white font-black text-sm uppercase rounded border-[2px] border-[#1A1A1A] shadow-[2px_2px_0px_#1A1A1A] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all w-full"
+              >
+                GOT IT
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
