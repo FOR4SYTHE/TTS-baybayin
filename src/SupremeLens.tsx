@@ -287,9 +287,11 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
 
   return (
     <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }}
-      className="fixed inset-0 z-50 flex flex-col font-sans bg-[#EEF2FF] overflow-hidden"
-      style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23E0E7FF\' fill-opacity=\'0.6\'/%3E%3C/svg%3E")' }}
+      className="fixed inset-0 z-50 flex flex-col font-sans bg-[#E0E7FF] overflow-hidden"
+      style={{ touchAction: 'none' }}
     >
+      {/* Background Grid - Matching Translator Mode */}
+      <div className="absolute inset-0 pointer-events-none z-0" style={{ backgroundImage: 'linear-gradient(rgba(26, 26, 26, 0.05) 2px, transparent 2px), linear-gradient(90deg, rgba(26, 26, 26, 0.05) 2px, transparent 2px)', backgroundSize: '40px 40px' }} />
 
       {/* CARTOON TOP DASHBOARD */}
       <div className="w-full flex justify-between items-center p-4 pt-10 relative z-30">
@@ -303,7 +305,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
           {/* Cartoon Slide Toggle for Flash */}
           <button
             onClick={() => setFlashOn(!flashOn)}
-            className={`relative w-20 h-12 rounded-full border-[4px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all p-1 flex items-center ${flashOn ? 'bg-[#FDE047]' : 'bg-[#EF4444]'}`}
+            className={`relative w-20 h-12 rounded-full border-[4px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none transition-all p-1 flex items-center ${flashOn ? 'bg-[#3B82F6]' : 'bg-[#EF4444]'}`}
           >
             <motion.div
               animate={{ x: flashOn ? 32 : 0 }}
@@ -364,7 +366,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
                 }
               }}
               className={`px-4 py-2 rounded-xl font-black text-sm tracking-widest transition-all ${mode === m
-                ? 'bg-[#1A1A1A] text-[#FDE047] shadow-[inset_0px_4px_0px_rgba(255,255,255,0.2)]'
+                ? 'bg-[#1A1A1A] text-[#3B82F6] shadow-[inset_0px_4px_0px_rgba(255,255,255,0.2)]'
                 : 'text-[#1A1A1A] hover:bg-gray-200'
                 }`}
             >
@@ -411,7 +413,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
         {isProcessing && (
           <>
             <div className="absolute inset-0 bg-black/50 z-10" />
-            <div ref={scanlineRef} className="absolute top-0 left-0 w-full h-4 bg-[#FDE047] shadow-[0_0_20px_#FDE047] opacity-80 z-20" />
+            <div ref={scanlineRef} className="absolute top-0 left-0 w-full h-4 bg-[#3B82F6] shadow-[0_0_20px_#3B82F6] opacity-80 z-20" />
             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none px-6">
 
               <div className="relative flex justify-center items-center w-full mb-4">
@@ -425,7 +427,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
               </div>
 
               {scanTime > 0 && (
-                <span className="text-[#FDE047] font-black text-xl tracking-widest border-[3px] border-[#1A1A1A] bg-[#1A1A1A]/80 px-5 py-1.5 rounded-full shadow-[4px_4px_0px_#1A1A1A]">
+                <span className="text-[#3B82F6] font-black text-xl tracking-widest border-[3px] border-[#1A1A1A] bg-[#1A1A1A]/80 px-5 py-1.5 rounded-full shadow-[4px_4px_0px_#1A1A1A]">
                   {scanTime}s
                 </span>
               )}
@@ -440,7 +442,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
             <span className="text-white font-title text-3xl tracking-widest uppercase text-center" style={{ WebkitTextStroke: '1px #1A1A1A' }}>
               LENS COOLING DOWN
             </span>
-            <span className="text-[#FDE047] font-black text-4xl mt-2">
+            <span className="text-[#3B82F6] font-black text-4xl mt-2">
               {lensCooldown}s
             </span>
           </div>
@@ -466,7 +468,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
         {!capturedImage ? (
           <div className="relative">
             <CartoonSparkle />
-            <button onClick={handleSnap} className="w-[100px] h-[100px] bg-[#FDE047] rounded-[255px_225px_255px_225px/225px_255px_225px_255px] border-[6px] border-[#1A1A1A] shadow-[6px_6px_0px_#1A1A1A] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all flex items-center justify-center outline-none hover:bg-[#FDF08A]">
+            <button onClick={handleSnap} className="w-[100px] h-[100px] bg-[#3B82F6] rounded-[255px_225px_255px_225px/225px_255px_225px_255px] border-[6px] border-[#1A1A1A] shadow-[6px_6px_0px_#1A1A1A] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all flex items-center justify-center outline-none hover:bg-[#60A5FA]">
               <div className="w-14 h-14 rounded-full border-[5px] border-[#1A1A1A] bg-[#F6F5F2]"></div>
             </button>
           </div>
@@ -483,7 +485,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
                   key={z}
                   onClick={() => setZoomLevel(z)}
                   className={`w-10 h-10 rounded-full font-black text-sm tracking-tighter transition-all flex items-center justify-center ${zoomLevel === z
-                    ? 'bg-[#1A1A1A] text-[#FDE047]'
+                    ? 'bg-[#1A1A1A] text-[#3B82F6]'
                     : 'text-[#1A1A1A] hover:bg-gray-200'
                     }`}
                 >
@@ -533,7 +535,7 @@ export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensPr
               <h3 className="text-3xl font-title uppercase mb-6 text-[#1A1A1A] border-b-[4px] border-[#1A1A1A] pb-2 inline-block">LENS GUIDE</h3>
               <ul className="space-y-6 text-lg font-black text-[#1A1A1A] uppercase tracking-tight">
                 <li className="flex items-center gap-4"><Zap strokeWidth={4} className="text-[#EF4444]" /> Hardware Flash Toggle</li>
-                <li className="flex items-center gap-4"><span className="px-3 py-1 bg-[#1A1A1A] text-[#FDE047] rounded-lg">EN/TL</span> Translation Engine</li>
+                <li className="flex items-center gap-4"><span className="px-3 py-1 bg-[#1A1A1A] text-[#3B82F6] rounded-lg">EN/TL</span> Translation Engine</li>
                 <li className="flex items-center gap-4"><span className="w-8 h-8 rounded-full border-[4px] border-[#1A1A1A] flex items-center justify-center text-sm bg-white">1x</span> Camera Zoom Scale</li>
                 <li className="flex items-center gap-4"><Camera strokeWidth={4} className="text-[#38BDF8]" /> Snap to translate!</li>
               </ul>
