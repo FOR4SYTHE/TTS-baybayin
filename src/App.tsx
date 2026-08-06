@@ -736,11 +736,45 @@ const Butterfly = () => (
   </motion.svg>
 );
 
-const JeepneyWing = ({ className, flipped = false }: { className?: string, flipped?: boolean }) => (
-  <svg width="50" height="100" viewBox="0 0 60 120" className={className} style={flipped ? { transform: 'scaleX(-1)' } : undefined}>
-    <path d="M 5 60 Q 30 5 55 20 Q 40 40 50 60 Q 35 75 45 95 Q 20 110 5 60 Z" fill="#FCD116" stroke="#1A1A1A" strokeWidth="5" strokeLinejoin="round" />
-    <path d="M 15 60 Q 30 40 45 45" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" />
-    <path d="M 15 65 Q 30 80 40 85" fill="none" stroke="#1A1A1A" strokeWidth="4" strokeLinecap="round" />
+const EagleWing = ({ className, flipped = false }: { className?: string, flipped?: boolean }) => (
+  <svg 
+    width="85" 
+    height="155" 
+    viewBox="0 0 120 220" 
+    className={className} 
+    style={flipped ? { transform: 'scaleX(-1)' } : undefined}
+  >
+    <defs>
+      <mask id={flipped ? "wing-cutout-flipped" : "wing-cutout"}>
+        <rect width="120" height="220" fill="white" />
+        
+        {/* Flowing separation lines between feathers */}
+        <path d="M120 40 Q80 35 30 65" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" />
+        <path d="M120 65 Q70 65 15 110" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" />
+        <path d="M120 90 Q65 95 10 150" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" />
+        <path d="M120 115 Q60 125 15 190" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" />
+        
+        {/* Shoulder tribal filigree */}
+        <circle cx="105" cy="25" r="5" fill="black" />
+        <path d="M120 25 Q105 10 90 20 Q75 30 85 45" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" />
+        <path d="M120 15 Q100 0 75 10 Q50 20 60 40" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" />
+      </mask>
+    </defs>
+    
+    <g fill="#1A1A1A" mask={`url(#${flipped ? "wing-cutout-flipped" : "wing-cutout"})`}>
+      {/* Shoulder Solid */}
+      <path d="M120 0 Q80 0 50 20 Q90 30 120 25 Z" />
+      
+      {/* 5 Prominent Primary Feathers */}
+      <path d="M120 15 Q70 10 15 55 Q70 65 120 45 Z" />
+      <path d="M120 35 Q60 40 0 105 Q60 110 120 75 Z" />
+      <path d="M120 65 Q55 75 0 145 Q65 145 120 105 Z" />
+      <path d="M120 95 Q50 110 5 185 Q75 180 120 135 Z" />
+      <path d="M120 125 Q60 145 25 220 Q85 200 120 160 Z" />
+      
+      {/* Spine to connect seamlessly to the jeep-card border */}
+      <rect x="110" y="0" width="10" height="220" />
+    </g>
   </svg>
 );
 
@@ -2009,12 +2043,30 @@ export default function App() {
               <div className="w-full z-10 relative mb-10 animate-in fade-in slide-in-from-bottom-6 duration-300" style={{ transform: 'rotate(-0.8deg)' }}>
 
                 <div className="relative">
-                  <motion.div className="absolute -left-6 top-1/2 -translate-y-1/2 -z-10" animate={{ rotate: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 4 }}>
-                    <JeepneyWing />
-                  </motion.div>
-                  <motion.div className="absolute -right-6 top-1/2 -translate-y-1/2 -z-10" animate={{ rotate: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 4, delay: 0.5 }}>
-                    <JeepneyWing flipped />
-                  </motion.div>
+                    <motion.div
+                      className="absolute -left-[80px] top-1/2 -translate-y-1/2 drop-shadow-md z-0"
+                      initial={{ scale: 0, rotate: 0 }}
+                      animate={{ scale: 1, rotate: [0, -4, 0] }}
+                      transition={{ 
+                        scale: { delay: 0.2, duration: 0.3 },
+                        rotate: { repeat: Infinity, duration: 4, ease: "easeInOut" }
+                      }}
+                      style={{ transformOrigin: "100% 20%" }}
+                    >
+                      <EagleWing />
+                    </motion.div>
+                    <motion.div
+                      className="absolute -right-[80px] top-1/2 -translate-y-1/2 drop-shadow-md z-0"
+                      initial={{ scale: 0, rotate: 0 }}
+                      animate={{ scale: 1, rotate: [0, 4, 0] }}
+                      transition={{ 
+                        scale: { delay: 0.2, duration: 0.3 },
+                        rotate: { repeat: Infinity, duration: 4, ease: "easeInOut" }
+                      }}
+                      style={{ transformOrigin: "0% 20%" }}
+                    >
+                      <EagleWing flipped />
+                    </motion.div>
 
                   <motion.div
                     key={translation ? `result-${translation.substring(0, 10)}` : 'empty'}
