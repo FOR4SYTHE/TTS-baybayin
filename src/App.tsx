@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import { toPng } from 'html-to-image';
 import SupremeLens from './SupremeLens'; // Added SupremeLens component
+import { playResultBamSound, playTapSound, playOpenLensSound, playPlopSound } from './utils/sounds';
 
 // ============================================================================
 // SUPREME ARCHITECT: LIVE CAMERA STAMP MACHINE (AWWWARDS SOTD FINAL)
@@ -1120,6 +1121,11 @@ export default function App() {
   const [baybayinHistory, setBaybayinHistory] = useState<{ input: string, output: string }[]>([]);
   const [showBaybayinHistory, setShowBaybayinHistory] = useState(false);
 
+  const resultSectionRef = useRef<HTMLDivElement>(null);
+  const exampleSectionRef = useRef<HTMLDivElement>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const currentAudioUrlRef = useRef<string | null>(null);
+
   const englishSuggestions = ['hello', 'how are you?', 'thank you', 'good morning', 'I love you'];
   const tagalogSuggestions = ['kumusta', 'salamat', 'magandang umaga', 'mahal kita', 'paalam'];
 
@@ -1142,6 +1148,9 @@ export default function App() {
 
   const handleModeSwitch = (mode: 'translator' | 'baybayin') => {
     if (mode === appMode) return;
+    if (mode === 'baybayin') {
+      playPlopSound();
+    }
     setNextMode(mode);
     setIsTransitioning(true);
     setTimeout(() => {
@@ -1331,6 +1340,7 @@ export default function App() {
 
   const handleTranslate = async () => {
     if (!englishWord.trim()) return;
+    playTapSound();
 
     setIsLoading(true);
     setTranslation('');
@@ -1355,6 +1365,11 @@ export default function App() {
       const data = await response.json();
       if (data.translation) {
         setTranslation(data.translation);
+        playResultBamSound();
+        setTimeout(() => {
+          resultSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+        
         setHistory(prev => {
           const newEntry = { english: englishWord, tagalog: data.translation, direction };
           const filtered = prev.filter(item => item.english.toLowerCase() !== englishWord.toLowerCase());
@@ -1373,10 +1388,30 @@ export default function App() {
   };
 
   const handleSpeak = (url: string | null) => {
-    if (url) {
-      const audio = new Audio(url);
-      audio.play().catch(e => console.error("Audio play failed:", e));
+    if (!url) return;
+    
+    if (currentAudioRef.current) {
+      const isSameAudio = currentAudioUrlRef.current === url;
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+      currentAudioUrlRef.current = null;
+      
+      if (isSameAudio) return; // If same, we just stop/reset it.
     }
+    
+    const audio = new Audio(url);
+    currentAudioRef.current = audio;
+    currentAudioUrlRef.current = url;
+    
+    audio.play().catch(e => console.error("Audio play failed:", e));
+    
+    audio.onended = () => {
+      if (currentAudioUrlRef.current === url) {
+        currentAudioRef.current = null;
+        currentAudioUrlRef.current = null;
+      }
+    };
   };
 
   const handleMicClick = () => {
@@ -1434,6 +1469,9 @@ export default function App() {
           tagalogSentence: targetSentence,
           englishTranslation: data.sourceTranslation || data.englishTranslation
         });
+        setTimeout(() => {
+          exampleSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
         const textToSpeak = direction === 'en-tl' ? targetSentence : (data.sourceTranslation || data.englishTranslation);
         prefetchAudio(textToSpeak, setExampleAudioUrl, direction === 'en-tl' ? 'fil-PH' : 'en-US');
       }
@@ -2040,7 +2078,7 @@ export default function App() {
 
             {/* ── OUTPUT BOX — Green BACLARAN LRT placard ── */}
             {(translation || isLoading) && (
-              <div className="w-full z-10 relative mb-10 animate-in fade-in slide-in-from-bottom-6 duration-300" style={{ transform: 'rotate(-0.8deg)' }}>
+              <div ref={resultSectionRef} className="w-full z-10 relative mb-10 animate-in fade-in slide-in-from-bottom-6 duration-300" style={{ transform: 'rotate(-0.8deg)' }}>
 
                 <div className="relative">
                     <motion.div
@@ -2217,7 +2255,7 @@ export default function App() {
 
                 {example && (
                   /* Example output — RECTO-style: navy + white text */
-                  <div className="w-full z-10 relative mb-8 animate-in zoom-in-95 duration-300" style={{ transform: 'rotate(0.7deg)' }}>
+                  <div ref={exampleSectionRef} className="w-full z-10 relative mb-8 animate-in zoom-in-95 duration-300" style={{ transform: 'rotate(0.7deg)' }}>
                     <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
                       {/* Header strip — Black with yellow accent */}
@@ -2491,7 +2529,10 @@ export default function App() {
         {/* Floating Action Button - Fixed bottom center (Standalone Cartoon Lens) */}
         <div className="absolute bottom-0 left-0 w-full flex justify-center z-40 pointer-events-none">
           <button
-            onClick={() => setIsLensOpen(true)}
+            onClick={() => {
+              playOpenLensSound();
+              setIsLensOpen(true);
+            }}
             className="pointer-events-auto cursor-pointer transition-transform duration-150 outline-none focus:outline-none focus-visible:outline-none [-webkit-tap-highlight-color:transparent] bg-transparent border-none p-0"
             title="Supreme Lens"
           >
