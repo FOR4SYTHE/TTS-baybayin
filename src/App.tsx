@@ -1534,11 +1534,11 @@ export default function App() {
               <polygon points="50,37 63,50 50,63 37,50" fill="none" strokeLinejoin="round" />
               
               {/* Dots */}
-              <circle cx="50" cy="50" r="4.5" fill="currentColor" stroke="none" />
-              <circle cx="50" cy="12" r="4.5" fill="currentColor" stroke="none" />
-              <circle cx="88" cy="50" r="4.5" fill="currentColor" stroke="none" />
-              <circle cx="50" cy="88" r="4.5" fill="currentColor" stroke="none" />
-              <circle cx="12" cy="50" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="50" cy="50" r="5.5" fill="currentColor" stroke="none" />
+              <circle cx="50" cy="12" r="5.5" fill="currentColor" stroke="none" />
+              <circle cx="88" cy="50" r="5.5" fill="currentColor" stroke="none" />
+              <circle cx="50" cy="88" r="5.5" fill="currentColor" stroke="none" />
+              <circle cx="12" cy="50" r="5.5" fill="currentColor" stroke="none" />
             </g>
             <g id="tribal-arrow" strokeLinecap="round">
               <path d="M 13 50 L 55 50" fill="none" />
@@ -1546,9 +1546,9 @@ export default function App() {
               <path d="M 38 35 L 23 50 L 38 65" fill="none" />
               <path d="M 48 35 L 33 50 L 48 65" fill="none" />
               <polygon points="63,42 71,50 63,58 55,50" fill="none" />
-              <circle cx="83" cy="50" r="4.5" fill="currentColor" stroke="none" />
-              <circle cx="63" cy="30" r="4.5" fill="currentColor" stroke="none" />
-              <circle cx="63" cy="70" r="4.5" fill="currentColor" stroke="none" />
+              <circle cx="83" cy="50" r="5.5" fill="currentColor" stroke="none" />
+              <circle cx="63" cy="30" r="5.5" fill="currentColor" stroke="none" />
+              <circle cx="63" cy="70" r="5.5" fill="currentColor" stroke="none" />
             </g>
           </defs>
         </svg>
@@ -1637,7 +1637,7 @@ export default function App() {
                 <use 
                   href={appMode === 'translator' ? "#standard-star" : "#tribal-arrow"} 
                   stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} 
-                  strokeWidth={appMode === 'translator' ? "6" : "4.5"} 
+                  strokeWidth={appMode === 'translator' ? "6" : "5.5"} 
                   strokeLinejoin="round" 
                   className={`transition-colors duration-150 ${appMode === 'translator' ? 'fill-[#FCD116] group-hover:fill-[#EAB308]' : 'fill-[#F6F5F2] group-hover:fill-white'}`}
                 />
@@ -1670,7 +1670,7 @@ export default function App() {
                 <use 
                   href={appMode === 'translator' ? "#standard-star" : "#tribal-history"} 
                   stroke={appMode === 'translator' ? '#1A1A1A' : '#2C2825'} 
-                  strokeWidth={appMode === 'translator' ? "6" : "4.5"} 
+                  strokeWidth={appMode === 'translator' ? "6" : "5.5"} 
                   strokeLinejoin="round" 
                   className={`transition-colors duration-150 ${appMode === 'translator' ? 'fill-[#FCD116] group-hover:fill-[#EAB308]' : 'fill-[#F6F5F2] group-hover:fill-white'}`}
                 />
