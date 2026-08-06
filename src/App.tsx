@@ -1400,7 +1400,8 @@ export default function App() {
           tagalogSentence: targetSentence,
           englishTranslation: data.sourceTranslation || data.englishTranslation
         });
-        prefetchAudio(targetSentence, setExampleAudioUrl, direction === 'en-tl' ? 'fil-PH' : 'en-US');
+        const textToSpeak = direction === 'en-tl' ? targetSentence : (data.sourceTranslation || data.englishTranslation);
+        prefetchAudio(textToSpeak, setExampleAudioUrl, direction === 'en-tl' ? 'fil-PH' : 'en-US');
       }
     } catch (error) {
       console.error('Example generation error:', error);
@@ -2177,13 +2178,13 @@ export default function App() {
                       {/* Body — pure white bg */}
                       <div className="bg-[#FFFFFF] p-8 flex flex-col items-center justify-center relative min-h-[160px]">
                         <p className="text-2xl font-box mb-5 break-words text-[#1A1A1A] text-center w-full leading-tight uppercase">
-                          {example.tagalogSentence}
+                          {direction === 'en-tl' ? example.tagalogSentence : example.englishTranslation}
                         </p>
                         <p
                           className="text-2xl font-quiapo mb-8 text-[#1A1A1A] text-center w-full px-5 py-3 border-[3px] border-[#1A1A1A] rounded-xl shadow-[3px_3px_0px_0px_#1A1A1A] bg-white tracking-wide"
                           style={{ transform: 'rotate(-1deg)' }}
                         >
-                          "{example.englishTranslation}"
+                          "{direction === 'en-tl' ? example.englishTranslation : example.tagalogSentence}"
                         </p>
                         <div className="flex items-center gap-4 flex-wrap justify-center">
                           <button
