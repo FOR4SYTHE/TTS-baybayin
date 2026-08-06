@@ -1067,8 +1067,17 @@ const BAYBAYIN_BG_SVG = encodeURIComponent(`
 export default function App() {
   // App Mode State
   const [appMode, setAppMode] = useState<'translator' | 'baybayin'>('translator');
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextMode, setNextMode] = useState<'translator' | 'baybayin'>('translator');
+
+  // Main App Tour State
+  const [tourStep, setTourStep] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [spotlightRect, setSpotlightRect] = useState({ top: 0, left: 0, width: 0, height: 0, borderRadius: '24px' });
+  const baybayinBtnRef = useRef<HTMLButtonElement>(null);
+  const historyBtnRef = useRef<HTMLButtonElement>(null);
+  const inputCardRef = useRef<HTMLDivElement>(null);
+  const supremeLensBtnRef = useRef<HTMLButtonElement>(null);
+
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Lens State (Added for Supreme Lens)
   const [isLensOpen, setIsLensOpen] = useState(false);
@@ -1125,6 +1134,7 @@ export default function App() {
   const exampleSectionRef = useRef<HTMLDivElement>(null);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const currentAudioUrlRef = useRef<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const englishSuggestions = ['hello', 'how are you?', 'thank you', 'good morning', 'I love you'];
   const tagalogSuggestions = ['kumusta', 'salamat', 'magandang umaga', 'mahal kita', 'paalam'];
@@ -1142,15 +1152,51 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [exampleCooldown]);
 
+  useEffect(() => {
+    if (audioRef.current && audioUrl) {
+      audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+    }
+  }, [audioUrl]);
+
+  // Main App Tour Logic
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('main_app_intro_seen');
+    if (!hasSeenTour) setTourStep(1);
+  }, []);
+
+  useEffect(() => {
+    let targetRef: React.RefObject<HTMLElement> | null = null;
+    if (tourStep === 1) targetRef = baybayinBtnRef;
+    if (tourStep === 2) targetRef = historyBtnRef;
+    if (tourStep === 3) targetRef = inputCardRef;
+    if (tourStep === 4) targetRef = supremeLensBtnRef;
+
+    if (targetRef && targetRef.current) {
+      const measure = () => {
+        if (!targetRef?.current) return;
+        const rect = targetRef.current.getBoundingClientRect();
+        const style = window.getComputedStyle(targetRef.current);
+        setSpotlightRect({
+          top: rect.top, left: rect.left, width: rect.width, height: rect.height, borderRadius: style.borderRadius || '12px'
+        });
+      };
+      measure();
+      window.addEventListener('resize', measure);
+      window.addEventListener('scroll', measure);
+      return () => {
+        window.removeEventListener('resize', measure);
+        window.removeEventListener('scroll', measure);
+      };
+    }
+  }, [tourStep, appMode, nextMode]);
+
   const currentPlaceholder = direction === 'en-tl'
     ? englishSuggestions[placeholderIndex % englishSuggestions.length]
     : tagalogSuggestions[placeholderIndex % tagalogSuggestions.length];
 
   const handleModeSwitch = (mode: 'translator' | 'baybayin') => {
     if (mode === appMode) return;
-    if (mode === 'baybayin') {
-      playPlopSound();
-    }
+    playPlopSound();
     setNextMode(mode);
     setIsTransitioning(true);
     setTimeout(() => {
@@ -1161,7 +1207,7 @@ export default function App() {
 
   const handleSwap = () => {
     setDirection(prev => prev === 'en-tl' ? 'tl-en' : 'en-tl');
-    setEnglishWord(''); // New strict clear
+    setEnglishWord(''); 
     setTranslation('');
     setExample(null);
     setFunFact(null);
@@ -1246,7 +1292,6 @@ export default function App() {
     toPng(baybayinRef.current, { 
       cacheBust: true, 
       pixelRatio: 4, 
-      // skipFonts removed to allow Baybayin font embedding
       style: { transform: 'scale(1) rotate(0deg) translateY(0px)' } 
     })
       .then((dataUrl) => {
@@ -1261,12 +1306,11 @@ export default function App() {
   const handleMorphToArt = () => {
     if (isArtMode) return;
     setIsGeneratingArt(true);
-    // Fake loading sequence
     setTimeout(() => {
       setArtBgIndex(Math.floor(Math.random() * 11) + 1);
       setIsArtMode(true);
       setIsGeneratingArt(false);
-    }, 3500); // 3.5 second anticipation
+    }, 3500); 
   };
 
   const handleCopyBaybayin = async () => {
@@ -1397,7 +1441,7 @@ export default function App() {
       currentAudioRef.current = null;
       currentAudioUrlRef.current = null;
       
-      if (isSameAudio) return; // If same, we just stop/reset it.
+      if (isSameAudio) return; 
     }
     
     const audio = new Audio(url);
@@ -1687,6 +1731,7 @@ export default function App() {
         <div className="w-full max-w-4xl flex justify-between items-center z-40 mb-2 relative">
           {/* Mode Switch Star */}
           <motion.button
+            ref={baybayinBtnRef as any}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleModeSwitch(appMode === 'translator' ? 'baybayin' : 'translator')}
             className="relative flex items-center justify-center w-14 h-14 group focus:outline-none focus-visible:outline-none [-webkit-tap-highlight-color:transparent]"
@@ -1720,6 +1765,7 @@ export default function App() {
 
           {/* History Star */}
           <motion.button
+            ref={historyBtnRef as any}
             whileTap={{ scale: 0.95 }}
             onClick={() => appMode === 'translator' ? setShowHistory(true) : setShowBaybayinHistory(true)}
             className="relative flex items-center justify-center w-14 h-14 group focus:outline-none focus-visible:outline-none [-webkit-tap-highlight-color:transparent]"
@@ -1979,7 +2025,7 @@ export default function App() {
               </div>
 
               {/* Placard card — MAKATI style: amber/gold bg, dark navy text */}
-              <div className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
+              <div ref={inputCardRef} className="jeep-card shadow-[7px_7px_0px_0px_#1A1A1A] border-[5px] border-[#1A1A1A]">
 
                 {/* Header strip — MAKATI amber with navy text */}
                 <div className="jeep-strip bg-[#D4961A] text-[#1A2464] jeep-rivet">
@@ -2529,6 +2575,7 @@ export default function App() {
         {/* Floating Action Button - Fixed bottom center (Standalone Cartoon Lens) */}
         <div className="absolute bottom-0 left-0 w-full flex justify-center z-40 pointer-events-none">
           <button
+            ref={supremeLensBtnRef}
             onClick={() => {
               playOpenLensSound();
               setIsLensOpen(true);
@@ -2553,6 +2600,101 @@ export default function App() {
 
         {showStampMachine && <StampMachine onClose={() => setShowStampMachine(false)} />}
 
+        {/* ONBOARDING TOUR */}
+        <AnimatePresence>
+          {tourStep > 0 && spotlightRect.width > 0 && (
+            <motion.div key="main-tour" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={`fixed inset-0 z-[100000] pointer-events-auto overflow-hidden ${tourStep === 3 ? 'bg-transparent' : 'bg-black/70'}`}>
+              
+              {/* Hole Punch (Only for Rectangle Input Card) */}
+              {tourStep === 3 && (
+                <div className="absolute pointer-events-none"
+                  style={{ top: spotlightRect.top, left: spotlightRect.left, width: spotlightRect.width, height: spotlightRect.height, borderRadius: spotlightRect.borderRadius, boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7)' }}
+                />
+              )}
+
+              {/* Exact Shape SVG Clones for Stars and Sun Camera */}
+              {(tourStep === 1 || tourStep === 2) && (
+                <div 
+                  className="absolute pointer-events-none drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+                  style={{ top: spotlightRect.top, left: spotlightRect.left, width: spotlightRect.width, height: spotlightRect.height }}
+                >
+                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                    <g fill="#1A1A1A" stroke="#1A1A1A" strokeWidth="6" strokeLinejoin="round">
+                      <use href="#standard-star" transform="translate(1.5, 1.5)" />
+                      <use href="#standard-star" transform="translate(3, 3)" />
+                      <use href="#standard-star" transform="translate(4.5, 4.5)" />
+                      <use href="#standard-star" transform="translate(6, 6)" />
+                      <use href="#standard-star" transform="translate(7.5, 7.5)" />
+                    </g>
+                  </svg>
+                  <div className="absolute inset-0 w-full h-full flex items-center justify-center text-[#1A1A1A]">
+                    <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+                      <use href="#standard-star" stroke="#1A1A1A" strokeWidth="6" strokeLinejoin="round" className="fill-[#FCD116]" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              {tourStep === 4 && (
+                <div 
+                  className="absolute pointer-events-none drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+                  style={{ top: spotlightRect.top, left: spotlightRect.left, width: spotlightRect.width, height: spotlightRect.height }}
+                >
+                  <TribalSunCamera />
+                </div>
+              )}
+              {/* Tooltip */}
+              <motion.div 
+                key={`tooltip-${tourStep}`}
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="absolute bg-[#F6F5F2] border-[4px] border-[#1A1A1A] p-4 rounded-[15px_15px_15px_15px] shadow-[6px_6px_0px_#1A1A1A] w-[280px] flex flex-col pointer-events-auto"
+                style={{
+                  top: tourStep === 4 ? Math.max(20, spotlightRect.top - 160) : spotlightRect.top + spotlightRect.height + 20,
+                  left: Math.min(window.innerWidth - 300, Math.max(20, tourStep === 2 ? spotlightRect.left - 240 : spotlightRect.left))
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 bg-[#3B82F6] rounded-full border-[2px] border-[#1A1A1A] flex items-center justify-center text-[#1A1A1A] font-black text-xs shrink-0 shadow-[2px_2px_0px_#1A1A1A]">
+                    {tourStep}
+                  </div>
+                  <h4 className="font-title text-xl text-[#1A1A1A] uppercase tracking-wide">
+                    {tourStep === 1 && "BAYBAYIN MODE"}
+                    {tourStep === 2 && "TRANSLATION HISTORY"}
+                    {tourStep === 3 && "TRANSLATE ENGINE"}
+                    {tourStep === 4 && "SUPREME LENS"}
+                  </h4>
+                </div>
+                <p className="font-box text-[15px] text-gray-700 mb-4 leading-tight font-bold">
+                  {tourStep === 1 && "Tap this star at any time to switch to the ancient Baybayin transcriber interface."}
+                  {tourStep === 2 && "Tap this star to view all your previous translations saved automatically."}
+                  {tourStep === 3 && "Type your English or Tagalog words here to get instant translations."}
+                  {tourStep === 4 && "Open the live camera lens for real-time translation and Baybayin decoding!"}
+                </p>
+                <div className="flex justify-between items-center w-full">
+                  <button 
+                    onClick={() => { localStorage.setItem('main_app_intro_seen', 'true'); setTourStep(0); }}
+                    className="text-xs font-black text-gray-500 hover:text-gray-800 underline uppercase"
+                  >
+                    SKIP
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (tourStep < 4) {
+                        setTourStep((prev) => (prev + 1) as any);
+                      } else {
+                        localStorage.setItem('main_app_intro_seen', 'true');
+                        setTourStep(0);
+                      }
+                    }}
+                    className="px-4 py-2 bg-[#3B82F6] text-[#1A1A1A] font-black text-sm uppercase rounded-[10px] border-[3px] border-[#1A1A1A] shadow-[3px_3px_0px_#1A1A1A] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all hover:bg-[#60A5FA]"
+                  >
+                    {tourStep < 4 ? "NEXT" : "GOT IT!"}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </>
   );

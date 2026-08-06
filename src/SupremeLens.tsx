@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
-import { X, Info, Zap, ZapOff, RefreshCcw, Camera, Copy, Check } from 'lucide-react';
+import { X, Info, Zap, ZapOff, RefreshCcw, Camera, Copy, Check, Sparkles } from 'lucide-react';
 
 const toBaybayin = (text: string) => {
   if (!text) return "";
@@ -581,9 +581,32 @@ export default function SupremeLens({ onClose, onCapturedChange, onOpenGallery }
               <h3 className="text-3xl font-title uppercase mb-6 text-[#1A1A1A] border-b-[4px] border-[#1A1A1A] pb-2 inline-block">LENS GUIDE</h3>
               <ul className="space-y-6 text-lg font-black text-[#1A1A1A] uppercase tracking-tight">
                 <li className="flex items-center gap-4"><Zap strokeWidth={4} className="text-[#EF4444]" /> Hardware Flash Toggle</li>
-                <li className="flex items-center gap-4"><span className="px-3 py-1 bg-[#1A1A1A] text-[#3B82F6] rounded-lg">EN/TL</span> Translation Engine</li>
+                <li className="flex flex-col gap-3">
+                  <div className="flex items-center gap-4">
+                    <span className="px-3 py-1 bg-[#1A1A1A] text-[#3B82F6] rounded-lg">EN/TL/BAY</span> Translation Engine
+                  </div>
+                  <div className="pl-[60px] flex flex-col gap-2 text-[15px] font-box normal-case text-gray-700 font-bold tracking-normal">
+                    <div className="flex items-center gap-3">
+                      <span className="px-2 py-0.5 bg-[#1A1A1A] text-[#3B82F6] rounded text-xs font-black uppercase">EN</span> Translate scan to English
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="px-2 py-0.5 bg-[#1A1A1A] text-[#3B82F6] rounded text-xs font-black uppercase">TL</span> Translate scan to Tagalog
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="px-2 py-0.5 bg-[#1A1A1A] text-[#3B82F6] rounded text-xs font-black uppercase">BAY</span> Translate scan to Baybayin
+                    </div>
+                  </div>
+                </li>
                 <li className="flex items-center gap-4"><span className="w-8 h-8 rounded-full border-[4px] border-[#1A1A1A] flex items-center justify-center text-sm bg-white">1x</span> Camera Zoom Scale</li>
                 <li className="flex items-center gap-4"><Camera strokeWidth={4} className="text-[#38BDF8]" /> Snap to translate!</li>
+                <li className="flex flex-col gap-2">
+                  <div className="flex items-center gap-4">
+                    <Sparkles strokeWidth={4} className="text-[#EAB308]" /> UPLOAD PHOTO
+                  </div>
+                  <div className="pl-10 text-[15px] font-box normal-case font-bold text-gray-700 leading-snug tracking-normal">
+                    Tap the gallery icon to pick any photo from your device — the same translate engine processes it instantly.
+                  </div>
+                </li>
               </ul>
             </div>
           </motion.div>
