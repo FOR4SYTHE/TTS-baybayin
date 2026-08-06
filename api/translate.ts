@@ -26,13 +26,13 @@ export default async function handler(req: Request) {
       const cleanBase64 = image.replace(/^data:image\/\w+;base64,/, "");
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3.6-flash',
         contents: [
           promptText,
           { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } }
         ],
         config: {
-          // Keeps 3.5 Flash's quality for image extraction but trims
+          // Keeps Flash-tier quality for image extraction but trims
           // the reasoning effort to cut latency on this call.
           thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }
         }

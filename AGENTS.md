@@ -34,11 +34,15 @@ effect of an unrelated task, even if you believe a newer option exists. Ask firs
 | `api/example.ts` | — | `gemini-3.1-flash-lite` | — |
 | `api/funfact.ts` | — | `gemini-3.1-flash-lite` | — |
 | `api/translate.ts` | text/word branch | `gemini-3.1-flash-lite` | — |
-| `api/translate.ts` | image/vision branch (Supreme Lens) | `gemini-3.5-flash` | `thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }` |
+| `api/translate.ts` | image/vision branch (Supreme Lens) | `gemini-3.6-flash` | `thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }` |
 
-Flash-Lite is used for plain text tasks (no reasoning needed, faster, cheaper). 3.5 Flash is
+Flash-Lite is used for plain text tasks (no reasoning needed, faster, cheaper). 3.6 Flash is
 kept only on the vision branch where extraction quality matters, with thinking capped low to
 control latency. Do not swap these around without being asked.
+
+3.6 Flash replaced 3.5 Flash on the vision branch on 2026-08-06 (successor model, cheaper and
+faster with better extraction-relevant benchmarks). Text branches stay on 3.1 Flash-Lite —
+3.6 Flash is a heavier tier than they need.
 
 ## Before touching any model string or SDK version
 1. Check `https://ai.google.dev/gemini-api/docs/changelog` first.
@@ -52,6 +56,19 @@ If `tsc`, a build, or a test command times out, hangs, or fails to run for any r
 "I can guarantee zero errors" or declare a task complete based on the code "looking
 correct." A guess dressed up as a guarantee is worse than no answer — paste the actual
 command output, or state clearly that verification did not happen and why.
+
+## Entry-point imports — do not break silently
+- `src/main.tsx` must import the root component as `import App from './App'`
+  (no extension). Vite resolves extensionless imports to whatever the file
+  actually is (`.tsx` or `.jsx`) — an explicit wrong extension (e.g. `./App.jsx`
+  when the file is `App.tsx`) 404s the module in dev and kills the entire render
+  tree. This looks like "the API is broken" from the browser, since nothing
+  downstream ever runs. If you rename or convert any file that's imported
+  elsewhere (e.g. `.jsx` → `.tsx`), grep the whole repo for its import path
+  before finishing — don't rely on the extension matching by habit.
+- Any UI/refactor task that touches file extensions or filenames is done only
+  after `npm run build` (or `vite dev` + manual load) confirms no 404s/resolve
+  errors — this check is not limited to `api/*.ts` changes.
 
 ## Design language
 - Translator mode: `doodle-border` / `doodle-shadow` utility classes, Comic Sans / Mali font stack.
