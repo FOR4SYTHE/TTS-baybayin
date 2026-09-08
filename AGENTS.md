@@ -31,18 +31,18 @@ effect of an unrelated task, even if you believe a newer option exists. Ask firs
 ### Current model assignments (as of this writing)
 | File | Branch | Model | Config |
 |---|---|---|---|
-| `api/example.ts` | — | `gemini-3.1-flash-lite` | — |
-| `api/funfact.ts` | — | `gemini-3.1-flash-lite` | — |
-| `api/translate.ts` | text/word branch | `gemini-3.1-flash-lite` | — |
-| `api/translate.ts` | image/vision branch (Supreme Lens) | `gemini-3.6-flash` | `thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }` |
+| `api/example.ts` | — | `gemini-3.5-flash-lite` | — |
+| `api/funfact.ts` | — | `gemini-3.5-flash-lite` | — |
+| `api/translate.ts` | text/word branch | `gemini-3.5-flash-lite` | — |
+| `api/translate.ts` | image/vision branch (Supreme Lens) | `gemini-3.8-flash` | `thinkingConfig: { thinkingLevel: ThinkingLevel.LOW }` |
 
-Flash-Lite is used for plain text tasks (no reasoning needed, faster, cheaper). 3.6 Flash is
+Flash-Lite is used for plain text tasks (no reasoning needed, faster, cheaper). 3.8 Flash is
 kept only on the vision branch where extraction quality matters, with thinking capped low to
 control latency. Do not swap these around without being asked.
 
-3.6 Flash replaced 3.5 Flash on the vision branch on 2026-08-06 (successor model, cheaper and
-faster with better extraction-relevant benchmarks). Text branches stay on 3.1 Flash-Lite —
-3.6 Flash is a heavier tier than they need.
+3.8 Flash replaced 3.6 Flash on the vision branch on 2026-09-08 (successor model, GA Sept 2,
+cheaper and faster with better extraction-relevant benchmarks). Text branches moved from
+3.1 Flash-Lite to 3.5 Flash-Lite on the same date for improved accuracy.
 
 ## Before touching any model string or SDK version
 1. Check `https://ai.google.dev/gemini-api/docs/changelog` first.

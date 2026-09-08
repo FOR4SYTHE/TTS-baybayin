@@ -26,7 +26,7 @@ export default async function handler(req: Request) {
       const cleanBase64 = image.replace(/^data:image\/\w+;base64,/, "");
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: 'gemini-3.8-flash',
         contents: [
           promptText,
           { inlineData: { mimeType: 'image/jpeg', data: cleanBase64 } }
@@ -73,7 +73,7 @@ ${word}`;
       // Plain word/sentence translation — Flash-Lite is fast enough
       // and accurate enough for this, no reasoning overhead needed.
       const response = await ai.models.generateContent({
-        model: 'gemini-3.1-flash-lite',
+        model: 'gemini-3.5-flash-lite',
         contents: prompt
       });
 

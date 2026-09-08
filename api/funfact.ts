@@ -22,7 +22,7 @@ export default async function handler(req: Request) {
     // Lightweight text task — no reasoning depth needed, so we use
     // Flash-Lite instead of 3.5 Flash for lower latency + cost.
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite',
+      model: 'gemini-3.5-flash-lite',
       contents: prompt
     });
 
