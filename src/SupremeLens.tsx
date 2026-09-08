@@ -44,10 +44,9 @@ const CartoonSparkle = () => (
 interface SupremeLensProps {
   onClose: () => void;
   onCapturedChange?: (captured: boolean) => void;
-  onOpenGallery?: () => void;
 }
 
-export default function SupremeLens({ onClose, onCapturedChange, onOpenGallery }: SupremeLensProps) {
+export default function SupremeLens({ onClose, onCapturedChange }: SupremeLensProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -73,6 +72,7 @@ export default function SupremeLens({ onClose, onCapturedChange, onOpenGallery }
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scanlineRef = useRef<HTMLDivElement>(null);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     onCapturedChange?.(!!capturedImage);
@@ -282,6 +282,76 @@ export default function SupremeLens({ onClose, onCapturedChange, onOpenGallery }
     }
   };
 
+  // Gallery upload handler — reads a picked image, downscales, and feeds it
+  // through the same /api/translate vision pipeline as the camera shutter.
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 600;
+        const scale = Math.min(MAX_WIDTH / img.width, 1);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const base64Image = canvas.toDataURL('image/jpeg', 0.4);
+        setCapturedImage(base64Image);
+        setIsProcessing(true);
+
+        // Kill camera stream since we're now viewing a picked photo
+        if (stream) stream.getTracks().forEach(track => track.stop());
+
+        try {
+          const response = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image, mode })
+          });
+
+          if (response.status === 503) {
+            setResultText("ORACLE OVERLOADED: GOOGLE SERVERS BUSY. PLEASE TRY AGAIN LATER.");
+            return;
+          }
+          if (response.status === 429) {
+            const data = await response.json();
+            setLensCooldown(data.retryAfter ?? 3600);
+            return;
+          }
+          if (!response.ok) throw new Error("API error");
+
+          const data = await response.json();
+          let text = data.translation || data.text || "";
+          text = text.replace(/[*#]/g, '');
+
+          const extractedLang = mode === 'BAY' ? 'TL' : mode;
+          setScanData({ text, lang: extractedLang });
+
+          if (mode === 'BAY') text = toBaybayin(text);
+          setResultText(text);
+        } catch {
+          setResultText("Error communicating with the oracle.");
+        } finally {
+          setIsProcessing(false);
+          if (scanlineRef.current) {
+            gsap.killTweensOf(scanlineRef.current);
+            gsap.set(scanlineRef.current, { clearProps: "all" });
+          }
+        }
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+
+    // Reset the input so the same file can be re-selected
+    e.target.value = '';
+  };
+
   const handleCopyLens = async () => {
     if (!resultText) return;
     try {
@@ -486,27 +556,32 @@ export default function SupremeLens({ onClose, onCapturedChange, onOpenGallery }
       {/* CARTOON BOTTOM DASHBOARD */}
       <div className="w-full px-6 pb-10 pt-4 flex justify-between items-center relative z-30">
 
-        {/* Left: Retake Button or Gallery */}
+        {/* Left: Retake Button or Gallery Upload */}
         <div className="w-20">
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleGalleryUpload}
+          />
           {capturedImage ? (
             <button onClick={() => { setCapturedImage(null); setResultText(''); setDisplayedText(''); setScanData(null); }} className="w-16 h-16 bg-[#F6F5F2] rounded-full border-[5px] border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:translate-x-1 active:shadow-none flex items-center justify-center text-[#1A1A1A] transition-all">
               <RefreshCcw strokeWidth={4} size={24} />
             </button>
           ) : (
-            onOpenGallery && (
-              <button 
-                onClick={onOpenGallery}
-                className="relative w-[68px] h-[68px] bg-[#E5E7EB] text-[#1A1A1A] rounded-xl border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center overflow-hidden hover:bg-[#D1D5DB] transition-all active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
-                title="Open Stamp Gallery"
-              >
-                <div className="absolute inset-1 border-[2px] border-dashed border-[#9CA3AF] rounded-md pointer-events-none"></div>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="z-10 text-[#4B5563]">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-              </button>
-            )
+            <button 
+              onClick={() => galleryInputRef.current?.click()}
+              className="relative w-[68px] h-[68px] bg-[#E5E7EB] text-[#1A1A1A] rounded-xl border-[3px] border-[#1A1A1A] shadow-[4px_4px_0px_0px_#1A1A1A] flex items-center justify-center overflow-hidden hover:bg-[#D1D5DB] transition-all active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+              title="Upload Photo"
+            >
+              <div className="absolute inset-1 border-[2px] border-dashed border-[#9CA3AF] rounded-md pointer-events-none"></div>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="z-10 text-[#4B5563]">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+            </button>
           )}
         </div>
 
