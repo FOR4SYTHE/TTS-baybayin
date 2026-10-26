@@ -480,12 +480,23 @@ export default function App() {
     }
   }, [audioUrl]);
 
-  // Main App Tour Logic
+  // Main App Tour Initial Trigger
   useEffect(() => {
-    const hasSeenTour = localStorage.getItem('main_app_intro_seen');
-    if (!hasSeenTour) setTourStep(1);
+    try {
+      const hasSeenTour = localStorage.getItem('main_app_intro_seen');
+      if (!hasSeenTour) {
+        // Small graceful pause on initial mount before starting tour
+        const timer = setTimeout(() => {
+          setTourStep(1);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      setTourStep(1);
+    }
   }, []);
 
+  // Tour Auto-Pan & Continuous Spotlight Tracking
   useEffect(() => {
     let targetRef: React.RefObject<HTMLElement> | null = null;
     if (tourStep === 1) targetRef = baybayinBtnRef;
@@ -494,18 +505,35 @@ export default function App() {
     if (tourStep === 4) targetRef = supremeLensBtnRef;
 
     if (targetRef && targetRef.current) {
+      // Auto-pan / scroll smoothly to target element so it is centered and fully visible
+      targetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
       const measure = () => {
         if (!targetRef?.current) return;
         const rect = targetRef.current.getBoundingClientRect();
         const style = window.getComputedStyle(targetRef.current);
         setSpotlightRect({
-          top: rect.top, left: rect.left, width: rect.width, height: rect.height, borderRadius: style.borderRadius || '12px'
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          borderRadius: style.borderRadius || '12px'
         });
       };
+
       measure();
+      // Track spotlight continuously while scrolling
+      const trackId = setInterval(measure, 35);
+      const timer = setTimeout(() => {
+        clearInterval(trackId);
+        measure();
+      }, 700);
+
       window.addEventListener('resize', measure);
       window.addEventListener('scroll', measure);
       return () => {
+        clearInterval(trackId);
+        clearTimeout(timer);
         window.removeEventListener('resize', measure);
         window.removeEventListener('scroll', measure);
       };
@@ -870,6 +898,19 @@ export default function App() {
             outline-style: none !important;
             box-shadow: none !important;
           }
+          @keyframes appleEntrance {
+            0% {
+              opacity: 0.35;
+              transform: translateY(8px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .apple-entrance {
+            animation: appleEntrance 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+          }
         `}
       </style>
 
@@ -1189,7 +1230,7 @@ export default function App() {
 
         {/* Translator Mode Layout */}
         {appMode === 'translator' && (
-          <div className="w-full max-w-md z-10 flex flex-col items-center pt-4 pb-12 animate-in fade-in duration-500">
+          <div className="w-full max-w-md z-10 flex flex-col items-center pt-4 pb-12 apple-entrance">
             {/* Header: 3-Tier KTS-Style Architecture */}
             <div className="w-full flex flex-col items-center justify-center relative mb-12 mt-4 select-none z-20">
               
@@ -1963,55 +2004,74 @@ export default function App() {
                   <TribalSunCamera />
                 </div>
               )}
-              {/* Tooltip */}
-              <motion.div 
-                key={`tooltip-${tourStep}`}
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className="absolute bg-[#F6F5F2] border-[4px] border-[#1A1A1A] p-4 rounded-[15px_15px_15px_15px] shadow-[6px_6px_0px_#1A1A1A] w-[280px] flex flex-col pointer-events-auto"
-                style={{
-                  top: tourStep === 4 ? Math.max(20, spotlightRect.top - 160) : spotlightRect.top + spotlightRect.height + 20,
-                  left: Math.min(window.innerWidth - 300, Math.max(20, tourStep === 2 ? spotlightRect.left - 240 : spotlightRect.left))
-                }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 bg-[#3B82F6] rounded-full border-[2px] border-[#1A1A1A] flex items-center justify-center text-[#1A1A1A] font-black text-xs shrink-0 shadow-[2px_2px_0px_#1A1A1A]">
-                    {tourStep}
-                  </div>
-                  <h4 className="font-title text-xl text-[#1A1A1A] uppercase tracking-wide">
-                    {tourStep === 1 && "BAYBAYIN MODE"}
-                    {tourStep === 2 && "TRANSLATION HISTORY"}
-                    {tourStep === 3 && "TRANSLATE ENGINE"}
-                    {tourStep === 4 && "SUPREME LENS"}
-                  </h4>
-                </div>
-                <p className="font-box text-[15px] text-gray-700 mb-4 leading-tight font-bold">
-                  {tourStep === 1 && "Tap this star at any time to switch to the ancient Baybayin transcriber interface."}
-                  {tourStep === 2 && "Tap this star to view all your previous translations saved automatically."}
-                  {tourStep === 3 && "Type your English or Tagalog words here to get instant translations."}
-                  {tourStep === 4 && "Open the live camera lens for real-time translation and Baybayin decoding!"}
-                </p>
-                <div className="flex justify-between items-center w-full">
-                  <button 
-                    onClick={() => { localStorage.setItem('main_app_intro_seen', 'true'); setTourStep(0); }}
-                    className="text-xs font-black text-gray-500 hover:text-gray-800 underline uppercase"
+              {/* Tooltip with Smart Auto-Positioning & Screen Clamping */}
+              {(() => {
+                const tooltipWidth = 280;
+                const tooltipHeight = 220;
+                let topPos = spotlightRect.top + spotlightRect.height + 16;
+                if (tourStep === 4 || topPos + tooltipHeight > window.innerHeight) {
+                  topPos = Math.max(16, spotlightRect.top - tooltipHeight - 16);
+                }
+                topPos = Math.max(16, Math.min(window.innerHeight - tooltipHeight - 16, topPos));
+
+                let leftPos = spotlightRect.left;
+                if (tourStep === 2) {
+                  leftPos = spotlightRect.left - 230;
+                } else if (tourStep === 3 || tourStep === 4) {
+                  leftPos = spotlightRect.left + (spotlightRect.width / 2) - (tooltipWidth / 2);
+                }
+                leftPos = Math.max(16, Math.min(window.innerWidth - tooltipWidth - 16, leftPos));
+
+                return (
+                  <motion.div 
+                    key={`tooltip-${tourStep}`}
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="absolute bg-[#F6F5F2] border-[4px] border-[#1A1A1A] p-4 rounded-[16px] shadow-[6px_6px_0px_#1A1A1A] w-[280px] flex flex-col pointer-events-auto z-[100001]"
+                    style={{ top: topPos, left: leftPos }}
                   >
-                    SKIP
-                  </button>
-                  <button 
-                    onClick={() => {
-                      if (tourStep < 4) {
-                        setTourStep((prev) => (prev + 1) as any);
-                      } else {
-                        localStorage.setItem('main_app_intro_seen', 'true');
-                        setTourStep(0);
-                      }
-                    }}
-                    className="px-4 py-2 bg-[#3B82F6] text-[#1A1A1A] font-black text-sm uppercase rounded-[10px] border-[3px] border-[#1A1A1A] shadow-[3px_3px_0px_#1A1A1A] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all hover:bg-[#60A5FA]"
-                  >
-                    {tourStep < 4 ? "NEXT" : "GOT IT!"}
-                  </button>
-                </div>
-              </motion.div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 bg-[#3B82F6] rounded-full border-[2px] border-[#1A1A1A] flex items-center justify-center text-[#1A1A1A] font-black text-xs shrink-0 shadow-[2px_2px_0px_#1A1A1A]">
+                        {tourStep}
+                      </div>
+                      <h4 className="font-title text-xl text-[#1A1A1A] uppercase tracking-wide">
+                        {tourStep === 1 && "BAYBAYIN MODE"}
+                        {tourStep === 2 && "TRANSLATION HISTORY"}
+                        {tourStep === 3 && "TRANSLATE ENGINE"}
+                        {tourStep === 4 && "SUPREME LENS"}
+                      </h4>
+                    </div>
+                    <p className="font-box text-[15px] text-gray-700 mb-4 leading-tight font-bold">
+                      {tourStep === 1 && "Tap this star at any time to switch to the ancient Baybayin transcriber interface."}
+                      {tourStep === 2 && "Tap this star to view all your previous translations saved automatically."}
+                      {tourStep === 3 && "Type your English or Tagalog words here to get instant translations."}
+                      {tourStep === 4 && "Open the live camera lens for real-time translation and Baybayin decoding!"}
+                    </p>
+                    <div className="flex justify-between items-center w-full">
+                      <button 
+                        onClick={() => { localStorage.setItem('main_app_intro_seen', 'true'); setTourStep(0); }}
+                        className="text-xs font-black text-gray-500 hover:text-gray-800 underline uppercase"
+                      >
+                        SKIP
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (tourStep < 4) {
+                            setTourStep((prev) => (prev + 1) as any);
+                          } else {
+                            localStorage.setItem('main_app_intro_seen', 'true');
+                            setTourStep(0);
+                          }
+                        }}
+                        className="px-4 py-2 bg-[#3B82F6] text-[#1A1A1A] font-black text-sm uppercase rounded-[10px] border-[3px] border-[#1A1A1A] shadow-[3px_3px_0px_#1A1A1A] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all hover:bg-[#60A5FA]"
+                      >
+                        {tourStep < 4 ? "NEXT" : "GOT IT!"}
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })()}
             </motion.div>
           )}
         </AnimatePresence>
