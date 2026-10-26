@@ -1196,8 +1196,8 @@ export default function App() {
               {/* TIER 1: SVG Curved "TAGALOG" Text (Martires Font) */}
               <div className="relative w-[320px] md:w-[380px] h-[100px] -mb-6 z-20">
                 <svg viewBox="0 0 400 120" className="w-full h-full overflow-visible">
-                  {/* The invisible path that dictates the curve */}
-                  <path id="tagalog-curve" fill="transparent" d="M 20,100 Q 200,10 380,100" />
+                  {/* The invisible path that dictates the curve - extended safely to avoid SVG textPath glyph clipping */}
+                  <path id="tagalog-curve" fill="transparent" d="M 0,110 Q 200,10 400,110" />
                   
                   {/* Fiesta Banderitas (Hanging from T to G) */}
                   <g style={{ filter: "drop-shadow(2px 3px 0px rgba(0,0,0,0.25))" }}>
@@ -1253,15 +1253,15 @@ export default function App() {
                   </g>
 
                   <g style={{ filter: "drop-shadow(4px 4px 3px rgba(0,0,0,0.3))" }}>
-                    {/* Outline Layer (Drawn first, underneath) */}
-                    <text width="400" className="text-6xl md:text-7xl uppercase tracking-wide" stroke="#FFFFFF" strokeWidth="16" strokeLinejoin="round" strokeLinecap="round" fill="none" style={{ fontFamily: "'Dela Gothic One', sans-serif" }}>
+                    {/* Outline Layer (Drawn first, underneath) - fixed SVG coordinate sizing to prevent double-scaling clipping */}
+                    <text className="uppercase" stroke="#FFFFFF" strokeWidth="16" strokeLinejoin="round" strokeLinecap="round" fill="none" style={{ fontFamily: "'Dela Gothic One', sans-serif", fontSize: '56px' }}>
                       <textPath href="#tagalog-curve" startOffset="50%" textAnchor="middle">
                         TAGALOG
                       </textPath>
                     </text>
                     
                     {/* Fill Layer (Drawn second, on top) */}
-                    <text width="400" className="text-6xl md:text-7xl uppercase tracking-wide fill-[#0032A0]" style={{ fontFamily: "'Dela Gothic One', sans-serif" }}>
+                    <text className="uppercase fill-[#0032A0]" style={{ fontFamily: "'Dela Gothic One', sans-serif", fontSize: '56px' }}>
                       <textPath href="#tagalog-curve" startOffset="50%" textAnchor="middle">
                         TAGALOG
                       </textPath>
